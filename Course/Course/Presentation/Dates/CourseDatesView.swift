@@ -13,15 +13,18 @@ import Theme
 public struct CourseDatesView: View {
     
     private let courseID: String
+    @Binding private var collapsed: Bool
     
     @StateObject
     private var viewModel: CourseDatesViewModel
     
     public init(
         courseID: String,
+        collapsed: Binding<Bool>,
         viewModel: CourseDatesViewModel
     ) {
         self.courseID = courseID
+        self._collapsed = collapsed
         self._viewModel = StateObject(wrappedValue: viewModel)
     }
     
@@ -35,7 +38,12 @@ public struct CourseDatesView: View {
                             .padding(.horizontal)
                     }
                 } else if let courseDates = viewModel.courseDates, !courseDates.courseDateBlocks.isEmpty {
-                    CourseDateListView(viewModel: viewModel, courseDates: courseDates, courseID: courseID)
+                    CourseDateListView(
+                        viewModel: viewModel,
+                        courseDates: courseDates,
+                        courseID: courseID,
+                        collapsed: $collapsed
+                    )
                         .padding(.top, 10)
                 }
             }
@@ -99,12 +107,17 @@ struct TimeLineView: View {
 struct CourseDateListView: View {
     @ObservedObject var viewModel: CourseDatesViewModel
     @State private var isExpanded = false
+    private var idiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
+
     var courseDates: CourseDates
     let courseID: String
+    @Binding var collapsed: Bool
 
     var body: some View {
         VStack {
+            VStack {}.frame(height: collapsed ? 0 : idiom == .pad ? 270 : 230)
             ScrollView {
+                ResponsiveView(collapsed: $collapsed, idiom: idiom)
                 VStack(alignment: .leading, spacing: 0) {
                     if !courseDates.hasEnded {
                         DatesStatusInfoView(
@@ -396,7 +409,8 @@ struct CourseDatesView_Previews: PreviewProvider {
             courseID: "")
         
         CourseDatesView(
-            courseID: "",
+            courseID: "", 
+            collapsed: .constant(false),
             viewModel: viewModel)
     }
 }

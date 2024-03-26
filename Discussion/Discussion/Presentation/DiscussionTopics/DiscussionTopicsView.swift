@@ -13,12 +13,20 @@ import Theme
 public struct DiscussionTopicsView: View {
     
     @StateObject private var viewModel: DiscussionTopicsViewModel
+    private var idiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     private let router: DiscussionRouter
     private let courseID: String
+    @Binding private var collapsed: Bool
     
-    public init(courseID: String, viewModel: DiscussionTopicsViewModel, router: DiscussionRouter) {
+    public init(
+        courseID: String,
+        collapsed: Binding<Bool>,
+        viewModel: DiscussionTopicsViewModel,
+        router: DiscussionRouter
+    ) {
         self._viewModel = StateObject(wrappedValue: { viewModel }())
         self.courseID = courseID
+        self._collapsed = collapsed
         self.router = router
     }
     
@@ -26,6 +34,7 @@ public struct DiscussionTopicsView: View {
         ZStack(alignment: .center) {
             VStack(alignment: .center) {
                 // MARK: - Search fake field
+                VStack {}.frame(height: collapsed ? 0 : idiom == .pad ? 270 : 230)
                 HStack(spacing: 11) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(Theme.Colors.textSecondary)
@@ -61,6 +70,7 @@ public struct DiscussionTopicsView: View {
                         RefreshableScrollViewCompat(action: {
                             await viewModel.getTopics(courseID: self.courseID, withProgress: false)
                         }) {
+                            ResponsiveView(collapsed: $collapsed, idiom: idiom)
                             VStack {
                                 if let topics = viewModel.discussionTopics {
                                     HStack {
@@ -176,7 +186,8 @@ struct DiscussionView_Previews: PreviewProvider {
             config: ConfigMock())
         let router = DiscussionRouterMock()
         
-        DiscussionTopicsView(courseID: "",
+        DiscussionTopicsView(courseID: "", 
+                             collapsed: .constant(false),
                              viewModel: vm,
                              router: router)
         .preferredColorScheme(.light)
@@ -184,6 +195,7 @@ struct DiscussionView_Previews: PreviewProvider {
         .loadFonts()
         
         DiscussionTopicsView(courseID: "",
+                             collapsed: .constant(false),
                              viewModel: vm,
                              router: router)
         .preferredColorScheme(.dark)

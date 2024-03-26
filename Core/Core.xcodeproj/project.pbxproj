@@ -16,6 +16,7 @@
 		02280F5B294B4E6F0032823A /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02280F5A294B4E6F0032823A /* Connectivity.swift */; };
 		02284C182A3B1AE00007117F /* UIApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02284C172A3B1AE00007117F /* UIApplicationExtension.swift */; };
 		022C64E429AE0191000F532B /* TextWithUrls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022C64E329AE0191000F532B /* TextWithUrls.swift */; };
+		022CAC582BB2452200888E7C /* ResponsiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022CAC572BB2452200888E7C /* ResponsiveView.swift */; };
 		0231CDBE2922422D00032416 /* CSSInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0231CDBD2922422D00032416 /* CSSInjector.swift */; };
 		0233D56F2AF13EB200BAC8BD /* StarRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0233D56E2AF13EB200BAC8BD /* StarRatingView.swift */; };
 		0233D5712AF13EC800BAC8BD /* SelectMailClientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0233D5702AF13EC800BAC8BD /* SelectMailClientView.swift */; };
@@ -188,6 +189,7 @@
 		02280F5A294B4E6F0032823A /* Connectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectivity.swift; sourceTree = "<group>"; };
 		02284C172A3B1AE00007117F /* UIApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplicationExtension.swift; sourceTree = "<group>"; };
 		022C64E329AE0191000F532B /* TextWithUrls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextWithUrls.swift; sourceTree = "<group>"; };
+		022CAC572BB2452200888E7C /* ResponsiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponsiveView.swift; sourceTree = "<group>"; };
 		0231CDBD2922422D00032416 /* CSSInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSInjector.swift; sourceTree = "<group>"; };
 		0233D56E2AF13EB200BAC8BD /* StarRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarRatingView.swift; sourceTree = "<group>"; };
 		0233D5702AF13EC800BAC8BD /* SelectMailClientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMailClientView.swift; sourceTree = "<group>"; };
@@ -667,6 +669,7 @@
 			children = (
 				0770DE7728D0C49E006D8A5D /* Base */,
 				072787B528D37A0E002E9142 /* Validator.swift */,
+				022CAC572BB2452200888E7C /* ResponsiveView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1107,6 +1110,7 @@
 				0248C92329C075EF00DC8402 /* CourseBlockModel.swift in Sources */,
 				E0D5861A2B2FF74C009B4BA7 /* DiscoveryConfig.swift in Sources */,
 				DBF6F2412B014ADA0098414B /* FirebaseConfig.swift in Sources */,
+				022CAC582BB2452200888E7C /* ResponsiveView.swift in Sources */,
 				072787B628D37A0E002E9142 /* Validator.swift in Sources */,
 				0236961D28F9A2D200EEF206 /* Data_AuthResponse.swift in Sources */,
 				A5F4E7B52B61544A00ACD166 /* BrazeConfig.swift in Sources */,

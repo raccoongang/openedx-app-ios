@@ -1,10 +1,12 @@
-API_HOST_URL: 'http://localhost:8000'
-ENVIRONMENT_DISPLAY_NAME: 'Localhost'
+API_HOST_URL: 'https://lms-studio-mfe-dev.raccoongang.com'
+ENVIRONMENT_DISPLAY_NAME: 'lms-studio-mfe-dev'
 FEEDBACK_EMAIL_ADDRESS: 'support@example.com'
-OAUTH_CLIENT_ID: ''
+OAUTH_CLIENT_ID: 'a7AYlw0R3WMoJm9PmnWRw78MmC8e9UJHKuUvWckW'
+DISCOVERY:
+    TYPE: "native"
 
 UI_COMPONENTS:
     COURSE_BANNER_ENABLED: true
-    COURSE_TOP_TAB_BAR_ENABLED: false
+    COURSE_TOP_TAB_BAR_ENABLED: true
     COURSE_UNIT_PROGRESS_ENABLED: false
     COURSE_NESTED_LIST_ENABLED: false

@@ -25,6 +25,7 @@ public struct CourseOutlineView: View {
     @State private var showingVideoDownloadQuality: Bool = false
     @State private var showingNoWifiMessage: Bool = false
     @Binding private var selection: Int
+    @Binding private var collapsed: Bool
 
     public init(
         viewModel: CourseContainerViewModel,
@@ -32,6 +33,7 @@ public struct CourseOutlineView: View {
         courseID: String,
         isVideo: Bool,
         selection: Binding<Int>,
+        collapsed: Binding<Bool>,
         dateTabIndex: Int
     ) {
         self.title = title
@@ -39,6 +41,7 @@ public struct CourseOutlineView: View {
         self.courseID = courseID
         self.isVideo = isVideo
         self._selection = selection
+        self._collapsed = collapsed
         self.dateTabIndex = dateTabIndex
     }
     
@@ -48,6 +51,7 @@ public struct CourseOutlineView: View {
             GeometryReader { proxy in
                 VStack(alignment: .center) {
                     // MARK: - Page Body
+                    VStack {}.frame(height: collapsed ? 0 : idiom == .pad ? 270 : 230)
                     RefreshableScrollViewCompat(action: {
                         await withTaskGroup(of: Void.self) { group in
                             group.addTask {
@@ -58,6 +62,7 @@ public struct CourseOutlineView: View {
                             }
                         }
                     }) {
+                        ResponsiveView(collapsed: $collapsed, idiom: idiom)
                         VStack(alignment: .leading) {
                             if let courseDeadlineInfo = viewModel.courseDeadlineInfo,
                                courseDeadlineInfo.datesBannerInfo.status == .resetDatesBanner,
@@ -71,9 +76,9 @@ public struct CourseOutlineView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)
                             }
-                            if viewModel.config.uiComponents.courseBannerEnabled {
-                                courseBanner(proxy: proxy)
-                            }
+//                            if viewModel.config.uiComponents.courseBannerEnabled {
+//                                courseBanner(proxy: proxy)
+//                            }
 
                             downloadQualityBars
 
@@ -140,6 +145,9 @@ public struct CourseOutlineView: View {
                                         .frame(maxWidth: .infinity)
                                         .padding(.top, 100)
                                 }
+                            }
+                            ForEach(0...100, id: \.hashValue) { _ in
+                                Text("Random text")
                             }
                             Spacer(minLength: 84)
                         }
@@ -354,7 +362,8 @@ struct CourseOutlineView_Previews: PreviewProvider {
                 title: "Course title",
                 courseID: "",
                 isVideo: false,
-                selection: $selection,
+                selection: $selection, 
+                collapsed: .constant(false),
                 dateTabIndex: 2
             )
             .preferredColorScheme(.light)
@@ -366,6 +375,7 @@ struct CourseOutlineView_Previews: PreviewProvider {
                 courseID: "",
                 isVideo: false,
                 selection: $selection,
+                collapsed: .constant(false),
                 dateTabIndex: 2
             )
             .preferredColorScheme(.dark)

@@ -322,3 +322,29 @@ public extension EnvironmentValues {
         return false
     }
 }
+
+public extension View {
+    func responsiveFrame(idiom: UIUserInterfaceIdiom, collapsed: Binding<Bool>) -> some View {
+        self.frame(height: collapsed.wrappedValue ? 250 : 0)
+            .overlay(
+                GeometryReader { geometry -> Color in
+                    if idiom == .phone {
+                        let minY = Int(geometry.frame(in: .global).minY)
+                        if minY <= 20 {
+                            print("Collapsed --  \(minY)")
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0.6)) {
+                                collapsed.wrappedValue = true
+                            }
+                        } else {
+                            print("Expanded --  \(minY)")
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0.6)) {
+                                collapsed.wrappedValue = false
+                            }
+                        }
+                    }
+                    return Color.clear
+                }
+            )
+    }
+}
+

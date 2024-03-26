@@ -13,7 +13,7 @@ public struct ScrollSlidingTabBar: View {
     @Binding private var selection: Int
     @State private var buttonFrames: [Int: CGRect] = [:]
     
-    private let tabs: [String]
+    private let tabs: [(String, Image)]
     private let style: Style
     private let onTap: ((Int) -> Void)?
 
@@ -23,7 +23,7 @@ public struct ScrollSlidingTabBar: View {
     
     public init(
         selection: Binding<Int>,
-        tabs: [String],
+        tabs: [(String, Image)],
         style: Style = .default,
         onTap: ((Int) -> Void)? = nil) {
         self._selection = selection
@@ -42,7 +42,7 @@ public struct ScrollSlidingTabBar: View {
                         Rectangle()
                             .fill(style.borderColor)
                             .frame(height: style.borderHeight, alignment: .leading)
-                        indicatorContainer()
+//                        indicatorContainer()
                     }
                 }
                 .coordinateSpace(name: containerSpace)
@@ -65,16 +65,42 @@ extension ScrollSlidingTabBar {
                     selection = obj.offset
                     onTap?(obj.offset)
                 } label: {
-                    HStack {
-                        Text(obj.element)
-                            .font(isSelected(index: obj.offset) ? style.selectedFont : style.font)
+                    HStack(spacing: 8) {
+                        obj.element.1.renderingMode(.template)
+                            .padding(.leading, 12)
+                            Text(obj.element.0)
+                                .padding(.trailing, 12)
+                                .font(isSelected(index: obj.offset)
+                                      ? style.selectedFont
+                                      : style.font)
+                        }
+                    .accentColor(
+                        isSelected(index: obj.offset)
+                        ? .white
+                        : style.activeAccentColor
+                    )
+                        
+                    .background {
+                        RoundedRectangle(cornerRadius: 20)
+                            .frame(height: 40)
+                            .accentColor(
+                                isSelected(index: obj.offset)
+                                ? style.activeAccentColor
+                                : .white
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(
+                                        isSelected(index: obj.offset)
+                                        ? .clear
+                                        : style.activeAccentColor,
+                                        lineWidth: 1
+                                    )
+                            )
                     }
                     .padding(.horizontal, style.buttonHInset)
                     .padding(.vertical, style.buttonVInset)
                 }
-                .accentColor(
-                    isSelected(index: obj.offset) ? style.activeAccentColor : style.inactiveAccentColor
-                )
                 .readFrame(in: .named(containerSpace)) {
                     buttonFrames[obj.offset] = $0
                 }
@@ -160,14 +186,14 @@ extension ScrollSlidingTabBar {
         }
         
         public static let `default` = Style(
-            font: Theme.Fonts.bodyLarge,
-            selectedFont: Theme.Fonts.titleMedium,
-            activeAccentColor: Theme.Colors.accentXColor,
-            inactiveAccentColor: Theme.Colors.textSecondary,
-            indicatorHeight: 2,
-            borderColor: .gray.opacity(0.2),
-            borderHeight: 1,
-            buttonHInset: 16,
+            font: Theme.Fonts.titleSmall,
+            selectedFont: Theme.Fonts.titleSmall,
+            activeAccentColor: Theme.Colors.accentColor,
+            inactiveAccentColor: Theme.Colors.white,
+            indicatorHeight: 0,
+            borderColor: .accentColor,
+            borderHeight: 0,
+            buttonHInset: 4,
             buttonVInset: 10
         )
     }
@@ -182,7 +208,14 @@ private struct SlidingTabConsumerView: View {
         VStack(alignment: .leading) {
             ScrollSlidingTabBar(
                 selection: $selection,
-                tabs: ["First", "Second", "Third", "Fourth", "Fifth", "Sixth"]
+                tabs: [
+                    ("First", Image(systemName: "left")),
+                    ("Second", Image(systemName: "left")),
+                    ("Third", Image(systemName: "left")),
+                    ("Fourth", Image(systemName: "left")),
+                    ("Fifth", Image(systemName: "left")),
+                    ("Sixth", Image(systemName: "left"))
+                ]
             )
             TabView(selection: $selection) {
                 HStack {

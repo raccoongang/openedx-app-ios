@@ -355,6 +355,7 @@ public class Router: AuthorizationRouter,
         )
         
         let controller = UIHostingController(rootView: screensView)
+        navigationController.setNavigationBarHidden(true, animated: false)
         navigationController.pushViewController(controller, animated: true)
     }
     
