@@ -10,6 +10,7 @@ import SwiftUI
 import Core
 import OEXFoundation
 import Combine
+// swiftlint:disable file_length
 
 public enum CourseTab: Int, CaseIterable, Identifiable, Sendable {
     public var id: Int {
@@ -111,7 +112,6 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
     let analytics: CourseAnalytics
     let coreAnalytics: CoreAnalytics
     private(set) var storage: CourseStorage
-    
     private let cellularFileSizeLimit: Int = 100 * 1024 * 1024
     
     public init(
@@ -157,7 +157,9 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
     func updateCourseIfNeeded(courseID: String) async {
         if updateCourseProgress {
             await getCourseBlocks(courseID: courseID, withProgress: false)
-            updateCourseProgress = false
+            await MainActor.run {
+                updateCourseProgress = false
+            }
         }
     }
     
@@ -312,6 +314,34 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
         }
     }
     
+    @MainActor
+    func onDownloadViewTap(chapter: CourseChapter, state: DownloadViewState) async {
+        let blocks = chapter.childs
+            .flatMap { $0.childs }
+            .flatMap { $0.childs }
+            .filter { $0.isDownloadable }
+
+        if state == .available, isShowedAllowLargeDownloadAlert(blocks: blocks) {
+            return
+        }
+
+        if state == .available {
+            analytics.bulkDownloadVideosSection(
+                courseID: courseStructure?.id ?? "",
+                sectionID: chapter.id,
+                videos: blocks.count
+            )
+        } else if state == .finished {
+            analytics.bulkDeleteVideosSection(
+                courseID: courseStructure?.id ?? "",
+                sectionId: chapter.id,
+                videos: blocks.count
+            )
+        }
+
+        await download(state: state, blocks: blocks, sequentials: chapter.childs.filter({ $0.isDownloadable }))
+    }
+    
     func verticalsBlocksDownloadable(by courseSequential: CourseSequential) -> [CourseBlock] {
         let verticals = downloadableVerticals.filter { verticalState in
             courseSequential.childs.contains(where: { item in
@@ -337,7 +367,9 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
             try await manager.addToDownloadQueue(blocks: blocks)
         } catch let error {
             if error is NoWiFiError {
-                errorMessage = CoreLocalization.Error.wifi
+                await MainActor.run {
+                    errorMessage = CoreLocalization.Error.wifi
+                }
             }
         }
     }
@@ -621,11 +653,12 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
                 sequentials: manager.updateUnzippedFileSize(for: sequentials),
                 action: { [weak self] in
                     guard let self else { return }
-                    Task {
-                        await self.manager.deleteFile(blocks: blocks)
-                        self.router.dismiss(animated: true)
+                    if let courseID = self.courseStructure?.id {
+                        Task {
+                            await manager.delete(blocks: blocks, courseId: courseID)
+                            self.router.dismiss(animated: true)
+                        }
                     }
-                    
                 },
                 cancel: { [weak self] in
                     guard let self else { return }
@@ -635,7 +668,7 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
             completion: {}
         )
     }
-    
+
     @MainActor
     func collectBlocks(
         chapter: CourseChapter,
@@ -674,7 +707,7 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
         
         return blocks
     }
-    
+
     @MainActor
     func isShowedAllowLargeDownloadAlert(blocks: [CourseBlock]) -> Bool {
         waitingDownloads = nil
@@ -1039,7 +1072,9 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
                         self.largestDownloadBlocks.removeAll { $0.id == block.id }
                     }
                     Task {
-                        await self.manager.deleteFile(blocks: [block])
+                        if let courseID = self.courseStructure?.id {
+                            await self.manager.delete(blocks: [block], courseId: courseID)
+                        }
                     }
                     self.router.dismiss(animated: true)
                 },
@@ -1072,7 +1107,9 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
                     guard let self else { return }
                     Task {
                         await self.stopAllDownloads()
-                        await self.manager.deleteFile(blocks: blocksToRemove)
+                        if let courseID = self.courseStructure?.id {
+                            await self.manager.delete(blocks: blocksToRemove, courseId: courseID)
+                        }
                     }
                     self.router.dismiss(animated: true)
                 },
@@ -1090,8 +1127,8 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
             .sink { [weak self] state in
                 guard let self else { return }
                 if case .progress = state { return }
+                debugLog(state, "--- state ---")
                 Task {
-                    debugLog(state, "--- state ---")
                     await self.setDownloadsStates(courseStructure: self.courseStructure)
                     await self.getDownloadingProgress()
                 }
@@ -1123,6 +1160,14 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
                 self.downloadAllButtonState = .start
             }
         }).store(in: &cancellables)
+
+        completionPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                updateCourseProgress = true
+            }
+            .store(in: &cancellables)
     }
     
     deinit {
