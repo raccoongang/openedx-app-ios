@@ -176,6 +176,7 @@ struct CourseVerticalView_Previews: PreviewProvider {
         ]
         
         let viewModel = CourseVerticalViewModel(
+            parentVM: nil,
             chapters: chapters,
             chapterIndex: 0,
             sequentialIndex: 0,

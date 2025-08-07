@@ -35,6 +35,7 @@ public protocol CourseRouter: BaseRouter {
     )
     
     func showCourseVerticalView(
+        parentVM: CourseContainerViewModel?,
         courseID: String,
         courseName: String,
         title: String,
@@ -92,6 +93,7 @@ public class CourseRouterMock: BaseRouterMock, CourseRouter {
     ) {}
     
     public func showCourseVerticalView(
+        parentVM: CourseContainerViewModel?,
         courseID: String,
         courseName: String,
         title: String,

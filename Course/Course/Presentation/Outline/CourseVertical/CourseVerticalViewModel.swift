@@ -9,7 +9,11 @@ import SwiftUI
 import Core
 import OEXFoundation
 
+@MainActor
 public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendable {
+
+    private let parentVM: CourseContainerViewModel?
+
     let router: CourseRouter
     let analytics: CourseAnalytics
     let connectivity: ConnectivityProtocol
@@ -28,6 +32,7 @@ public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendabl
     }
     
     public init(
+        parentVM: CourseContainerViewModel?,
         chapters: [CourseChapter],
         chapterIndex: Int,
         sequentialIndex: Int,
@@ -35,13 +40,22 @@ public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendabl
         analytics: CourseAnalytics,
         connectivity: ConnectivityProtocol
     ) {
+        self.parentVM = parentVM
         self.chapters = chapters
         self.chapterIndex = chapterIndex
         self.sequentialIndex = sequentialIndex
         self.router = router
         self.analytics = analytics
         self.connectivity = connectivity
-        self.verticals = chapters[chapterIndex].childs[sequentialIndex].childs
+
+        self.verticals = parentVM?.courseStructure?.childs[chapterIndex].childs[sequentialIndex].childs ?? []
+
+        parentVM?.$courseStructure
+            .compactMap { $0?.childs[chapterIndex]
+                    .childs[sequentialIndex]
+                .childs }
+            .assign(to: &$verticals)
+
     }
     
     func trackVerticalClicked(

@@ -213,29 +213,8 @@ public struct CourseOutlineView: View {
                 )
             }
         }
-        .onReceive(
-            NotificationCenter.default.publisher(
-                for: .onBlockCompletion
-            )
-        ) { notification in
-            guard let userInfo = notification.userInfo,
-                  let chapterID = userInfo["chapterID"] as? String,
-                  let sequentialID = userInfo["sequentialID"] as? String,
-                  let verticalID = userInfo["verticalID"] as? String,
-                  let blockID = userInfo["blockID"] as? String else {
-                return
-            }
-            Task {
-                await viewModel.completeBlock(
-                    chapterID: chapterID,
-                    sequentialID: sequentialID,
-                    verticalID: verticalID,
-                    blockID: blockID
-                )
-            }
-        }
     }
-    
+
     @ViewBuilder
     private func downloadQualityBars(proxy: GeometryProxy) -> some View {
         if let courseVideosStructure = viewModel.courseVideosStructure,

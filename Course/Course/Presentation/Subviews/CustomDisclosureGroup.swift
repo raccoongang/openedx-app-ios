@@ -97,6 +97,7 @@ struct CustomDisclosureGroup: View {
                                                     )
                                                 } else {
                                                     viewModel.router.showCourseVerticalView(
+                                                        parentVM: viewModel,
                                                         courseID: viewModel.courseStructure?.id ?? "",
                                                         courseName: viewModel.courseStructure?.displayName ?? "",
                                                         title: sequential.displayName,
