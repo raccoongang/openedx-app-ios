@@ -12,8 +12,6 @@ import OEXFoundation
 @MainActor
 public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendable {
 
-    private let parentVM: CourseContainerViewModel?
-
     let router: CourseRouter
     let analytics: CourseAnalytics
     let connectivity: ConnectivityProtocol
@@ -46,7 +44,6 @@ public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendabl
           self.analytics = analytics
           self.connectivity = connectivity
 
-          // безопасная инициализация verticals
           if chapters.wrappedValue.indices.contains(chapterIndex),
              chapters.wrappedValue[chapterIndex].childs.indices.contains(sequentialIndex) {
               self.verticals = chapters.wrappedValue[chapterIndex].childs[sequentialIndex].childs
@@ -54,6 +51,7 @@ public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendabl
               self.verticals = []
           }
       }
+
     func trackVerticalClicked(
         courseId: String,
         courseName: String,

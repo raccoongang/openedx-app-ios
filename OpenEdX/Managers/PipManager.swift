@@ -133,7 +133,6 @@ public final class PipManager: PipManagerProtocol {
         
         if let data = VerticalData.dataFor(blockId: holder.blockID, in: courseStructure.childs) {
             return router.getVerticalController(
-                parentVM: nil,
                 courseID: holder.courseID,
                 courseName: courseStructure.displayName,
                 title: courseStructure.childs[data.chapterIndex].childs[data.sequentialIndex].displayName,

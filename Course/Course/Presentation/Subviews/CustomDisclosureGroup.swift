@@ -11,9 +11,9 @@ import Theme
 
 struct CustomDisclosureGroup: View {
     @State private var expandedSections: [String: Bool] = [:]
-    
-    private let proxy: GeometryProxy
     @Binding var course: CourseStructure
+
+    private let proxy: GeometryProxy
     private let viewModel: CourseContainerViewModel
     private var idiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     
@@ -101,7 +101,6 @@ struct CustomDisclosureGroup: View {
                                                     )
                                                 } else {
                                                     viewModel.router.showCourseVerticalView(
-                                                        parentVM: viewModel,
                                                         courseID: viewModel.courseStructure?.id ?? "",
                                                         courseName: viewModel.courseStructure?.displayName ?? "",
                                                         title: sequential.displayName,

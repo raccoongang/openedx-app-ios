@@ -338,7 +338,6 @@ public class Router: AuthorizationRouter,
         sequentialIndex: Int
     ) {
         let controller = getVerticalController(
-            parentVM: parentVM,
             courseID: courseID,
             courseName: courseName,
             title: title,
@@ -350,7 +349,6 @@ public class Router: AuthorizationRouter,
     }
 
     public func getVerticalController(
-        parentVM: CourseContainerViewModel?,
         courseID: String,
         courseName: String,
         title: String,
@@ -359,8 +357,7 @@ public class Router: AuthorizationRouter,
         sequentialIndex: Int
     ) -> UIHostingController<CourseVerticalView> {
         let viewModel = Container.shared.resolve(
-            CourseVerticalViewModel.self,
-            arguments: parentVM,
+            CourseVerticalViewModel.self, arguments:
             chapters,
             chapterIndex,
             sequentialIndex
@@ -625,7 +622,6 @@ public class Router: AuthorizationRouter,
             controllers.append(contentsOf: [controllerUnit])
         } else {
             let controllerVertical = getVerticalController(
-                parentVM: nil,
                 courseID: courseID,
                 courseName: courseName,
                 title: chapters[chapterIndex].childs[sequentialIndex].displayName,
