@@ -363,6 +363,7 @@ class ScreenAssembly: Assembly {
         ) { @MainActor r in
             CourseDownloadHelper(courseStructure: nil, manager: r.resolve(DownloadManagerProtocol.self)!)
         }
+        
         container.register(CourseVerticalViewModel.self) { @MainActor r, chapters, chapterIndex, sequentialIndex in
             CourseVerticalViewModel(
                 chapters: chapters,

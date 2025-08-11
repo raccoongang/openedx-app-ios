@@ -7,6 +7,7 @@
 
 import Foundation
 import Core
+import SwiftUI
 
 @MainActor
 public protocol CourseRouter: BaseRouter {
@@ -38,7 +39,7 @@ public protocol CourseRouter: BaseRouter {
         courseID: String,
         courseName: String,
         title: String,
-        chapters: [CourseChapter],
+        chapters: Binding<[CourseChapter]>,
         chapterIndex: Int,
         sequentialIndex: Int
     )
@@ -95,7 +96,7 @@ public class CourseRouterMock: BaseRouterMock, CourseRouter {
         courseID: String,
         courseName: String,
         title: String,
-        chapters: [CourseChapter],
+        chapters: Binding<[CourseChapter]>,
         chapterIndex: Int,
         sequentialIndex: Int
     ) {}

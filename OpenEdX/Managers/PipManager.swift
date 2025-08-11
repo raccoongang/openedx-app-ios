@@ -136,7 +136,7 @@ public final class PipManager: PipManagerProtocol {
                 courseID: holder.courseID,
                 courseName: courseStructure.displayName,
                 title: courseStructure.childs[data.chapterIndex].childs[data.sequentialIndex].displayName,
-                chapters: courseStructure.childs,
+                chapters: .constant(courseStructure.childs),
                 chapterIndex: data.chapterIndex,
                 sequentialIndex: data.sequentialIndex
             )

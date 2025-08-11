@@ -15,7 +15,7 @@ public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendabl
     let connectivity: ConnectivityProtocol
     @Published var verticals: [CourseVertical]
     @Published var showError: Bool = false
-    let chapters: [CourseChapter]
+    @Binding var chapters: [CourseChapter]
     let chapterIndex: Int
     let sequentialIndex: Int
     
@@ -26,24 +26,30 @@ public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendabl
             }
         }
     }
-    
+
     public init(
-        chapters: [CourseChapter],
-        chapterIndex: Int,
-        sequentialIndex: Int,
-        router: CourseRouter,
-        analytics: CourseAnalytics,
-        connectivity: ConnectivityProtocol
-    ) {
-        self.chapters = chapters
-        self.chapterIndex = chapterIndex
-        self.sequentialIndex = sequentialIndex
-        self.router = router
-        self.analytics = analytics
-        self.connectivity = connectivity
-        self.verticals = chapters[chapterIndex].childs[sequentialIndex].childs
-    }
-    
+          chapters: Binding<[CourseChapter]>,
+          chapterIndex: Int,
+          sequentialIndex: Int,
+          router: CourseRouter,
+          analytics: CourseAnalytics,
+          connectivity: ConnectivityProtocol
+      ) {
+          self._chapters = chapters
+          self.chapterIndex = chapterIndex
+          self.sequentialIndex = sequentialIndex
+          self.router = router
+          self.analytics = analytics
+          self.connectivity = connectivity
+
+          // безопасная инициализация verticals
+          if chapters.wrappedValue.indices.contains(chapterIndex),
+             chapters.wrappedValue[chapterIndex].childs.indices.contains(sequentialIndex) {
+              self.verticals = chapters.wrappedValue[chapterIndex].childs[sequentialIndex].childs
+          } else {
+              self.verticals = []
+          }
+      }
     func trackVerticalClicked(
         courseId: String,
         courseName: String,
@@ -56,4 +62,11 @@ public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendabl
             blockName: vertical.displayName
         )
     }
+
+    public func refreshVerticals() {
+          if chapters.indices.contains(chapterIndex),
+             chapters[chapterIndex].childs.indices.contains(sequentialIndex) {
+              verticals = chapters[chapterIndex].childs[sequentialIndex].childs
+          }
+      }
 }

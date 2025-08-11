@@ -352,7 +352,7 @@ public final class CourseUnitViewModel: ObservableObject {
     private func setBlockCompletionForSelectedLesson() {
         verticals[verticalIndex].childs[index].completion = 1.0
         NotificationCenter.default.post(
-            name: .onBlockCompletion,
+            name: .onblockCompletionRequested,
             object: nil,
             userInfo: [
                 "chapterID": chapters[chapterIndex].id,

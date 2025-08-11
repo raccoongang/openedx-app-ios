@@ -333,7 +333,7 @@ public class Router: AuthorizationRouter,
         courseID: String,
         courseName: String,
         title: String,
-        chapters: [CourseChapter],
+        chapters: Binding<[CourseChapter]>,
         chapterIndex: Int,
         sequentialIndex: Int
     ) {
@@ -352,7 +352,7 @@ public class Router: AuthorizationRouter,
         courseID: String,
         courseName: String,
         title: String,
-        chapters: [CourseChapter],
+        chapters: Binding<[CourseChapter]>,
         chapterIndex: Int,
         sequentialIndex: Int
     ) -> UIHostingController<CourseVerticalView> {
@@ -625,7 +625,7 @@ public class Router: AuthorizationRouter,
                 courseID: courseID,
                 courseName: courseName,
                 title: chapters[chapterIndex].childs[sequentialIndex].displayName,
-                chapters: chapters,
+                chapters: .constant(chapters),
                 chapterIndex: chapterIndex,
                 sequentialIndex: sequentialIndex
             )
