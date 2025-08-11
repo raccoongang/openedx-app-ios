@@ -9,7 +9,11 @@ import SwiftUI
 import Core
 import OEXFoundation
 
+@MainActor
 public final class CourseVerticalViewModel: ObservableObject, @unchecked Sendable {
+
+    private let parentVM: CourseContainerViewModel?
+
     let router: CourseRouter
     let analytics: CourseAnalytics
     let connectivity: ConnectivityProtocol

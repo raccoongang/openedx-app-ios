@@ -366,6 +366,7 @@ class ScreenAssembly: Assembly {
         
         container.register(CourseVerticalViewModel.self) { @MainActor r, chapters, chapterIndex, sequentialIndex in
             CourseVerticalViewModel(
+                parentVM: parentVM,
                 chapters: chapters,
                 chapterIndex: chapterIndex,
                 sequentialIndex: sequentialIndex,
