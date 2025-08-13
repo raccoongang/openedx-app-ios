@@ -146,6 +146,11 @@ public enum CourseLocalization {
     }
     /// Add calendar
     public static let addCalendarTitle = CourseLocalization.tr("Localizable", "COURSE_DATES.ADD_CALENDAR_TITLE", fallback: "Add calendar")
+    /// This course will begin on %@.
+    /// Come back then to start learning!
+    public static func beginDate(_ p1: Any) -> String {
+      return CourseLocalization.tr("Localizable", "COURSE_DATES.BEGIN_DATE", String(describing: p1), fallback: "This course will begin on %@.\nCome back then to start learning!")
+    }
     /// Calendar events
     public static let calendarEvents = CourseLocalization.tr("Localizable", "COURSE_DATES.CALENDAR_EVENTS", fallback: "Calendar events")
     /// Your course calendar has been added.

@@ -13,7 +13,7 @@ import Theme
 @_spi(Advanced) import SwiftUIIntrospect
 
 public struct CourseContainerView: View {
-    
+
     @ObservedObject
     public var viewModel: CourseContainerViewModel
     @ObservedObject
@@ -29,10 +29,10 @@ public struct CourseContainerView: View {
     @Environment(\.isHorizontal) private var isHorizontal
     @Namespace private var animationNamespace
     private var idiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
-    
+
     private let coordinateBoundaryLower: CGFloat = -115
     private let courseRawImage: String?
-    
+
     private var coordinateBoundaryHigher: CGFloat {
         let topInset = UIApplication.shared.windowInsets.top
         guard topInset > 0 else {
@@ -41,7 +41,7 @@ public struct CourseContainerView: View {
 
         return topInset
     }
-    
+
     private struct GeometryName {
         static let backButton = "backButton"
         static let topTabBar = "topTabBar"
@@ -49,7 +49,7 @@ public struct CourseContainerView: View {
         static let blurPrimaryBg = "blurPrimaryBg"
         static let blurBg = "blurBg"
     }
-    
+
     public init(
         viewModel: CourseContainerViewModel,
         courseDatesViewModel: CourseDatesViewModel,
@@ -73,7 +73,7 @@ public struct CourseContainerView: View {
         self.courseDatesViewModel = courseDatesViewModel
         self.courseRawImage = courseRawImage
     }
-    
+
     public var body: some View {
         ZStack(alignment: .top) {
             content
@@ -85,11 +85,15 @@ public struct CourseContainerView: View {
         .onChange(of: coordinate, perform: collapseHeader)
         .background(Theme.Colors.background)
     }
-    
+
     @ViewBuilder
     private var content: some View {
-        if let courseStart = viewModel.courseStart {
-            if courseStart > Date() {
+        ZStack(alignment: .top) {
+
+            if let courseStart = viewModel.courseStart,
+               !courseStart.isInFuture {
+                tabs
+            } else {
                 CourseOutlineView(
                     viewModel: viewModel,
                     title: title,
@@ -99,38 +103,35 @@ public struct CourseContainerView: View {
                     coordinate: $coordinate,
                     collapsed: $collapsed,
                     viewHeight: $viewHeight,
-                    dateTabIndex: CourseTab.dates.rawValue
-                )
-            } else {
-                ZStack(alignment: .top) {
-                    tabs
-                    GeometryReader { proxy in
-                        VStack(spacing: 0) {
-                            CourseHeaderView(
-                                viewModel: viewModel,
-                                title: title,
-                                collapsed: $collapsed,
-                                containerWidth: proxy.size.width,
-                                animationNamespace: animationNamespace,
-                                isAnimatingForTap: $isAnimatingForTap,
-                                courseRawImage: courseRawImage
-                            )
-                        }
-                        .offset(
-                            y: ignoreOffset
-                            ? (collapsed ? coordinateBoundaryLower : .zero)
-                            : ((coordinateBoundaryLower...coordinateBoundaryHigher).contains(coordinate)
-                               ? (collapsed ? coordinateBoundaryLower : coordinate)
-                               : (collapsed ? coordinateBoundaryLower : .zero))
-                        )
-                        backButton(containerWidth: proxy.size.width)
-                    }
-                }
-                .ignoresSafeArea(edges: idiom == .pad ? .leading : .top)
-                .onAppear {
-                    self.collapsed = isHorizontal
-                }
+                    dateTabIndex: CourseTab.dates.rawValue)
+                .padding(.top, 30)
             }
+
+            GeometryReader { proxy in
+                VStack(spacing: 0) {
+                    CourseHeaderView(
+                        viewModel: viewModel,
+                        title: title,
+                        collapsed: $collapsed,
+                        containerWidth: proxy.size.width,
+                        animationNamespace: animationNamespace,
+                        isAnimatingForTap: $isAnimatingForTap,
+                        courseRawImage: courseRawImage
+                    )
+                }
+                .offset(
+                    y: ignoreOffset
+                    ? (collapsed ? coordinateBoundaryLower : .zero)
+                    : ((coordinateBoundaryLower...coordinateBoundaryHigher).contains(coordinate)
+                       ? (collapsed ? coordinateBoundaryLower : coordinate)
+                       : (collapsed ? coordinateBoundaryLower : .zero))
+                )
+                backButton(containerWidth: proxy.size.width)
+            }
+        }
+        .ignoresSafeArea(edges: idiom == .pad ? .leading : .top)
+        .onAppear {
+            self.collapsed = isHorizontal
         }
         switch courseDatesViewModel.eventState {
         case .removedCalendar:
@@ -147,7 +148,7 @@ public struct CourseContainerView: View {
             EmptyView()
         }
     }
-    
+
     private func showDatesSuccessView(title: String, message: String) -> some View {
         return DatesSuccessView(
             title: title,
@@ -157,7 +158,7 @@ public struct CourseContainerView: View {
             courseDatesViewModel.resetEventState()
         }
     }
-    
+
     private func backButton(containerWidth: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
             if !collapsed {
@@ -184,7 +185,7 @@ public struct CourseContainerView: View {
             }
         }
     }
-    
+
     private var tabs: some View {
         TabView(selection: $viewModel.selection) {
             ForEach(CourseTab.allCases) { tab in
@@ -297,7 +298,7 @@ public struct CourseContainerView: View {
             viewModel.analytics.courseOutlineCourseTabClicked(courseId: courseID, courseName: title)
         }
     }
-    
+
     private func didSelect(_ selection: Int) {
         lastCoordinate = .zero
         ignoreOffset = true
@@ -309,12 +310,12 @@ public struct CourseContainerView: View {
             )
         }
     }
-    
+
     private func collapseHeader(_ coordinate: CGFloat) {
         guard !isHorizontal else { return collapsed = true }
         let lowerBound: CGFloat = -90
         let upperBound: CGFloat = 160
-        
+
         switch coordinate {
         case lowerBound...upperBound:
             if shouldAnimateHeader(coordinate: coordinate) {
@@ -336,22 +337,22 @@ public struct CourseContainerView: View {
             }
         }
     }
-    
+
     private func shouldAnimateHeader(coordinate: CGFloat) -> Bool {
         let ignoringOffset: CGFloat = 120
-        
+
         guard coordinate <= ignoringOffset, lastCoordinate != 0 else {
             return false
         }
-        
+
         if collapsed && lastCoordinate > coordinate {
             return false
         }
-        
+
         if !collapsed && lastCoordinate < coordinate {
             return false
         }
-        
+
         return true
     }
 }

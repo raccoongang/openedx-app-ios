@@ -193,7 +193,7 @@ public extension Date {
         }
         
         let date = dateFormatter.string(from: self)
-        
+
         switch style {
         case .courseStartsMonthDDYear:
             return CoreLocalization.Date.courseStarts + " " + date

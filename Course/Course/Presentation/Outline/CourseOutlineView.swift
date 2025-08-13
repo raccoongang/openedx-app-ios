@@ -76,17 +76,19 @@ public struct CourseOutlineView: View {
                                 }
                                 certificateView
                                 
-                                if viewModel.courseStructure == nil,
+                                if let startDate = viewModel.courseStart,
+                                   !startDate.isUpcoming,
+                                   viewModel.courseStructure == nil,
                                    viewModel.isShowProgress == false,
                                    !isVideo {
-                                    FullScreenErrorView(
-                                        type: .noContent(
-                                            CourseLocalization.Error.coursewareUnavailable,
-                                            image: CoreAssets.information.swiftUIImage
+                                        FullScreenErrorView(
+                                            type: .noContent(
+                                                CourseLocalization.Error.coursewareUnavailable,
+                                                image: CoreAssets.information.swiftUIImage
+                                            )
                                         )
-                                    )
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: proxy.size.height - viewHeight)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: proxy.size.height - viewHeight)
                                 } else {
                                     if let continueWith = viewModel.continueWith,
                                        let courseStructure = viewModel.courseStructure,
@@ -123,17 +125,34 @@ public struct CourseOutlineView: View {
                                             viewModel: viewModel
                                         )
                                     } else {
-                                        if let courseStart = viewModel.courseStart {
-                                            Text(
-                                                courseStart > Date()
-                                                ? CourseLocalization.Outline.courseHasntStarted
-                                                : ""
-                                            )
-                                            .frame(maxWidth: .infinity)
-                                            .frame(maxHeight: .infinity)
-                                            .padding(.top, 100)
+                                        if let courseStart = viewModel.courseStart,
+                                           courseStart.isUpcoming {
+                                            VStack(alignment: .center) {
+                                                Spacer()
+                                                HStack {
+                                                    Spacer()
+                                                    CoreAssets.icCalendarStartDate.swiftUIImage
+                                                    Spacer()
+                                                }
+
+                                                Text(
+                                                    CourseLocalization.CourseDates.beginDate(
+                                                        courseStart.dateToString(
+                                                            style: .shortWeekdayMonthDayYear,
+                                                            useRelativeDates: false
+                                                        )
+                                                    )
+                                                )
+                                                .font(Theme.Fonts.labelLarge)
+                                                .multilineTextAlignment(.center)
+                                                .padding(.top, 24)
+                                            }
+                                            .padding(.top, 98)
+                                            .onAppear {
+                                                viewModel.isShowRefresh = false
+                                                viewModel.isShowProgress = false
+                                            }
                                         }
-                                        Spacer(minLength: viewHeight < 200 ? 200 : viewHeight)
                                     }
                                 }
                             }

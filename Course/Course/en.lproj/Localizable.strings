@@ -109,6 +109,8 @@
 "COURSE_DATES.RESET_DATE.SUCCESS_MESSAGE" = "Your dates have been successfully shifted.";
 "COURSE_DATES.RESET_DATE.TITLE" = "Course Dates";
 
+"COURSE_DATES.BEGIN_DATE" = "This course will begin on %@.\nCome back then to start learning!" ;
+
 "COURSE.DUE_TODAY" = "Due Today";
 "COURSE.DUE_TOMORROW" = "Due Tomorrow";
 

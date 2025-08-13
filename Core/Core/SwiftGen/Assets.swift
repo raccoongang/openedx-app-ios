@@ -35,6 +35,7 @@ public enum CoreAssets {
   public static let assignmentIcon = ImageAsset(name: "assignment_icon")
   public static let calendarIcon = ImageAsset(name: "calendar_icon")
   public static let certificateIcon = ImageAsset(name: "certificate_icon")
+  public static let icCalendarStartDate = ImageAsset(name: "ic-calendar-start-date")
   public static let lockIcon = ImageAsset(name: "lock_icon")
   public static let lockWithWatchIcon = ImageAsset(name: "lock_with_watch_icon")
   public static let schoolCapIcon = ImageAsset(name: "school_cap_icon")

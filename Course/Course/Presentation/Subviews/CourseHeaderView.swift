@@ -91,9 +91,14 @@ struct CourseHeaderView: View {
                         }
                         .padding(.top, 46)
                         .padding(.leading, 12)
-                        courseMenuBar(containerWidth: containerWidth)
-                            .matchedGeometryEffect(id: GeometryName.topTabBar, in: animationNamespace)
-                            .padding(.bottom, 12)
+
+                        if let startDate = viewModel.courseStart {
+                            courseMenuBar(containerWidth: containerWidth)
+                                .matchedGeometryEffect(id: GeometryName.topTabBar, in: animationNamespace)
+                                .padding(.bottom, 12)
+                                .opacity(!startDate.isInFuture ? 1 : 0)
+                        }
+
                     }.background {
                         ZStack(alignment: .bottom) {
                             Rectangle()
@@ -122,18 +127,25 @@ struct CourseHeaderView: View {
                                     .allowsHitTesting(false)
                                     .frameLimit(width: containerWidth)
                             }
-                            Text(title)
-                                .lineLimit(3)
-                                .font(Theme.Fonts.titleLarge)
-                                .foregroundStyle(Theme.Colors.textPrimary)
-                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                                .multilineTextAlignment(.leading)
-                                .padding(.horizontal, 24)
-                                .allowsHitTesting(false)
-                                .frameLimit(width: containerWidth)
-                            courseMenuBar(containerWidth: containerWidth)
-                                .matchedGeometryEffect(id: GeometryName.topTabBar, in: animationNamespace)
-                                .padding(.bottom, 12)
+                            if let startDate = viewModel.courseStart {
+                                Text(title)
+                                    .lineLimit(3)
+                                    .font(Theme.Fonts.titleLarge)
+                                    .foregroundStyle(Theme.Colors.textPrimary)
+                                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                                    .multilineTextAlignment(.leading)
+                                    .padding(.horizontal, 24)
+                                    .allowsHitTesting(false)
+                                    .frameLimit(width: containerWidth)
+                                    .padding(!startDate.isInFuture ? 0 : 16)
+
+                                   if !startDate.isInFuture {
+                                    courseMenuBar(containerWidth: containerWidth)
+                                        .matchedGeometryEffect(id: GeometryName.topTabBar, in: animationNamespace)
+                                        .padding(.bottom, 12)
+                                }
+                            }
+
                         }.background {
                             ZStack(alignment: .bottom) {
                                 Rectangle()
