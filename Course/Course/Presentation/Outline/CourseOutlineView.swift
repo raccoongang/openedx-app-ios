@@ -146,6 +146,12 @@ public struct CourseOutlineView: View {
                                                 .font(Theme.Fonts.labelLarge)
                                                 .multilineTextAlignment(.center)
                                                 .padding(.top, 24)
+
+                                                UnitButtonView(type: .custom("Back")) {
+                                                    viewModel.router.back(animated: true)
+                                                }
+                                                .padding(.top, 196)
+                                                .padding(.horizontal, 24)
                                             }
                                             .padding(.top, 98)
                                             .onAppear {
