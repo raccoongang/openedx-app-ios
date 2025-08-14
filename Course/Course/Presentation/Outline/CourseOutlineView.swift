@@ -15,6 +15,7 @@ import SwiftUIIntrospect
 public struct CourseOutlineView: View {
     
     @StateObject private var viewModel: CourseContainerViewModel
+    @Environment(\.isHorizontal) var isHorizontal
     private let title: String
     private let courseID: String
     private let isVideo: Bool
@@ -127,6 +128,14 @@ public struct CourseOutlineView: View {
                                     } else {
                                         if let courseStart = viewModel.courseStart,
                                            courseStart.isUpcoming {
+
+                                            let beginDateText = CourseLocalization.CourseDates.beginDate(
+                                                courseStart.dateToString(
+                                                    style: .shortWeekdayMonthDayYear,
+                                                    useRelativeDates: false
+                                                )
+                                            )
+
                                             VStack(alignment: .center) {
                                                 Spacer()
                                                 HStack {
@@ -135,25 +144,22 @@ public struct CourseOutlineView: View {
                                                     Spacer()
                                                 }
 
-                                                Text(
-                                                    CourseLocalization.CourseDates.beginDate(
-                                                        courseStart.dateToString(
-                                                            style: .shortWeekdayMonthDayYear,
-                                                            useRelativeDates: false
-                                                        )
-                                                    )
-                                                )
+                                                Text(beginDateText)
                                                 .font(Theme.Fonts.labelLarge)
                                                 .multilineTextAlignment(.center)
                                                 .padding(.top, 24)
+                                                .accessibilityLabel(
+                                                    Text(beginDateText))
 
-                                                UnitButtonView(type: .custom("Back")) {
+                                                UnitButtonView(type: .custom(CoreLocalization.back)) {
                                                     viewModel.router.back(animated: true)
                                                 }
-                                                .padding(.top, 196)
+                                                .padding(.top, isHorizontal ? 20 : 196)
                                                 .padding(.horizontal, 24)
+                                                .accessibilityLabel(CoreLocalization.back)
+                                                .accessibilityAddTraits(.isButton)
                                             }
-                                            .padding(.top, 98)
+                                            .padding(.top, isHorizontal ? 0 : 98)
                                             .onAppear {
                                                 viewModel.isShowRefresh = false
                                                 viewModel.isShowProgress = false
