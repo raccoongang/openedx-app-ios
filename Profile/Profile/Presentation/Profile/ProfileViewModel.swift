@@ -27,6 +27,7 @@ public final class ProfileViewModel: ObservableObject {
     let router: ProfileRouter
     let config: ConfigProtocol
     let connectivity: ConnectivityProtocol
+    let tenantManager: TenantManagerProtocol
     
     private let interactor: ProfileInteractorProtocol
     private let analytics: ProfileAnalytics
@@ -36,13 +37,15 @@ public final class ProfileViewModel: ObservableObject {
         router: ProfileRouter,
         analytics: ProfileAnalytics,
         config: ConfigProtocol,
-        connectivity: ConnectivityProtocol
+        connectivity: ConnectivityProtocol,
+        tenantManager: TenantManagerProtocol
     ) {
         self.interactor = interactor
         self.router = router
         self.analytics = analytics
         self.config = config
         self.connectivity = connectivity
+        self.tenantManager = tenantManager
     }
       
     @MainActor

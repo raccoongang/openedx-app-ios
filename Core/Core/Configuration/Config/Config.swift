@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 //sourcery: AutoMockable
 public protocol ConfigProtocol: Sendable {
@@ -35,6 +36,9 @@ public protocol ConfigProtocol: Sendable {
     var program: DiscoveryConfig { get }
     var experimentalFeatures: ExperimentalFeaturesConfig { get }
     var URIScheme: String { get }
+    var isMultiTenant: Bool { get }
+    var multiTenant: MultiTenantConfig? { get }
+    var currentTenant: TenantConfig? { get }
 }
 
 public enum TokenType: String, Sendable {
@@ -62,6 +66,10 @@ public class Config: @unchecked Sendable {
     let configFileName = "config"
     
     internal var properties: [String: Any] = [:]
+    private var tenantManager: TenantManagerProtocol?
+    private var multiTenantConfig: MultiTenantConfig?
+    private var cancellables = Set<AnyCancellable>()
+    private var _currentTenant: TenantConfig?
     
     internal init(properties: [String: Any]) {
         self.properties = properties
@@ -70,6 +78,36 @@ public class Config: @unchecked Sendable {
     public convenience init() {
         self.init(properties: [:])
         loadAndParseConfig()
+    }
+    
+    public convenience init(tenantManager: TenantManagerProtocol) {
+        self.init(properties: [:])
+        self.tenantManager = tenantManager
+        loadAndParseConfig()
+    }
+    
+    public func setTenantManager(_ tenantManager: TenantManagerProtocol) {
+        print("🔧 Config setTenantManager called")
+        self.tenantManager = tenantManager
+        // Устанавливаем текущий тенант сразу
+        self._currentTenant = tenantManager.currentTenant
+        print("🔧 Config: Initial current tenant set to: \(self._currentTenant?.environmentDisplayName ?? "nil")")
+        subscribeToTenantChanges()
+    }
+    
+    private func subscribeToTenantChanges() {
+        guard let tenantManager = tenantManager else { 
+            print("🔧 Config subscribeToTenantChanges: tenantManager is nil")
+            return 
+        }
+        
+        print("🔧 Config: Subscribing to tenant changes")
+        tenantManager.currentTenantPublisher
+            .sink { [weak self] tenant in
+                print("🔧 Config: Current tenant changed to: \(tenant?.environmentDisplayName ?? "nil")")
+                self?._currentTenant = tenant
+            }
+            .store(in: &cancellables)
     }
     
     private func loadAndParseConfig() {
@@ -82,6 +120,74 @@ public class Config: @unchecked Sendable {
         else { return }
         
         properties = dict
+        
+        // Проверяем, есть ли конфигурация мультитенантности
+        if let tenantsArray = dict["TENANTS"] as? [[String: Any]], !tenantsArray.isEmpty {
+            parseMultiTenantConfig(from: dict, tenantsArray: tenantsArray)
+        }
+    }
+    
+    private func parseMultiTenantConfig(from dict: [String: Any], tenantsArray: [[String: Any]]) {
+        var tenants: [TenantConfig] = []
+        
+        print("🔧 Config parseMultiTenantConfig:")
+        print("  - Found \(tenantsArray.count) tenants in config")
+        
+        for tenantDict in tenantsArray {
+            if let tenant = parseTenantConfig(from: tenantDict) {
+                print("  - Parsed tenant: \(tenant.environmentDisplayName)")
+                tenants.append(tenant)
+            }
+        }
+        
+        let firebaseConfig = FirebaseConfig(dictionary: dict as [String: AnyObject])
+        multiTenantConfig = MultiTenantConfig(tenants: tenants, firebase: firebaseConfig)
+        
+        print("  - MultiTenantConfig created with \(tenants.count) tenants")
+        print("  - isMultiTenant: \(multiTenantConfig?.isMultiTenant ?? false)")
+    }
+    
+    private func parseTenantConfig(from dict: [String: Any]) -> TenantConfig? {
+        guard let baseURL = dict["API_HOST_URL"] as? String,
+              let ssoURL = dict["SSO_URL"] as? String,
+              let ssoFinishedURL = dict["SSO_FINISHED_URL"] as? String,
+              let environmentDisplayName = dict["ENVIRONMENT_DISPLAY_NAME"] as? String,
+              let feedbackEmail = dict["FEEDBACK_EMAIL_ADDRESS"] as? String,
+              let oAuthClientId = dict["OAUTH_CLIENT_ID"] as? String else {
+            return nil
+        }
+        
+        let ssoButtonTitle = dict["SSO_BUTTON_TITLE"] as? [String: String] ?? [:]
+        let discoveryDict = dict["DISCOVERY"] as? [String: Any] ?? [:]
+        let uiComponentsDict = dict["UI_COMPONENTS"] as? [String: Any] ?? [:]
+        let accentColor = dict["ACCENT_COLOR"] as? String
+        
+        return TenantConfig(
+            baseURL: baseURL,
+            ssoURL: ssoURL,
+            ssoFinishedURL: ssoFinishedURL,
+            environmentDisplayName: environmentDisplayName,
+            feedbackEmail: feedbackEmail,
+            oAuthClientId: oAuthClientId,
+            ssoButtonTitle: ssoButtonTitle,
+            discovery: DiscoveryConfig(dictionary: discoveryDict as [String: AnyObject]),
+            uiComponents: UIComponentsConfig(dictionary: uiComponentsDict),
+            accentColor: accentColor
+        )
+    }
+    
+    public var isMultiTenant: Bool {
+        return multiTenantConfig?.isMultiTenant ?? false
+    }
+    
+    public var multiTenant: MultiTenantConfig? {
+        return multiTenantConfig
+    }
+    
+    public var currentTenant: TenantConfig? {
+        let tenant = _currentTenant ?? tenantManager?.currentTenant ?? multiTenantConfig?.defaultTenant
+        print("🔧 Config currentTenant: _currentTenant=\(_currentTenant?.environmentDisplayName ?? "nil"), tenantManager.currentTenant=\(tenantManager?.currentTenant?.environmentDisplayName ?? "nil"), result=\(tenant?.environmentDisplayName ?? "nil")")
+        return tenant
     }
     
     internal subscript(key: String) -> Any? {
@@ -119,14 +225,34 @@ public class Config: @unchecked Sendable {
 
 extension Config: ConfigProtocol {
     public var baseURL: URL {
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            guard let url = URL(string: tenant.baseURL) else {
+                fatalError("Unable to find base url in tenant config.")
+            }
+            print("🔧 Config baseURL: Using tenant \(tenant.environmentDisplayName) - \(tenant.baseURL)")
+            return url
+        }
+        
+        // Fallback на старую логику
         guard let urlString = string(for: ConfigKeys.baseURL.rawValue),
               let url = URL(string: urlString) else {
             fatalError("Unable to find base url in config.")
         }
+        print("🔧 Config baseURL: Using fallback - \(urlString)")
         return url
     }
     
     public var baseSSOURL: URL {
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            guard let url = URL(string: tenant.ssoURL) else {
+                fatalError("Unable to find SSO base url in tenant config.")
+            }
+            return url
+        }
+        
+        // Fallback на старую логику
         guard let urlString = string(for: ConfigKeys.ssoBaseURL.rawValue),
               let url = URL(string: urlString) else {
             fatalError("Unable to find SSO base url in config.")
@@ -135,6 +261,15 @@ extension Config: ConfigProtocol {
     }
     
     public var ssoFinishedURL: URL {
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            guard let url = URL(string: tenant.ssoFinishedURL) else {
+                fatalError("Unable to find SSO finished url in tenant config.")
+            }
+            return url
+        }
+        
+        // Fallback на старую логику
         guard let urlString = string(for: ConfigKeys.ssoFinishedURL.rawValue),
               let url = URL(string: urlString) else {
             fatalError("Unable to find SSO successful login url in config.")
@@ -143,6 +278,14 @@ extension Config: ConfigProtocol {
     }
     
     public var ssoButtonTitle: [String: Any] {
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            return tenant.ssoButtonTitle.isEmpty ? 
+                ["en": CoreLocalization.SignIn.logInWithSsoBtn] : 
+                tenant.ssoButtonTitle
+        }
+        
+        // Fallback на старую логику
         guard let ssoButtonTitle = dict(for: ConfigKeys.ssoButtonTitle.rawValue) else {
             return ["en": CoreLocalization.SignIn.logInWithSsoBtn]
         }
@@ -150,9 +293,17 @@ extension Config: ConfigProtocol {
     }
     
     public var oAuthClientId: String {
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            print("🔧 Config oAuthClientId: Using tenant \(tenant.environmentDisplayName) - \(tenant.oAuthClientId)")
+            return tenant.oAuthClientId
+        }
+        
+        // Fallback на старую логику
         guard let clientID = string(for: ConfigKeys.oAuthClientID.rawValue) else {
             fatalError("Unable to find OAuth ClientID in config.")
         }
+        print("🔧 Config oAuthClientId: Using fallback - \(clientID)")
         return clientID
     }
     
@@ -164,6 +315,12 @@ extension Config: ConfigProtocol {
     }
     
     public var feedbackEmail: String {
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            return tenant.feedbackEmail
+        }
+        
+        // Fallback на старую логику
         return string(for: ConfigKeys.feedbackEmailAddress.rawValue) ?? ""
     }
 

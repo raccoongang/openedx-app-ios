@@ -155,6 +155,12 @@ public struct AllCoursesView: View {
                     await viewModel.getCourses(page: 1)
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .tenantSwitched)) { _ in
+                Task {
+                    viewModel.myEnrollments?.courses = []
+                    await viewModel.getCourses(page: 1, refresh: true)
+                }
+            }
             .onChange(of: viewModel.selectedMenu) { _ in
                 Task {
                     viewModel.myEnrollments?.courses = []

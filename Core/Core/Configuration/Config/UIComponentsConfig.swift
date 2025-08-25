@@ -16,7 +16,7 @@ private enum Keys: String, RawStringExtractable {
     case samlSSODefaultLoginButton = "SAML_SSO_DEFAULT_LOGIN_BUTTON"
 }
 
-public class UIComponentsConfig: NSObject {
+public class UIComponentsConfig: NSObject, Codable, @unchecked Sendable {
     public var courseDropDownNavigationEnabled: Bool
     public var courseUnitProgressEnabled: Bool
     public var loginRegistrationEnabled: Bool
@@ -36,6 +36,12 @@ public class UIComponentsConfig: NSObject {
 private let key = "UI_COMPONENTS"
 extension Config {
     public var uiComponents: UIComponentsConfig {
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            return tenant.uiComponents
+        }
+        
+        // Fallback на старую логику
         return UIComponentsConfig(dictionary: properties[key] as? [String: AnyObject] ?? [:])
     }
 }

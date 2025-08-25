@@ -201,6 +201,13 @@ public struct DiscoveryView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .tenantSwitched)) { _ in
+            Task {
+                viewModel.totalPages = 1
+                viewModel.nextPage = 1
+                await viewModel.discovery(page: 1, withProgress: true)
+            }
+        }
         .background(Theme.Colors.background.ignoresSafeArea())
     }
 }

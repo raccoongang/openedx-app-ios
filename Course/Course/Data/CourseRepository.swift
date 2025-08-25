@@ -8,6 +8,7 @@
 import Foundation
 import Core
 import OEXFoundation
+import Swinject
 
 public protocol CourseRepositoryProtocol: Sendable {
     func getCourseBlocks(courseID: String) async throws -> CourseStructure
@@ -25,21 +26,23 @@ public protocol CourseRepositoryProtocol: Sendable {
 
 public actor CourseRepository: CourseRepositoryProtocol {
     
-    private let api: API
     private let coreStorage: CoreStorage
-    private let config: ConfigProtocol
     private let persistence: CoursePersistenceProtocol
     
     public init(
-        api: API,
         coreStorage: CoreStorage,
-        config: ConfigProtocol,
         persistence: CoursePersistenceProtocol
     ) {
-        self.api = api
         self.coreStorage = coreStorage
-        self.config = config
         self.persistence = persistence
+    }
+    
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
+    
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
     }
     
     public func getCourseBlocks(courseID: String) async throws -> CourseStructure {

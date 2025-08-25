@@ -7,6 +7,8 @@
 
 import Foundation
 import Alamofire
+import Swinject
+import OEXFoundation
 
 private struct MutableState {
     var isRefreshing = false
@@ -15,12 +17,14 @@ private struct MutableState {
 
 final public class RequestInterceptor: Alamofire.RequestInterceptor {
     
-    private let config: ConfigProtocol
     private let storage: CoreStorage
     
-    public init(config: ConfigProtocol, storage: CoreStorage) {
-        self.config = config
+    public init(storage: CoreStorage) {
         self.storage = storage
+    }
+    
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
     }
     
     private let lock = NSLock()
@@ -115,11 +119,14 @@ final public class RequestInterceptor: Alamofire.RequestInterceptor {
         refreshToken: String,
         completion: @escaping @Sendable (_ succeeded: Bool) -> Void
     ) {
+        print("🚨🚨🚨 RequestInterceptor refreshToken called!")
         guard !mutableState.isRefreshing else { return }
         
         mutableState.isRefreshing = true
         
         let url = config.baseURL.appendingPathComponent("/oauth2/access_token")
+        print("🚨🚨🚨 RequestInterceptor refreshToken - baseURL: \(config.baseURL.absoluteString)")
+        print("🚨🚨🚨 RequestInterceptor refreshToken - full URL: \(url.absoluteString)")
         
         let parameters: [String: Encodable & Sendable] = [
             "grant_type": AuthConstants.GrantTypeRefreshToken,

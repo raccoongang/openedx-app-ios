@@ -19,6 +19,7 @@ import Downloads
 import Profile
 import WhatsNew
 import Combine
+import KeychainSwift
 
 // swiftlint:disable type_body_length file_length
 public class Router: AuthorizationRouter,
@@ -115,13 +116,18 @@ public class Router: AuthorizationRouter,
     }
     
     public func showLoginScreen(sourceScreen: LogistrationSourceScreen) {
+        print("🔧 Router showLoginScreen called with sourceScreen: \(sourceScreen)")
         guard let viewModel = Container.shared.resolve(
             SignInViewModel.self,
             argument: sourceScreen
         ), let authAnalytics = Container.shared.resolve(
             AuthorizationAnalytics.self
-        ) else { return }
+        ) else { 
+            print("🔧 Router showLoginScreen: Failed to resolve dependencies")
+            return 
+        }
         
+        print("🔧 Router showLoginScreen: Creating SignInView and pushing to navigation")
         let view = SignInView(viewModel: viewModel)
         let controller = UIHostingController(rootView: view)
         navigationController.pushViewController(controller, animated: true)
@@ -130,7 +136,23 @@ public class Router: AuthorizationRouter,
     }
     
     public func showStartupScreen() {
-        if let config = Container.shared.resolve(ConfigProtocol.self), config.features.startupScreenEnabled {
+        let config = Container.shared.resolve(ConfigProtocol.self)!
+        let tenantManager = Container.shared.resolve(TenantManagerProtocol.self)!
+        
+        print("🔧 Router showStartupScreen:")
+        print("  - config.isMultiTenant: \(config.isMultiTenant)")
+        print("  - tenantManager.isMultiTenant: \(tenantManager.isMultiTenant)")
+        print("  - tenantManager.currentTenant: \(tenantManager.currentTenant?.environmentDisplayName ?? "nil")")
+        print("  - availableTenants: \(tenantManager.availableTenants.map { $0.environmentDisplayName })")
+        
+        // Проверяем, нужно ли показать экран выбора тенантов
+        if tenantManager.isMultiTenant && tenantManager.currentTenant == nil {
+            print("  - Showing tenant selection screen")
+            showTenantSelectionScreen()
+            return
+        }
+        
+        if config.features.startupScreenEnabled {
             let view = StartupView(viewModel: Container.shared.resolve(StartupViewModel.self)!)
             let controller = UIHostingController(rootView: view)
             navigationController.setViewControllers([controller], animated: true)
@@ -144,6 +166,46 @@ public class Router: AuthorizationRouter,
             let controller = UIHostingController(rootView: view)
             navigationController.setViewControllers([controller], animated: false)
         }
+    }
+    
+    public func showTenantSelectionScreen() {
+        let tenantManager = Container.shared.resolve(TenantManagerProtocol.self)!
+        let viewModel = TenantSelectionViewModel(
+            tenants: tenantManager.availableTenants,
+            tenantManager: tenantManager,
+            onTenantSelected: { [weak self] tenant in
+                print("🔧 Tenant selected: \(tenant.environmentDisplayName)")
+                // После выбора тенанта показываем экран логина
+                self?.showLoginScreen(sourceScreen: .default)
+            }
+        )
+        
+        let view = TenantSelectionView(viewModel: viewModel)
+        let controller = UIHostingController(rootView: view)
+        print("🔧 Setting tenant selection as root view controller")
+        navigationController.setViewControllers([controller], animated: true)
+        print("🔧 Navigation stack after setting tenant selection: \(navigationController.viewControllers.count)")
+    }
+    
+    public func handleTenantSwitch(_ tenant: TenantConfig, isLoggedIn: Bool) {
+        print("🔧 Router handleTenantSwitch: \(tenant.environmentDisplayName), isLoggedIn: \(isLoggedIn)")
+        
+        if isLoggedIn {
+            // Если пользователь уже залогинен, переходим на главный экран
+            showMainOrWhatsNewScreen(sourceScreen: .default, postLoginData: nil)
+            
+            // Обновляем экраны Discovery, Dashboard и Profile
+            refreshCurrentScreens()
+        } else {
+            // Если не залогинен, показываем экран логина
+            showLoginScreen(sourceScreen: .default)
+        }
+    }
+    
+    private func refreshCurrentScreens() {
+        print("🔧 Router refreshCurrentScreens: Sending tenantSwitched notification")
+        // Отправляем уведомление для обновления экранов
+        NotificationCenter.default.post(name: .tenantSwitched, object: nil)
     }
     
     public func presentAppReview() {

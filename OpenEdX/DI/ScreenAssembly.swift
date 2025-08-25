@@ -25,9 +25,7 @@ class ScreenAssembly: Assembly {
         
         // MARK: OfflineSync
         container.register(OfflineSyncRepositoryProtocol.self) { r in
-            OfflineSyncRepository(
-                api: r.resolve(API.self)!
-            )
+            OfflineSyncRepository()
         }
         container.register(OfflineSyncInteractorProtocol.self) { r in
             OfflineSyncInteractor(
@@ -45,11 +43,7 @@ class ScreenAssembly: Assembly {
         
         // MARK: Auth
         container.register(AuthRepositoryProtocol.self) { r in
-            AuthRepository(
-                api: r.resolve(API.self)!,
-                appStorage: r.resolve(CoreStorage.self)!,
-                config: r.resolve(ConfigProtocol.self)!
-            )
+            AuthRepository(appStorage: r.resolve(CoreStorage.self)!)
         }
         container.register(AuthInteractorProtocol.self) { r in
             AuthInteractor(
@@ -130,9 +124,7 @@ class ScreenAssembly: Assembly {
         
         container.register(DiscoveryRepositoryProtocol.self) { r in
             DiscoveryRepository(
-                api: r.resolve(API.self)!,
                 appStorage: r.resolve(CoreStorage.self)!,
-                config: r.resolve(ConfigProtocol.self)!,
                 persistence: r.resolve(DiscoveryPersistenceProtocol.self)!
             )
         }
@@ -193,9 +185,7 @@ class ScreenAssembly: Assembly {
         
         container.register(DashboardRepositoryProtocol.self) { r in
             DashboardRepository(
-                api: r.resolve(API.self)!,
                 storage: r.resolve(CoreStorage.self)!,
-                config: r.resolve(ConfigProtocol.self)!,
                 persistence: r.resolve(DashboardPersistenceProtocol.self)!
             )
         }
@@ -242,11 +232,9 @@ class ScreenAssembly: Assembly {
         
         container.register(ProfileRepositoryProtocol.self) { r in
             ProfileRepository(
-                api: r.resolve(API.self)!,
                 storage: r.resolve(AppStorage.self)!,
                 coreDataHandler: r.resolve(CoreDataHandlerProtocol.self)!,
-                downloadManager: r.resolve(DownloadManagerProtocol.self)!,
-                config: r.resolve(ConfigProtocol.self)!
+                downloadManager: r.resolve(DownloadManagerProtocol.self)!
             )
         }
         container.register(ProfileInteractorProtocol.self) { r in
@@ -260,7 +248,8 @@ class ScreenAssembly: Assembly {
                 router: r.resolve(ProfileRouter.self)!,
                 analytics: r.resolve(ProfileAnalytics.self)!,
                 config: r.resolve(ConfigProtocol.self)!,
-                connectivity: r.resolve(ConnectivityProtocol.self)!
+                connectivity: r.resolve(ConnectivityProtocol.self)!,
+                tenantManager: r.resolve(TenantManagerProtocol.self)!
             )
         }
         container.register(EditProfileViewModel.self) { @MainActor r, userModel in
@@ -550,9 +539,7 @@ class ScreenAssembly: Assembly {
         // MARK: Discussion
         container.register(DiscussionRepositoryProtocol.self) { r in
             DiscussionRepository(
-                api: r.resolve(API.self)!,
                 appStorage: r.resolve(CoreStorage.self)!,
-                config: r.resolve(ConfigProtocol.self)!,
                 router: r.resolve(DiscussionRouter.self)!
             )
         }
@@ -627,9 +614,7 @@ class ScreenAssembly: Assembly {
         
         container.register(CourseRepositoryProtocol.self) { r in
             CourseRepository(
-                api: r.resolve(API.self)!,
                 coreStorage: r.resolve(CoreStorage.self)!,
-                config: r.resolve(ConfigProtocol.self)!,
                 persistence: r.resolve(CoursePersistenceProtocol.self)!
             )
         }
@@ -651,9 +636,7 @@ class ScreenAssembly: Assembly {
         
         container.register(DownloadsRepositoryProtocol.self) { r in
             DownloadsRepository(
-                api: r.resolve(API.self)!,
                 coreStorage: r.resolve(CoreStorage.self)!,
-                config: r.resolve(ConfigProtocol.self)!,
                 persistence: r.resolve(DownloadsPersistenceProtocol.self)!
             )
         }

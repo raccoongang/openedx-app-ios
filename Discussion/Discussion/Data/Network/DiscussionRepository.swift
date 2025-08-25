@@ -9,6 +9,7 @@ import Foundation
 import Core
 import OEXFoundation
 import Combine
+import Swinject
 
 public protocol DiscussionRepositoryProtocol: Sendable {
     func getCourseDiscussionInfo(courseID: String) async throws -> DiscussionInfo
@@ -37,15 +38,17 @@ public protocol DiscussionRepositoryProtocol: Sendable {
 
 public actor DiscussionRepository: DiscussionRepositoryProtocol {
     
-    private let api: API
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
     private let appStorage: CoreStorage
-    private let config: ConfigProtocol
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
+    }
     private let router: DiscussionRouter
     
-    public init(api: API, appStorage: CoreStorage, config: ConfigProtocol, router: DiscussionRouter) {
-        self.api = api
+    public init(appStorage: CoreStorage, router: DiscussionRouter) {
         self.appStorage = appStorage
-        self.config = config
         self.router = router
     }
 

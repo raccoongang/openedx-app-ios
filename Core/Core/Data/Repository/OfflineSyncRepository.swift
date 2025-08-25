@@ -7,6 +7,7 @@
 
 import Foundation
 import OEXFoundation
+import Swinject
 
 public protocol OfflineSyncRepositoryProtocol: Sendable {
     func submitOfflineProgress(courseID: String, blockID: String, data: String) async throws -> Bool
@@ -14,10 +15,11 @@ public protocol OfflineSyncRepositoryProtocol: Sendable {
 
 public actor OfflineSyncRepository: OfflineSyncRepositoryProtocol {
     
-    private let api: API
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
     
-    public init(api: API) {
-        self.api = api
+    public init() {
     }
     
     public func submitOfflineProgress(courseID: String, blockID: String, data: String) async throws -> Bool {

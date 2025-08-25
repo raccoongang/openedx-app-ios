@@ -18,6 +18,10 @@ class RouteController: UIViewController {
         diContainer.resolve(UINavigationController.self)!
     }()
     
+    private lazy var router: Router = {
+        diContainer.resolve(Router.self)!
+    }()
+    
     private lazy var appStorage: CoreStorage = {
         diContainer.resolve(CoreStorage.self)!
     }()
@@ -49,23 +53,8 @@ class RouteController: UIViewController {
     }
     
     private func showStartupScreen() {
-        if let config = Container.shared.resolve(ConfigProtocol.self), config.features.startupScreenEnabled {
-            let controller = UIHostingController(
-                rootView: StartupView(viewModel: diContainer.resolve(StartupViewModel.self)!))
-            navigation.viewControllers = [controller]
-            present(navigation, animated: false)
-        } else {
-            let controller = UIHostingController(
-                rootView: SignInView(
-                    viewModel: diContainer.resolve(
-                        SignInViewModel.self,
-                        argument: LogistrationSourceScreen.default
-                    )!
-                )
-            )
-            navigation.viewControllers = [controller]
-            present(navigation, animated: false)
-        }
+        router.showStartupScreen()
+        present(navigation, animated: false)
     }
     
     private func showMainOrWhatsNewScreen() {

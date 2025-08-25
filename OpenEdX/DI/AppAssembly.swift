@@ -91,8 +91,12 @@ class AppAssembly: Assembly {
             Connectivity()
         }
         
-        container.register(DatabaseManager.self) { _ in
-            DatabaseManager(databaseName: "Database")
+        container.register(DatabaseManager.self) { r in
+            return DatabaseManager(databaseName: "Database", tenantManager: nil)
+        }.initCompleted { r, manager in
+            if let tenantManager = r.resolve(TenantManagerProtocol.self) {
+                manager.setTenantManager(tenantManager)
+            }
         }.inObjectScope(.container)
         
         container.register(CoreDataHandlerProtocol.self) { r in
@@ -143,8 +147,13 @@ class AppAssembly: Assembly {
             r.resolve(Router.self)!
         }.inObjectScope(.container)
         
-        container.register(ConfigProtocol.self) { _ in
-            Config()
+        // Сначала создаем Config без TenantManager
+        container.register(Config.self) { _ in
+            return Config()
+        }.inObjectScope(.container)
+        
+        container.register(ConfigProtocol.self) { r in
+            return r.resolve(Config.self)!
         }.inObjectScope(.container)
         
         container.register(CSSInjector.self) { r in
@@ -162,10 +171,15 @@ class AppAssembly: Assembly {
         }.inObjectScope(.container)
         
         container.register(AppStorage.self) { r in
-            AppStorage(
+            let storage = AppStorage(
                 keychain: r.resolve(KeychainSwift.self)!,
                 userDefaults: r.resolve(UserDefaults.self)!
             )
+            return storage
+        }.initCompleted { r, storage in
+            if let tenantManager = r.resolve(TenantManagerProtocol.self) {
+                storage.setTenantManager(tenantManager)
+            }
         }.inObjectScope(.container)
         
         container.register(CoreStorage.self) { r in
@@ -186,6 +200,22 @@ class AppAssembly: Assembly {
 
         container.register(ProfileStorage.self) { r in
             r.resolve(AppStorage.self)!
+        }.inObjectScope(.container)
+        
+        // Создаем TenantManager с Config
+        container.register(TenantManagerProtocol.self) { r in
+            let config = r.resolve(Config.self)!
+            let storage = r.resolve(CoreStorage.self)!
+            return TenantManager(storage: storage, multiTenantConfig: config.multiTenant)
+        }.initCompleted { r, tenantManager in
+            // После создания TenantManager связываем его с Config
+            let config = r.resolve(Config.self)!
+            config.setTenantManager(tenantManager)
+        }.inObjectScope(.container)
+        
+        container.register(TenantThemeManagerProtocol.self) { r in
+            let tenantManager = r.resolve(TenantManagerProtocol.self)!
+            return TenantThemeManager(tenantManager: tenantManager)
         }.inObjectScope(.container)
         
         container.register(SSOHelper.self) { r in

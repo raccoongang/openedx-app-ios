@@ -8,7 +8,7 @@
 import Foundation
 import OEXFoundation
 
-public enum DiscoveryConfigType: String {
+public enum DiscoveryConfigType: String, Codable {
     case native
     case webview
     case none
@@ -22,7 +22,7 @@ private enum DiscoveryKeys: String, RawStringExtractable {
     case programDetailTemplate = "PROGRAM_DETAIL_TEMPLATE"
 }
 
-public class DiscoveryWebviewConfig: NSObject {
+public class DiscoveryWebviewConfig: NSObject, Codable, @unchecked Sendable {
     public let baseURL: String?
     public let courseDetailTemplate: String?
     public let programDetailTemplate: String?
@@ -34,7 +34,7 @@ public class DiscoveryWebviewConfig: NSObject {
     }
 }
 
-public class DiscoveryConfig: NSObject {
+public class DiscoveryConfig: NSObject, Codable, @unchecked Sendable {
     public let type: DiscoveryConfigType
     public let webview: DiscoveryWebviewConfig
     public var isWebViewConfigured: Bool {
@@ -56,7 +56,13 @@ public class DiscoveryConfig: NSObject {
 private let key = "DISCOVERY"
 extension Config {
     public var discovery: DiscoveryConfig {
-        DiscoveryConfig(dictionary: self[key] as? [String: AnyObject] ?? [:])
+        // Для мультитенантности используем текущий тенант
+        if let tenant = currentTenant {
+            return tenant.discovery
+        }
+        
+        // Fallback на старую логику
+        return DiscoveryConfig(dictionary: self[key] as? [String: AnyObject] ?? [:])
     }
 }
 

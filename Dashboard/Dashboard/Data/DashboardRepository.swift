@@ -8,6 +8,7 @@
 import Foundation
 import Core
 import OEXFoundation
+import Swinject
 
 public protocol DashboardRepositoryProtocol: Sendable {
     func getEnrollments(page: Int) async throws -> [CourseItem]
@@ -19,16 +20,20 @@ public protocol DashboardRepositoryProtocol: Sendable {
 
 public actor DashboardRepository: DashboardRepositoryProtocol {
     
-    private let api: API
     private let storage: CoreStorage
-    private let config: ConfigProtocol
     private let persistence: DashboardPersistenceProtocol
     
-    public init(api: API, storage: CoreStorage, config: ConfigProtocol, persistence: DashboardPersistenceProtocol) {
-        self.api = api
+    public init(storage: CoreStorage, persistence: DashboardPersistenceProtocol) {
         self.storage = storage
-        self.config = config
         self.persistence = persistence
+    }
+    
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
+    
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
     }
     
     public func getEnrollments(page: Int) async throws -> [CourseItem] {

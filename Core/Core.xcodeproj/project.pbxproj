@@ -163,6 +163,13 @@
 		CEC8753B2D7845DB00A2626C /* DownloadErrorAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC875362D7845DB00A2626C /* DownloadErrorAlertView.swift */; };
 		CEC8753F2D786F7B00A2626C /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8753E2D786F7B00A2626C /* ArrayExtension.swift */; };
 		CED42FFC2D099F0400C7AD89 /* DownloadManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED42FFB2D099F0400C7AD89 /* DownloadManagerMock.swift */; };
+		CEDA5AB02E5B4ABD0080C65E /* TenantConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDA5AAF2E5B4ABD0080C65E /* TenantConfig.swift */; };
+		CEDA5AB32E5B4AE70080C65E /* TenantManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDA5AB12E5B4AE70080C65E /* TenantManager.swift */; };
+		CEDA5AB62E5B4B580080C65E /* TenantSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDA5AB42E5B4B580080C65E /* TenantSelectionView.swift */; };
+		CEDA5AB72E5B4B580080C65E /* TenantSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDA5AB52E5B4B580080C65E /* TenantSelectionViewModel.swift */; };
+		CEDA5ABA2E5B4C360080C65E /* TenantSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDA5AB82E5B4C360080C65E /* TenantSwitcherView.swift */; };
+		CEDA5ABB2E5B4C360080C65E /* TenantSwitcherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDA5AB92E5B4C360080C65E /* TenantSwitcherViewModel.swift */; };
+		CEDA5ABD2E5B4FC60080C65E /* TenantThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDA5ABC2E5B4FC60080C65E /* TenantThemeManager.swift */; };
 		CEF4AA1E2DBA41C4006C4F0A /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4AA1D2DBA41C4006C4F0A /* StringExtension.swift */; };
 		CFC84952299F8B890055E497 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC84951299F8B890055E497 /* Debounce.swift */; };
 		DBF6F2412B014ADA0098414B /* FirebaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF6F2402B014ADA0098414B /* FirebaseConfig.swift */; };
@@ -380,6 +387,13 @@
 		CEC875372D7845DB00A2626C /* DeviceStorageFullAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStorageFullAlertView.swift; sourceTree = "<group>"; };
 		CEC8753E2D786F7B00A2626C /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
 		CED42FFB2D099F0400C7AD89 /* DownloadManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerMock.swift; sourceTree = "<group>"; };
+		CEDA5AAF2E5B4ABD0080C65E /* TenantConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfig.swift; sourceTree = "<group>"; };
+		CEDA5AB12E5B4AE70080C65E /* TenantManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantManager.swift; sourceTree = "<group>"; };
+		CEDA5AB42E5B4B580080C65E /* TenantSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantSelectionView.swift; sourceTree = "<group>"; };
+		CEDA5AB52E5B4B580080C65E /* TenantSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantSelectionViewModel.swift; sourceTree = "<group>"; };
+		CEDA5AB82E5B4C360080C65E /* TenantSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantSwitcherView.swift; sourceTree = "<group>"; };
+		CEDA5AB92E5B4C360080C65E /* TenantSwitcherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantSwitcherViewModel.swift; sourceTree = "<group>"; };
+		CEDA5ABC2E5B4FC60080C65E /* TenantThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantThemeManager.swift; sourceTree = "<group>"; };
 		CEF4AA1D2DBA41C4006C4F0A /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		CFC84951299F8B890055E497 /* Debounce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
 		DBF6F2402B014ADA0098414B /* FirebaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseConfig.swift; sourceTree = "<group>"; };
@@ -589,6 +603,7 @@
 				0727877528D2383C002E9142 /* Model */,
 				0770DE2428D08FBA006D8A5D /* CoreStorage.swift */,
 				02512FEF299533DE0024D438 /* CoreDataHandlerProtocol.swift */,
+				CEDA5AB22E5B4AE70080C65E /* Manager */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -716,6 +731,10 @@
 			children = (
 				0770DE7728D0C49E006D8A5D /* Base */,
 				072787B528D37A0E002E9142 /* Validator.swift */,
+				CEDA5AB42E5B4B580080C65E /* TenantSelectionView.swift */,
+				CEDA5AB82E5B4C360080C65E /* TenantSwitcherView.swift */,
+				CEDA5AB92E5B4C360080C65E /* TenantSwitcherViewModel.swift */,
+				CEDA5AB52E5B4B580080C65E /* TenantSelectionViewModel.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -869,6 +888,15 @@
 			path = ActionViews;
 			sourceTree = "<group>";
 		};
+		CEDA5AB22E5B4AE70080C65E /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				CEDA5ABC2E5B4FC60080C65E /* TenantThemeManager.swift */,
+				CEDA5AB12E5B4AE70080C65E /* TenantManager.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		CFC84955299FAC4D0055E497 /* Combine */ = {
 			isa = PBXGroup;
 			children = (
@@ -895,6 +923,7 @@
 				A53A32342B233DEC005FE38A /* ThemeConfig.swift */,
 				E0D586192B2FF74C009B4BA7 /* DiscoveryConfig.swift */,
 				CE38BBD62D9D8294002CD276 /* ExperimentalFeaturesConfig.swift */,
+				CEDA5AAF2E5B4ABD0080C65E /* TenantConfig.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -1178,12 +1207,16 @@
 				06BEEA0E2B6A55C500D25A97 /* ColorInversionInjection.swift in Sources */,
 				064987972B4D69FF0071642A /* WebView.swift in Sources */,
 				06619EAD2B90918B001FAADE /* ReadabilityInjection.swift in Sources */,
+				CEDA5AB62E5B4B580080C65E /* TenantSelectionView.swift in Sources */,
+				CEDA5AB72E5B4B580080C65E /* TenantSelectionViewModel.swift in Sources */,
 				029A13262C2457D9005FB830 /* OfflineProgress.swift in Sources */,
 				06619EAF2B973B25001FAADE /* AccessibilityInjection.swift in Sources */,
 				BAFB99822B0E2354007D09F9 /* FacebookConfig.swift in Sources */,
 				02935B732BCECAD000B22F66 /* Data_PrimaryEnrollment.swift in Sources */,
 				027BD3B32909475900392132 /* Publishers+KeyboardState.swift in Sources */,
 				06DEA4A32BBD66A700110D20 /* BackNavigationButton.swift in Sources */,
+				CEDA5ABA2E5B4C360080C65E /* TenantSwitcherView.swift in Sources */,
+				CEDA5ABB2E5B4C360080C65E /* TenantSwitcherViewModel.swift in Sources */,
 				0727877D28D25212002E9142 /* ProgressBar.swift in Sources */,
 				CE09B2B62CE796AE0090DB53 /* InvalidCoreDataContextError.swift in Sources */,
 				BA981BD02B91ED50005707C2 /* FullScreenProgressView.swift in Sources */,
@@ -1209,6 +1242,7 @@
 				0260E58028FD792800BBBE18 /* WebUnitViewModel.swift in Sources */,
 				02A4833A29B8A9AB00D33F33 /* DownloadManager.swift in Sources */,
 				9784D47E2BF7762800AFEFFF /* FullScreenErrorView.swift in Sources */,
+				CEDA5AB02E5B4ABD0080C65E /* TenantConfig.swift in Sources */,
 				027BD3AE2909475000392132 /* KeyboardScrollerOptions.swift in Sources */,
 				BAFB99922B14E23D007D09F9 /* AppleSignInConfig.swift in Sources */,
 				141F1D302B7328D4009E81EB /* WebviewCookiesUpdateProtocol.swift in Sources */,
@@ -1261,6 +1295,7 @@
 				0267F8512C3C256F0089D810 /* FileWebView.swift in Sources */,
 				A5F4E7B52B61544A00ACD166 /* BrazeConfig.swift in Sources */,
 				06DEA4A52BBD66D700110D20 /* BackNavigationButtonViewModel.swift in Sources */,
+				CEDA5AB32E5B4AE70080C65E /* TenantManager.swift in Sources */,
 				02AFCC182AEFDB24000360F0 /* ThirdPartyMailClient.swift in Sources */,
 				0233D5712AF13EC800BAC8BD /* SelectMailClientView.swift in Sources */,
 				BAFB99842B0E282E007D09F9 /* MicrosoftConfig.swift in Sources */,
@@ -1273,6 +1308,7 @@
 				0727877928D23BE0002E9142 /* RequestInterceptor.swift in Sources */,
 				028CE96929858ECC00B6B1C3 /* FlexibleKeyboardInputView.swift in Sources */,
 				027BD3A92909474200392132 /* KeyboardAvoidingViewControllerRepr.swift in Sources */,
+				CEDA5ABD2E5B4FC60080C65E /* TenantThemeManager.swift in Sources */,
 				0649879A2B4D69FF0071642A /* WebViewHTML.swift in Sources */,
 				02CA59842BD7DDBE00D517AA /* DashboardConfig.swift in Sources */,
 				0236961B28F9A28B00EEF206 /* AuthInteractor.swift in Sources */,

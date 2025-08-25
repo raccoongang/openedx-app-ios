@@ -9,6 +9,7 @@ import Foundation
 import Core
 import OEXFoundation
 import Alamofire
+import Swinject
 
 public protocol ProfileRepositoryProtocol: Sendable {
     func getUserProfile(username: String) async throws -> UserProfile
@@ -29,24 +30,26 @@ public protocol ProfileRepositoryProtocol: Sendable {
 
 public actor ProfileRepository: ProfileRepositoryProtocol {
     
-    private let api: API
     private let storage: CoreStorage & ProfileStorage
     private let downloadManager: DownloadManagerProtocol
     private let coreDataHandler: CoreDataHandlerProtocol
-    private let config: ConfigProtocol
     
     public init(
-        api: API,
         storage: CoreStorage & ProfileStorage,
         coreDataHandler: CoreDataHandlerProtocol,
-        downloadManager: DownloadManagerProtocol,
-        config: ConfigProtocol
+        downloadManager: DownloadManagerProtocol
     ) {
-        self.api = api
         self.storage = storage
         self.coreDataHandler = coreDataHandler
         self.downloadManager = downloadManager
-        self.config = config
+    }
+    
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
+    
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
     }
     
     public func getUserProfile(username: String) async throws -> UserProfile {

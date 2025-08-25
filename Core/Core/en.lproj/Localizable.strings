@@ -189,3 +189,9 @@
 "DOWNLOAD.DOWNLOAD_LARGE_FILE_MESSAGE" = "The videos you've selected are larger than 1 GB. Do you want to download these videos?";
 "DOWNLOAD.DOWNLOAD" = "Download";
 "ALERT.ACCEPT" = "Accept";
+// MARK: - Tenant Selection
+"TENANT_SELECTION.TITLE" = "Select Environment";
+"TENANT_SELECTION.SUBTITLE" = "Choose the environment you want to access";
+"TENANT_SELECTION.SWITCH_TENANT" = "Switch Environment";
+"TENANT_SELECTION.LOGGED_IN" = "Logged In";
+"TENANT_SELECTION.NOT_LOGGED_IN" = "Not Logged In";

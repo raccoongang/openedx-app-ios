@@ -7,6 +7,8 @@
 
 import Foundation
 import OEXFoundation
+import Swinject
+import KeychainSwift
 
 public protocol AuthRepositoryProtocol: Sendable {
     func login(username: String, password: String) async throws -> User
@@ -21,18 +23,23 @@ public protocol AuthRepositoryProtocol: Sendable {
 
 public actor AuthRepository: AuthRepositoryProtocol {
     
-    private let api: API
     private var appStorage: CoreStorage
-    private let config: ConfigProtocol
     
-    public init(api: API, appStorage: CoreStorage, config: ConfigProtocol) {
-        self.api = api
+    public init(appStorage: CoreStorage) {
         self.appStorage = appStorage
-        self.config = config
+    }
+    
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
+    
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
     }
     
     public func login(username: String, password: String) async throws -> User {
         appStorage.cookiesDate = nil
+        print("🔧 AuthRepository config.baseURL: \(config.baseURL.absoluteString)")
         let endPoint = AuthEndpoint.getAccessToken(
             username: username,
             password: password,
@@ -52,8 +59,15 @@ public actor AuthRepository: AuthRepositoryProtocol {
         appStorage.accessToken = accessToken
         appStorage.refreshToken = refreshToken
         
+        // Сохраняем токены в keychain для текущего тенанта
+        saveTokensForCurrentTenant(accessToken: accessToken, refreshToken: refreshToken)
+        
         let user = try await api.requestData(AuthEndpoint.getUserInfo).mapResponse(DataLayer.User.self)
         appStorage.user = user
+        
+        // Сохраняем данные пользователя для текущего тенанта
+        saveUserForCurrentTenant(user: user)
+        
         return user.domain
     }
 
@@ -77,8 +91,15 @@ public actor AuthRepository: AuthRepositoryProtocol {
         appStorage.accessToken = accessToken
         appStorage.refreshToken = refreshToken
 
+        // Сохраняем токены в keychain для текущего тенанта
+        saveTokensForCurrentTenant(accessToken: accessToken, refreshToken: refreshToken)
+
         let user = try await api.requestData(AuthEndpoint.getUserInfo).mapResponse(DataLayer.User.self)
         appStorage.user = user
+        
+        // Сохраняем данные пользователя для текущего тенанта
+        saveUserForCurrentTenant(user: user)
+        
         return user.domain
     }
 
@@ -134,6 +155,33 @@ public actor AuthRepository: AuthRepositoryProtocol {
             }
         }
         throw APIError.parsingError
+    }
+    
+    private func saveTokensForCurrentTenant(accessToken: String, refreshToken: String) {
+        guard let tenantManager = Container.shared.resolve(TenantManagerProtocol.self),
+              let currentTenant = tenantManager.currentTenant else {
+            return
+        }
+        
+        let tenantKey = currentTenant.environmentDisplayName
+        let keychain = KeychainSwift()
+        keychain.set(accessToken, forKey: "accessToken_\(tenantKey)")
+        keychain.set(refreshToken, forKey: "refreshToken_\(tenantKey)")
+        
+        print("🔧 AuthRepository: Saved tokens for tenant \(tenantKey)")
+    }
+    
+    private func saveUserForCurrentTenant(user: DataLayer.User) {
+        guard let tenantManager = Container.shared.resolve(TenantManagerProtocol.self),
+              let currentTenant = tenantManager.currentTenant else {
+            return
+        }
+        
+        let tenantKey = currentTenant.environmentDisplayName
+        if let userData = try? JSONEncoder().encode(user) {
+            UserDefaults.standard.set(userData, forKey: "user_\(tenantKey)")
+            print("🔧 AuthRepository: Saved user data for tenant \(tenantKey)")
+        }
     }
     
 }

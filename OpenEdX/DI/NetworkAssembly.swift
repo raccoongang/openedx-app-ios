@@ -14,7 +14,7 @@ import Swinject
 class NetworkAssembly: Assembly {
     func assemble(container: Container) {
         container.register(RequestInterceptor.self) { r in
-            RequestInterceptor(config: r.resolve(ConfigProtocol.self)!, storage: r.resolve(CoreStorage.self)!)
+            RequestInterceptor(storage: r.resolve(CoreStorage.self)!)
         }.inObjectScope(.container)
         
         container.register(Alamofire.Session.self) { r in
@@ -39,7 +39,9 @@ class NetworkAssembly: Assembly {
         }.inObjectScope(.container)
         
         container.register(API.self) {r in
-            API(session: r.resolve(Alamofire.Session.self)!, baseURL: r.resolve(ConfigProtocol.self)!.baseURL)
-        }.inObjectScope(.container)
+            let baseURL = r.resolve(ConfigProtocol.self)!.baseURL
+            print("🔧 NetworkAssembly: Creating API with baseURL: \(baseURL.absoluteString)")
+            return API(session: r.resolve(Alamofire.Session.self)!, baseURL: baseURL)
+        }.inObjectScope(.transient)
     }
 }

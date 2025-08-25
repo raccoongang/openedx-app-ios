@@ -369,6 +369,18 @@ public enum CoreLocalization {
     /// Register
     public static let registerBtn = CoreLocalization.tr("Localizable", "SIGN_IN.REGISTER_BTN", fallback: "Register")
   }
+  public enum TenantSelection {
+    /// Logged In
+    public static let loggedIn = CoreLocalization.tr("Localizable", "TENANT_SELECTION.LOGGED_IN", fallback: "Logged In")
+    /// Not Logged In
+    public static let notLoggedIn = CoreLocalization.tr("Localizable", "TENANT_SELECTION.NOT_LOGGED_IN", fallback: "Not Logged In")
+    /// Choose the environment you want to access
+    public static let subtitle = CoreLocalization.tr("Localizable", "TENANT_SELECTION.SUBTITLE", fallback: "Choose the environment you want to access")
+    /// Switch Environment
+    public static let switchTenant = CoreLocalization.tr("Localizable", "TENANT_SELECTION.SWITCH_TENANT", fallback: "Switch Environment")
+    /// Select Environment
+    public static let title = CoreLocalization.tr("Localizable", "TENANT_SELECTION.TITLE", fallback: "Select Environment")
+  }
   public enum View {
     public enum Snackbar {
       /// Try Again

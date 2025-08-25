@@ -10,6 +10,7 @@ import Core
 import OEXFoundation
 import CoreData
 import Alamofire
+import Swinject
 
 public protocol DiscoveryRepositoryProtocol: Sendable {
     func getDiscovery(page: Int) async throws -> [CourseItem]
@@ -22,21 +23,23 @@ public protocol DiscoveryRepositoryProtocol: Sendable {
 
 public actor DiscoveryRepository: DiscoveryRepositoryProtocol {
     
-    private let api: API
     private let coreStorage: CoreStorage
-    private let config: ConfigProtocol
     private let persistence: DiscoveryPersistenceProtocol
     
     public init(
-        api: API,
         appStorage: CoreStorage,
-        config: ConfigProtocol,
         persistence: DiscoveryPersistenceProtocol
     ) {
-        self.api = api
         self.coreStorage = appStorage
-        self.config = config
         self.persistence = persistence
+    }
+    
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
+    
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
     }
     
     public func getDiscovery(page: Int) async throws -> [CourseItem] {

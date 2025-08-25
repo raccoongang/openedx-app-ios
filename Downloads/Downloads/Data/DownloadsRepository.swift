@@ -9,6 +9,7 @@ import Foundation
 import Core
 import Alamofire
 import OEXFoundation
+import Swinject
 
 public protocol DownloadsRepositoryProtocol: Sendable {
     func getDownloadCourses() async throws -> [DownloadCoursePreview]
@@ -17,21 +18,23 @@ public protocol DownloadsRepositoryProtocol: Sendable {
 
 public actor DownloadsRepository: DownloadsRepositoryProtocol {
     
-    private let api: API
     private let coreStorage: CoreStorage
-    private let config: ConfigProtocol
     private let persistence: DownloadsPersistenceProtocol
     
     public init(
-        api: API,
         coreStorage: CoreStorage,
-        config: ConfigProtocol,
         persistence: DownloadsPersistenceProtocol
     ) {
-        self.api = api
         self.coreStorage = coreStorage
-        self.config = config
         self.persistence = persistence
+    }
+    
+    private var api: API {
+        Container.shared.resolve(API.self)!
+    }
+    
+    private var config: ConfigProtocol {
+        Container.shared.resolve(ConfigProtocol.self)!
     }
     
     public func getDownloadCourses() async throws -> [DownloadCoursePreview] {

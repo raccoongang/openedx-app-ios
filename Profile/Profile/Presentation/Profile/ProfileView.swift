@@ -149,6 +149,33 @@ public struct ProfileView: View {
                 }.padding(.all, 24)
                 profileInfo
                 editProfileButton
+                
+                // MARK: - Tenant Switcher
+                if viewModel.tenantManager.isMultiTenant {
+                    TenantSwitcherView(
+                        viewModel: TenantSwitcherViewModel(
+                            tenants: viewModel.tenantManager.availableTenants,
+                            tenantManager: viewModel.tenantManager,
+                            onTenantSwitched: { tenant in
+                                let isLoggedIn = viewModel.tenantManager.isLoggedIn(for: tenant)
+                                if isLoggedIn {
+                                    // Обновляем данные профиля для нового тенанта
+                                    Task {
+                                        await viewModel.getMyProfile()
+                                    }
+                                    // Отправляем уведомление об обновлении
+                                    NotificationCenter.default.post(name: .tenantSwitched, object: nil)
+                                } else {
+                                    // Переходим на экран логина
+                                    viewModel.router.showLoginScreen(sourceScreen: .default)
+                                }
+                            }
+                        )
+                    )
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
+                }
+                
                 Spacer()
             }
         }
@@ -186,28 +213,29 @@ public struct ProfileView: View {
 }
 
 #if DEBUG
-struct ProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        let router = ProfileRouterMock()
-        let vm = ProfileViewModel(
-            interactor: ProfileInteractor.mock,
-            router: router,
-            analytics: ProfileAnalyticsMock(),
-            config: ConfigMock(),
-            connectivity: Connectivity()
-        )
-        
-        ProfileView(viewModel: vm)
-            .preferredColorScheme(.light)
-            .previewDisplayName("DiscoveryView Light")
-            .loadFonts()
-        
-        ProfileView(viewModel: vm)
-            .preferredColorScheme(.dark)
-            .previewDisplayName("DiscoveryView Dark")
-            .loadFonts()
-    }
-}
+//struct ProfileView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let router = ProfileRouterMock()
+//        let vm = ProfileViewModel(
+//            interactor: ProfileInteractor.mock,
+//            router: router,
+//            analytics: ProfileAnalyticsMock(),
+//            config: ConfigMock(),
+//            connectivity: Connectivity(),
+//            tenantManager: TenantManager(storage: CoreStorageMock(), multiTenantConfig: Mul)
+//        )
+//        
+//        ProfileView(viewModel: vm)
+//            .preferredColorScheme(.light)
+//            .previewDisplayName("DiscoveryView Light")
+//            .loadFonts()
+//        
+//        ProfileView(viewModel: vm)
+//            .preferredColorScheme(.dark)
+//            .previewDisplayName("DiscoveryView Dark")
+//            .loadFonts()
+//    }
+//}
 #endif
 
 struct UserAvatar: View {

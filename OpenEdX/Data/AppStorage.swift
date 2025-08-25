@@ -22,34 +22,47 @@ public final class AppStorage: CoreStorage,
 
     private nonisolated(unsafe) let keychain: KeychainSwift
     private nonisolated(unsafe) let userDefaults: UserDefaults
+    private nonisolated(unsafe) var tenantManager: TenantManagerProtocol?
 
     public init(keychain: KeychainSwift, userDefaults: UserDefaults) {
         self.keychain = keychain
         self.userDefaults = userDefaults
     }
+    
+    public func setTenantManager(_ tenantManager: TenantManagerProtocol) {
+        self.tenantManager = tenantManager
+    }
+    
+    private func getTenantKey() -> String {
+        return tenantManager?.getCurrentTenantKey() ?? "default"
+    }
 
     public var accessToken: String? {
         get {
-            return keychain.get(KEY_ACCESS_TOKEN)
+            let key = "\(KEY_ACCESS_TOKEN)_\(getTenantKey())"
+            return keychain.get(key)
         }
         set(newValue) {
+            let key = "\(KEY_ACCESS_TOKEN)_\(getTenantKey())"
             if let newValue {
-                keychain.set(newValue, forKey: KEY_ACCESS_TOKEN)
+                keychain.set(newValue, forKey: key)
             } else {
-                keychain.delete(KEY_ACCESS_TOKEN)
+                keychain.delete(key)
             }
         }
     }
 
     public var refreshToken: String? {
         get {
-            return keychain.get(KEY_REFRESH_TOKEN)
+            let key = "\(KEY_REFRESH_TOKEN)_\(getTenantKey())"
+            return keychain.get(key)
         }
         set(newValue) {
+            let key = "\(KEY_REFRESH_TOKEN)_\(getTenantKey())"
             if let newValue {
-                keychain.set(newValue, forKey: KEY_REFRESH_TOKEN)
+                keychain.set(newValue, forKey: key)
             } else {
-                keychain.delete(KEY_REFRESH_TOKEN)
+                keychain.delete(key)
             }
         }
     }
@@ -156,19 +169,21 @@ public final class AppStorage: CoreStorage,
 
     public var userProfile: DataLayer.UserProfile? {
         get {
-            guard let userJson = userDefaults.data(forKey: KEY_USER_PROFILE) else {
+            let key = "\(KEY_USER_PROFILE)_\(getTenantKey())"
+            guard let userJson = userDefaults.data(forKey: key) else {
                 return nil
             }
             return try? JSONDecoder().decode(DataLayer.UserProfile.self, from: userJson)
         }
         set(newValue) {
+            let key = "\(KEY_USER_PROFILE)_\(getTenantKey())"
             if let user = newValue {
                 let encoder = JSONEncoder()
                 if let encoded = try? encoder.encode(user) {
-                    userDefaults.set(encoded, forKey: KEY_USER_PROFILE)
+                    userDefaults.set(encoded, forKey: key)
                 }
             } else {
-                userDefaults.set(nil, forKey: KEY_USER_PROFILE)
+                userDefaults.set(nil, forKey: key)
             }
         }
     }
@@ -228,19 +243,21 @@ public final class AppStorage: CoreStorage,
 
     public var user: DataLayer.User? {
         get {
-            guard let userJson = userDefaults.data(forKey: KEY_USER) else {
+            let key = "\(KEY_USER)_\(getTenantKey())"
+            guard let userJson = userDefaults.data(forKey: key) else {
                 return nil
             }
             return try? JSONDecoder().decode(DataLayer.User.self, from: userJson)
         }
         set(newValue) {
+            let key = "\(KEY_USER)_\(getTenantKey())"
             if let user = newValue {
                 let encoder = JSONEncoder()
                 if let encoded = try? encoder.encode(user) {
-                    userDefaults.set(encoded, forKey: KEY_USER)
+                    userDefaults.set(encoded, forKey: key)
                 }
             } else {
-                userDefaults.set(nil, forKey: KEY_USER)
+                userDefaults.set(nil, forKey: key)
             }
         }
     }
@@ -393,6 +410,31 @@ public final class AppStorage: CoreStorage,
         cookiesDate = nil
         user = nil
         userProfile = nil
+        // delete all cookies
+        if let cookies = HTTPCookieStorage.shared.cookies {
+            for cookie in cookies {
+                HTTPCookieStorage.shared.deleteCookie(cookie)
+            }
+        }
+    }
+    
+    public func clearAllTenants() {
+        // Очищаем данные для всех тенантов
+        guard let tenantManager = tenantManager else { return }
+        
+        for tenant in tenantManager.availableTenants {
+            let tenantKey = tenant.environmentDisplayName
+            
+            // Очищаем keychain
+            keychain.delete("\(KEY_ACCESS_TOKEN)_\(tenantKey)")
+            keychain.delete("\(KEY_REFRESH_TOKEN)_\(tenantKey)")
+            keychain.delete("\(KEY_PUSH_TOKEN)_\(tenantKey)")
+            
+            // Очищаем UserDefaults
+            userDefaults.removeObject(forKey: "\(KEY_USER)_\(tenantKey)")
+            userDefaults.removeObject(forKey: "\(KEY_USER_PROFILE)_\(tenantKey)")
+        }
+        
         // delete all cookies
         if let cookies = HTTPCookieStorage.shared.cookies {
             for cookie in cookies {

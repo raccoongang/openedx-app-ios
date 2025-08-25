@@ -28,7 +28,7 @@ enum AnalyticsSource: String {
     case none
 }
 
-public final class FirebaseConfig: NSObject {
+public final class FirebaseConfig: NSObject, @unchecked Sendable {
     public var enabled: Bool = false
     public var cloudMessagingEnabled: Bool = false
     public let apiKey: String?

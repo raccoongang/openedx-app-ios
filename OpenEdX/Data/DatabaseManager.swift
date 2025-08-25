@@ -16,7 +16,12 @@ import Profile
 
 final class DatabaseManager: CoreDataHandlerProtocol {
     
-    private let databaseName: String
+    private let baseDatabaseName: String
+    private nonisolated(unsafe) var _tenantManager: TenantManagerProtocol?
+    
+    private var tenantManager: TenantManagerProtocol? {
+        return _tenantManager
+    }
         
     private let bundles: [Bundle] = [
         Bundle(for: CoreBundle.self),
@@ -27,33 +32,49 @@ final class DatabaseManager: CoreDataHandlerProtocol {
         Bundle(for: DownloadsBundle.self)
     ]
         
-    private nonisolated(unsafe) var persistentContainer: NSPersistentContainer?
+    private nonisolated(unsafe) var persistentContainers: [String: NSPersistentContainer] = [:]
     
     public func getPersistentContainer() -> NSPersistentContainer {
-        if persistentContainer == nil {
-           persistentContainer = createContainer()
+        let tenantKey = tenantManager?.getCurrentTenantKey() ?? "default"
+        
+        if persistentContainers[tenantKey] == nil {
+            persistentContainers[tenantKey] = createContainer(for: tenantKey)
         }
-        return persistentContainer!
+        return persistentContainers[tenantKey]!
     }
     
-    init(databaseName: String) {
-        self.databaseName = databaseName
+    init(databaseName: String, tenantManager: TenantManagerProtocol? = nil) {
+        self.baseDatabaseName = databaseName
+        self._tenantManager = tenantManager
     }
     
-    private func createContainer() -> NSPersistentContainer {
+    public func setTenantManager(_ tenantManager: TenantManagerProtocol) {
+        self._tenantManager = tenantManager
+    }
+    
+    private func createContainer(for tenantKey: String) -> NSPersistentContainer {
         let model = NSManagedObjectModel.mergedModel(from: bundles)!
+        let databaseName = "\(baseDatabaseName)_\(tenantKey)"
         let container = NSPersistentContainer(name: databaseName, managedObjectModel: model)
+        
+        // Создаем уникальный путь для базы данных каждого тенанта
+        let description = NSPersistentStoreDescription()
+        description.shouldInferMappingModelAutomatically = true
+        description.shouldMigrateStoreAutomatically = true
+        
+        if let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let storeURL = documentsURL.appendingPathComponent("\(databaseName).sqlite")
+            description.url = storeURL
+        }
+        
+        container.persistentStoreDescriptions = [description]
+        
         container.loadPersistentStores { _, error in
             if let error = error {
                 print("Unresolved error \(error)")
                 fatalError()
             }
         }
-
-        let description = NSPersistentStoreDescription()
-        description.shouldInferMappingModelAutomatically = true
-        description.shouldMigrateStoreAutomatically = true
-        container.persistentStoreDescriptions = [description]
         
         return container
     }
@@ -65,7 +86,14 @@ final class DatabaseManager: CoreDataHandlerProtocol {
     }
     
     public func clear() {
-        let storeContainer = getPersistentContainer().persistentStoreCoordinator
+        let tenantKey = tenantManager?.getCurrentTenantKey() ?? "default"
+        clearTenant(tenantKey: tenantKey)
+    }
+    
+    public func clearTenant(tenantKey: String) {
+        guard let container = persistentContainers[tenantKey] else { return }
+        
+        let storeContainer = container.persistentStoreCoordinator
         for store in storeContainer.persistentStores {
             do {
                 try storeContainer.destroyPersistentStore(
@@ -78,12 +106,18 @@ final class DatabaseManager: CoreDataHandlerProtocol {
             }
         }
 
-        // Re-create the persistent container
-        getPersistentContainer().loadPersistentStores { _, error in
-            if let error = error {
-                print("Unresolved error \(error)")
-                fatalError()
-            }
+        // Remove from cache
+        persistentContainers.removeValue(forKey: tenantKey)
+        
+        // Re-create the persistent container if it's the current tenant
+        if tenantKey == (tenantManager?.getCurrentTenantKey() ?? "default") {
+            _ = getPersistentContainer()
+        }
+    }
+    
+    public func clearAllTenants() {
+        for tenantKey in persistentContainers.keys {
+            clearTenant(tenantKey: tenantKey)
         }
     }
 }
