@@ -11,6 +11,19 @@ import Theme
 import Combine
 import OEXFoundation
 
+// Класс для уведомления об изменениях темы
+public class ThemeNotifier: ObservableObject {
+    @MainActor public static let shared = ThemeNotifier()
+    
+    @Published public var themeChanged = false
+    
+    private init() {}
+    
+    public func notifyThemeChanged() {
+        themeChanged.toggle()
+    }
+}
+
 public protocol TenantThemeManagerProtocol: Sendable {
     func applyTheme(for tenant: TenantConfig?)
     func resetToDefaultTheme()
@@ -23,22 +36,31 @@ public final class TenantThemeManager: TenantThemeManagerProtocol, @unchecked Se
     public init(tenantManager: TenantManagerProtocol) {
         self.tenantManager = tenantManager
         
+        print("🎨 TenantThemeManager: Initializing and subscribing to tenant changes")
+        
         // Подписываемся на изменения текущего тенанта
         tenantManager.currentTenantPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] tenant in
+                print("🎨 TenantThemeManager: Received tenant change: \(tenant?.environmentDisplayName ?? "nil")")
                 self?.applyTheme(for: tenant)
             }
             .store(in: &cancellables)
+        
+        // Применяем тему для текущего тенанта при инициализации
+        applyTheme(for: tenantManager.currentTenant)
     }
     
     public func applyTheme(for tenant: TenantConfig?) {
         DispatchQueue.main.async {
             guard let tenant = tenant,
                   let accentColorHex = tenant.accentColor else {
+                print("🎨 TenantThemeManager: No tenant or accent color, resetting to default theme")
                 self.resetToDefaultTheme()
                 return
             }
+            
+            print("🎨 TenantThemeManager: Applying theme for tenant \(tenant.environmentDisplayName) with color \(accentColorHex)")
             
             let accentColor = Color(hex: accentColorHex)
             
@@ -51,16 +73,35 @@ public final class TenantThemeManager: TenantThemeManagerProtocol, @unchecked Se
             // Обновляем UIColors для UIKit компонентов
             Theme.UIColors.update(
                 accentColor: accentColor.uiColor(),
-                accentXColor: accentColor.uiColor()
+                accentXColor: accentColor.uiColor(),
+                
             )
+            
+            // Уведомляем об изменении темы
+            ThemeNotifier.shared.notifyThemeChanged()
+            
+            // Принудительно обновляем tintColor окна
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                window.tintColor = accentColor.uiColor()
+            }
+            
+            // Отправляем уведомление об изменении темы
+            NotificationCenter.default.post(name: .themeChanged, object: nil)
+            
+            print("🎨 TenantThemeManager: Theme applied successfully")
         }
     }
     
     public func resetToDefaultTheme() {
         DispatchQueue.main.async {
+            print("🎨 TenantThemeManager: Resetting to default theme")
             // Сбрасываем на дефолтные цвета
             Theme.Colors.update()
             Theme.UIColors.update()
+            
+            // Уведомляем об изменении темы
+            ThemeNotifier.shared.notifyThemeChanged()
         }
     }
 }
@@ -86,9 +127,16 @@ extension Color {
             .sRGB,
             red: Double(r) / 255,
             green: Double(g) / 255,
-            blue:  Double(b) / 255,
+            blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
     }
+    
+    func uiColor() -> UIColor {
+        return UIColor(self)
+    }
 }
 
+public extension Notification.Name {
+    static let themeChanged = Notification.Name("themeChanged")
+}

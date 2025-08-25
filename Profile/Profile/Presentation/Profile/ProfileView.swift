@@ -14,9 +14,31 @@ import OEXFoundation
 public struct ProfileView: View {
     
     @StateObject private var viewModel: ProfileViewModel
+    @ObservedObject private var themeNotifier = ThemeNotifier.shared
+    @StateObject private var tenantSwitcherViewModel: TenantSwitcherViewModel
     
     public init(viewModel: ProfileViewModel) {
         self._viewModel = StateObject(wrappedValue: { viewModel }())
+        self._tenantSwitcherViewModel = StateObject(wrappedValue: {
+            TenantSwitcherViewModel(
+                tenants: viewModel.tenantManager.availableTenants,
+                tenantManager: viewModel.tenantManager,
+                onTenantSwitched: { tenant in
+                    let isLoggedIn = viewModel.tenantManager.isLoggedIn(for: tenant)
+                    if isLoggedIn {
+                        // Обновляем данные профиля для нового тенанта
+                        Task {
+                            await viewModel.getMyProfile()
+                        }
+                        // Отправляем уведомление об обновлении
+                        NotificationCenter.default.post(name: .tenantSwitched, object: nil)
+                    } else {
+                        // Переходим на экран логина
+                        viewModel.router.showLoginScreen(sourceScreen: .default)
+                    }
+                }
+            )
+        }())
     }
     
     public var body: some View {
@@ -79,6 +101,10 @@ public struct ProfileView: View {
                 Task {
                     await viewModel.getMyProfile()
                 }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .themeChanged)) { _ in
+                print("📱 ProfileView: Received theme change notification")
+                // Принудительно обновляем UI при изменении темы
             }
         }
     }
@@ -152,28 +178,9 @@ public struct ProfileView: View {
                 
                 // MARK: - Tenant Switcher
                 if viewModel.tenantManager.isMultiTenant {
-                    TenantSwitcherView(
-                        viewModel: TenantSwitcherViewModel(
-                            tenants: viewModel.tenantManager.availableTenants,
-                            tenantManager: viewModel.tenantManager,
-                            onTenantSwitched: { tenant in
-                                let isLoggedIn = viewModel.tenantManager.isLoggedIn(for: tenant)
-                                if isLoggedIn {
-                                    // Обновляем данные профиля для нового тенанта
-                                    Task {
-                                        await viewModel.getMyProfile()
-                                    }
-                                    // Отправляем уведомление об обновлении
-                                    NotificationCenter.default.post(name: .tenantSwitched, object: nil)
-                                } else {
-                                    // Переходим на экран логина
-                                    viewModel.router.showLoginScreen(sourceScreen: .default)
-                                }
-                            }
-                        )
-                    )
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 16)
+                    TenantSwitcherView(viewModel: tenantSwitcherViewModel)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 16)
                 }
                 
                 Spacer()

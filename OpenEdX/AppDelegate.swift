@@ -76,6 +76,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         Theme.Fonts.registerFonts()
+        
+        // Инициализируем TenantThemeManager для автоматического применения тем
+        _ = Container.shared.resolve(TenantThemeManagerProtocol.self)
+        
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = RouteController()
         window?.makeKeyAndVisible()

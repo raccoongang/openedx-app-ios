@@ -40,12 +40,16 @@ public class TenantSwitcherViewModel: ObservableObject {
     }
     
     public func switchToTenant(_ tenant: TenantConfig) {
+        print("🔄 TenantSwitcherViewModel: Switching to tenant \(tenant.environmentDisplayName)")
+        
         if tenantManager.isLoggedIn(for: tenant) {
             // Если пользователь уже залогинен в этот тенант, просто переключаемся
+            print("🔄 TenantSwitcherViewModel: User is logged in, switching tenant")
             tenantManager.setCurrentTenant(tenant)
             onTenantSwitched(tenant)
         } else {
             // Если не залогинен, устанавливаем тенант и переходим на экран логина
+            print("🔄 TenantSwitcherViewModel: User not logged in, setting tenant and calling onTenantSwitched")
             tenantManager.setCurrentTenant(tenant)
             onTenantSwitched(tenant)
         }

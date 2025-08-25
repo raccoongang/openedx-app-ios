@@ -88,6 +88,7 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
     }
     
     public func setCurrentTenant(_ tenant: TenantConfig) {
+        print("🔧 TenantManager: Setting current tenant to \(tenant.environmentDisplayName)")
         currentTenantSubject.send(tenant)
         
         // Сохраняем выбранный тенант
@@ -97,6 +98,8 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
         
         // Обновляем токены в CoreStorage для нового тенанта
         updateTokensForCurrentTenant(tenant)
+        
+        print("🔧 TenantManager: Current tenant set successfully")
     }
     
     private func updateTokensForCurrentTenant(_ tenant: TenantConfig) {
