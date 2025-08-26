@@ -20,7 +20,7 @@ public struct ProfileView: View {
     public init(viewModel: ProfileViewModel) {
         self._viewModel = StateObject(wrappedValue: { viewModel }())
         self._tenantSwitcherViewModel = StateObject(wrappedValue: {
-            TenantSwitcherViewModel(
+            let tenantSwitcherVM = TenantSwitcherViewModel(
                 tenants: viewModel.tenantManager.availableTenants,
                 tenantManager: viewModel.tenantManager,
                 onTenantSwitched: { tenant in
@@ -38,6 +38,9 @@ public struct ProfileView: View {
                     }
                 }
             )
+            // Загружаем текущий тенант при инициализации
+            tenantSwitcherVM.loadTenants()
+            return tenantSwitcherVM
         }())
     }
     

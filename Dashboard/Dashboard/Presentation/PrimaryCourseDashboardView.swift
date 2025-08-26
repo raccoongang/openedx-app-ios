@@ -194,6 +194,11 @@ public struct PrimaryCourseDashboardView<ProgramView: View>: View {
             .onAppear {
                 viewModel.updateNeeded = true
             }
+            .onReceive(NotificationCenter.default.publisher(for: .tenantSwitched)) { _ in
+                Task {
+                    await viewModel.getEnrollments(showProgress: true)
+                }
+            }
             .background(
                 Theme.Colors.background
                     .ignoresSafeArea()
