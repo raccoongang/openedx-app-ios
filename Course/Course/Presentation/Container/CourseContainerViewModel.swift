@@ -974,6 +974,13 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 updateCourseProgress = true
+
+                if let id = courseStructure?.id {
+                    Task {
+                       await self.updateCourseIfNeeded(courseID: id)
+                    }
+                }
+
             }
             .store(in: &cancellables)
     }

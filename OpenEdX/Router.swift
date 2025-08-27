@@ -333,7 +333,7 @@ public class Router: AuthorizationRouter,
         courseID: String,
         courseName: String,
         title: String,
-        chapters: [CourseChapter],
+        chapters: Binding<[CourseChapter]>,
         chapterIndex: Int,
         sequentialIndex: Int
     ) {
@@ -347,18 +347,18 @@ public class Router: AuthorizationRouter,
         )
         navigationController.pushViewController(controller, animated: true)
     }
-    
+
     public func getVerticalController(
         courseID: String,
         courseName: String,
         title: String,
-        chapters: [CourseChapter],
+        chapters: Binding<[CourseChapter]>,
         chapterIndex: Int,
         sequentialIndex: Int
     ) -> UIHostingController<CourseVerticalView> {
         let viewModel = Container.shared.resolve(
-            CourseVerticalViewModel.self,
-            arguments: chapters,
+            CourseVerticalViewModel.self, arguments:
+            chapters,
             chapterIndex,
             sequentialIndex
         )!
@@ -628,7 +628,7 @@ public class Router: AuthorizationRouter,
                 courseID: courseID,
                 courseName: courseName,
                 title: chapters[chapterIndex].childs[sequentialIndex].displayName,
-                chapters: chapters,
+                chapters: .constant(chapters),
                 chapterIndex: chapterIndex,
                 sequentialIndex: sequentialIndex
             )

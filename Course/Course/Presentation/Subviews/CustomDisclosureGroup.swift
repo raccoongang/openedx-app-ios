@@ -11,14 +11,18 @@ import Theme
 
 struct CustomDisclosureGroup: View {
     @State private var expandedSections: [String: Bool] = [:]
-    
+    @Binding var course: CourseStructure
+
     private let proxy: GeometryProxy
-    private let course: CourseStructure
     private let viewModel: CourseContainerViewModel
     private var idiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     
-    init(course: CourseStructure, proxy: GeometryProxy, viewModel: CourseContainerViewModel) {
-        self.course = course
+    init(
+        course: Binding<CourseStructure>,
+        proxy: GeometryProxy,
+        viewModel: CourseContainerViewModel
+    ) {
+        self._course = course
         self.proxy = proxy
         self.viewModel = viewModel
     }
@@ -100,7 +104,7 @@ struct CustomDisclosureGroup: View {
                                                         courseID: viewModel.courseStructure?.id ?? "",
                                                         courseName: viewModel.courseStructure?.displayName ?? "",
                                                         title: sequential.displayName,
-                                                        chapters: course.childs,
+                                                        chapters: $course.childs,
                                                         chapterIndex: chapterIndex,
                                                         sequentialIndex: sequentialIndex
                                                     )
@@ -392,7 +396,22 @@ struct CustomDisclosureGroup_Previews: PreviewProvider {
                 ]
             )
         ]
-        
+
+        @State var course = CourseStructure(
+            id: "Id",
+            graded: false,
+            completion: 0,
+            viewYouTubeUrl: "",
+            encodedVideo: "",
+            displayName: "Course",
+            childs: sampleCourseChapters,
+            media: CourseMedia.init(image: CourseImage(raw: "", small: "", large: "")),
+            certificate: nil,
+            org: "org",
+            isSelfPaced: false,
+            courseProgress: nil
+        )
+
         let viewModel = CourseContainerViewModel(
             interactor: CourseInteractor.mock,
             authInteractor: AuthInteractor.mock,
@@ -425,20 +444,7 @@ struct CustomDisclosureGroup_Previews: PreviewProvider {
         return GeometryReader { proxy in
             ScrollView {
                 CustomDisclosureGroup(
-                    course: CourseStructure(
-                        id: "Id",
-                        graded: false,
-                        completion: 0,
-                        viewYouTubeUrl: "",
-                        encodedVideo: "",
-                        displayName: "Course",
-                        childs: sampleCourseChapters,
-                        media: CourseMedia.init(image: CourseImage(raw: "", small: "", large: "")),
-                        certificate: nil,
-                        org: "org",
-                        isSelfPaced: false,
-                        courseProgress: nil
-                    ),
+                    course: $course,
                     proxy: proxy,
                     viewModel: viewModel
                 )

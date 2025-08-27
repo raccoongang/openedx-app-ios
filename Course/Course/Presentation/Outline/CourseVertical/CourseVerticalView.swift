@@ -134,13 +134,16 @@ public struct CourseVerticalView: View {
             Theme.Colors.background
                 .ignoresSafeArea()
         )
+        .onAppear {
+            viewModel.refreshVerticals()
+        }
     }
 }
 
 #if DEBUG
 struct CourseVerticalView_Previews: PreviewProvider {
     static var previews: some View {
-        let chapters = [
+        @State var chapters = [
             CourseChapter(
                 blockId: "1",
                 id: "1",
@@ -176,7 +179,7 @@ struct CourseVerticalView_Previews: PreviewProvider {
         ]
         
         let viewModel = CourseVerticalViewModel(
-            chapters: chapters,
+            chapters: $chapters,
             chapterIndex: 0,
             sequentialIndex: 0,
             router: CourseRouterMock(),
