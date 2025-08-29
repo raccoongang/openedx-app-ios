@@ -57,7 +57,7 @@ final class DatabaseManager: CoreDataHandlerProtocol {
         let databaseName = "\(baseDatabaseName)_\(tenantKey)"
         let container = NSPersistentContainer(name: databaseName, managedObjectModel: model)
         
-        // Создаем уникальный путь для базы данных каждого тенанта
+        // create a unique path for the database of each Tenant
         let description = NSPersistentStoreDescription()
         description.shouldInferMappingModelAutomatically = true
         description.shouldMigrateStoreAutomatically = true

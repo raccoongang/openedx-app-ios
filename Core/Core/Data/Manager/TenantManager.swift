@@ -23,6 +23,7 @@ public protocol TenantManagerProtocol: Sendable {
     func logout(from tenant: TenantConfig)
     func switchToNextAvailableTenant()
     func clearCurrentTenant()
+    func clearAllTenantData() // for debug purpose
 }
 
 public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
@@ -57,7 +58,10 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
         print("  - availableTenants count: \(availableTenants.count)")
         print("  - availableTenants: \(availableTenants.map { $0.environmentDisplayName })")
         
-        // Загружаем сохраненный тенант только если пользователь авторизован в нем
+        // We check if this is the first launch after installation
+        checkAndClearDataIfFirstLaunch()
+        
+        // load the saved Tenant only if the user is authorized in it
         if let savedTenantData = UserDefaults.standard.data(forKey: KEY_CURRENT_TENANT),
            let savedTenant = try? JSONDecoder().decode(TenantConfig.self, from: savedTenantData),
            availableTenants.contains(savedTenant) {
@@ -76,14 +80,14 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
     }
     
     private func checkForLoggedInTenants() {
-        // Проверяем, есть ли тенанты, в которых пользователь уже авторизован
+        // check if there are tenants in which the user has already been authorized
         let loggedInTenants = availableTenants.filter { isLoggedIn(for: $0) }
         if let firstLoggedInTenant = loggedInTenants.first {
             print("  - Setting first logged in tenant: \(firstLoggedInTenant.environmentDisplayName)")
             setCurrentTenant(firstLoggedInTenant)
         } else {
             print("  - No tenant set - user not logged in anywhere")
-            // Не устанавливаем тенант, если пользователь нигде не авторизован
+            // Do not install the tenant if the user is not authorized anywhere
         }
     }
     
@@ -91,12 +95,12 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
         print("🔧 TenantManager: Setting current tenant to \(tenant.environmentDisplayName)")
         currentTenantSubject.send(tenant)
         
-        // Сохраняем выбранный тенант
+        // save the selected Tenant
         if let encoded = try? JSONEncoder().encode(tenant) {
             UserDefaults.standard.set(encoded, forKey: KEY_CURRENT_TENANT)
         }
         
-        // Обновляем токены в CoreStorage для нового тенанта
+        // update tokens in Corestorage for the new Tenant
         updateTokensForCurrentTenant(tenant)
         
         print("🔧 TenantManager: Current tenant set successfully")
@@ -106,17 +110,17 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
         let tenantKey = tenant.environmentDisplayName
         let keychain = KeychainSwift()
         
-        // Получаем токены для нового тенанта из keychain
+        // get tokens for the new Tenant from KeyChain
         let accessToken = keychain.get("accessToken_\(tenantKey)")
         let refreshToken = keychain.get("refreshToken_\(tenantKey)")
         
-        // Обновляем CoreStorage
+        // update CoreStorage
         if let storage = Container.shared.resolve(CoreStorage.self) {
             var mutableStorage = storage
             mutableStorage.accessToken = accessToken
             mutableStorage.refreshToken = refreshToken
             
-            // Загружаем данные пользователя для этого тенанта
+            // load the user's data for this Tenant
             if let userData = UserDefaults.standard.data(forKey: "user_\(tenantKey)"),
                let user = try? JSONDecoder().decode(DataLayer.User.self, from: userData) {
                 mutableStorage.user = user
@@ -148,7 +152,7 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
         keychain.delete("accessToken_\(tenantKey)")
         keychain.delete("refreshToken_\(tenantKey)")
         
-        // Очищаем данные пользователя для этого тенанта
+        // Clean user data for this Tenant
         UserDefaults.standard.removeObject(forKey: "user_\(tenantKey)")
         UserDefaults.standard.removeObject(forKey: "userProfile_\(tenantKey)")
     }
@@ -168,6 +172,38 @@ public final class TenantManager: TenantManagerProtocol, @unchecked Sendable {
         UserDefaults.standard.removeObject(forKey: KEY_CURRENT_TENANT)
         print("  - Current tenant cleared")
     }
+    
+    private func checkAndClearDataIfFirstLaunch() {
+        let hasLaunchedKey = "HasLaunchedBefore"
+        
+        if !UserDefaults.standard.bool(forKey: hasLaunchedKey) {
+            print("🔧 TenantManager: First launch detected, clearing all tenant data")
+            clearAllTenantData()
+            
+            // We note that the application has already been launched
+            UserDefaults.standard.set(true, forKey: hasLaunchedKey)
+            print("  - First launch cleanup completed")
+        }
+    }
+    
+    public func clearAllTenantData() {
+        print("🔧 TenantManager: Clearing all tenant data")
+        
+        // Clean the current Tenant
+        currentTenantSubject.send(nil)
+        UserDefaults.standard.removeObject(forKey: KEY_CURRENT_TENANT)
+        
+        // Clean all KeyChain tokens for all tenants
+        let keychain = KeychainSwift()
+        for tenant in availableTenants {
+            let tenantKey = tenant.environmentDisplayName
+            keychain.delete("accessToken_\(tenantKey)")
+            keychain.delete("refreshToken_\(tenantKey)")
+            UserDefaults.standard.removeObject(forKey: "user_\(tenantKey)")
+            UserDefaults.standard.removeObject(forKey: "userProfile_\(tenantKey)")
+            print("  - Cleared data for tenant: \(tenantKey)")
+        }
+        
+        print("  - All tenant data cleared")
+    }
 }
-
-import KeychainSwift

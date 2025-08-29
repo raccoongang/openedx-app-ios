@@ -11,7 +11,6 @@ import Theme
 import Combine
 import OEXFoundation
 
-// Класс для уведомления об изменениях темы
 public class ThemeNotifier: ObservableObject {
     @MainActor public static let shared = ThemeNotifier()
     
@@ -38,7 +37,6 @@ public final class TenantThemeManager: TenantThemeManagerProtocol, @unchecked Se
         
         print("🎨 TenantThemeManager: Initializing and subscribing to tenant changes")
         
-        // Подписываемся на изменения текущего тенанта
         tenantManager.currentTenantPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] tenant in
@@ -46,9 +44,7 @@ public final class TenantThemeManager: TenantThemeManagerProtocol, @unchecked Se
                 self?.applyTheme(for: tenant)
             }
             .store(in: &cancellables)
-        
-        // Применяем тему для текущего тенанта при инициализации
-        applyTheme(for: tenantManager.currentTenant)
+                applyTheme(for: tenantManager.currentTenant)
     }
     
     public func applyTheme(for tenant: TenantConfig?) {
@@ -64,29 +60,26 @@ public final class TenantThemeManager: TenantThemeManagerProtocol, @unchecked Se
             
             let accentColor = Color(hex: accentColorHex)
             
-            // Обновляем цвета темы
             Theme.Colors.update(
                 accentColor: accentColor,
                 accentXColor: accentColor
             )
             
-            // Обновляем UIColors для UIKit компонентов
             Theme.UIColors.update(
                 accentColor: accentColor.uiColor(),
                 accentXColor: accentColor.uiColor(),
                 
             )
             
-            // Уведомляем об изменении темы
             ThemeNotifier.shared.notifyThemeChanged()
             
-            // Принудительно обновляем tintColor окна
+            // Force update the tintcolor windows
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let window = windowScene.windows.first {
                 window.tintColor = accentColor.uiColor()
             }
             
-            // Отправляем уведомление об изменении темы
+            // We send a notification about the change theme
             NotificationCenter.default.post(name: .themeChanged, object: nil)
             
             print("🎨 TenantThemeManager: Theme applied successfully")
@@ -96,11 +89,10 @@ public final class TenantThemeManager: TenantThemeManagerProtocol, @unchecked Se
     public func resetToDefaultTheme() {
         DispatchQueue.main.async {
             print("🎨 TenantThemeManager: Resetting to default theme")
-            // Сбрасываем на дефолтные цвета
+            // reset to default colors
             Theme.Colors.update()
             Theme.UIColors.update()
             
-            // Уведомляем об изменении темы
             ThemeNotifier.shared.notifyThemeChanged()
         }
     }

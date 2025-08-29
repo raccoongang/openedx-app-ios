@@ -419,18 +419,18 @@ public final class AppStorage: CoreStorage,
     }
     
     public func clearAllTenants() {
-        // Очищаем данные для всех тенантов
+        // Clean data for all tenants
         guard let tenantManager = tenantManager else { return }
         
         for tenant in tenantManager.availableTenants {
             let tenantKey = tenant.environmentDisplayName
             
-            // Очищаем keychain
+            // clear keychain
             keychain.delete("\(KEY_ACCESS_TOKEN)_\(tenantKey)")
             keychain.delete("\(KEY_REFRESH_TOKEN)_\(tenantKey)")
             keychain.delete("\(KEY_PUSH_TOKEN)_\(tenantKey)")
             
-            // Очищаем UserDefaults
+            // clear UserDefaults
             userDefaults.removeObject(forKey: "\(KEY_USER)_\(tenantKey)")
             userDefaults.removeObject(forKey: "\(KEY_USER_PROFILE)_\(tenantKey)")
         }

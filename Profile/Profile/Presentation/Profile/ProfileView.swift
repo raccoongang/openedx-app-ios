@@ -107,7 +107,7 @@ public struct ProfileView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .themeChanged)) { _ in
                 print("📱 ProfileView: Received theme change notification")
-                // Принудительно обновляем UI при изменении темы
+                // forcefully update UI when changing the theme
             }
         }
     }
