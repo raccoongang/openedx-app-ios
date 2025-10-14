@@ -53,13 +53,19 @@ public class OfflineSyncManager: OfflineSyncManagerProtocol {
                     progressJson: progressJson
                 )
             )
-            var correctedProgressJson = progressJson
-            correctedProgressJson = correctedProgressJson.removingPercentEncoding ?? correctedProgressJson
-            _ = message.webView?.evaluateJavaScript("markProblemCompleted('\(correctedProgressJson)')") { _, _ in }
+            let correctedProgressJson = (progressJson.removingPercentEncoding ?? progressJson)
+            await dispatchMarkProblemCompleted(
+                on: message.webView,
+                blockID: blockID,
+                payload: correctedProgressJson
+            )
         } else if let offlineProgress = await persistence.loadProgress(for: blockID) {
-            var correctedProgressJson = offlineProgress.progressJson
-            correctedProgressJson = correctedProgressJson.removingPercentEncoding ?? correctedProgressJson
-            _ = message.webView?.evaluateJavaScript("markProblemCompleted('\(correctedProgressJson)')") { _, _ in }
+            let correctedProgressJson = (offlineProgress.progressJson.removingPercentEncoding ?? offlineProgress.progressJson)
+            await dispatchMarkProblemCompleted(
+                on: message.webView,
+                blockID: blockID,
+                payload: correctedProgressJson
+            )
         }
     }
     
@@ -83,5 +89,67 @@ public class OfflineSyncManager: OfflineSyncManagerProtocol {
                 debugLog("Error submitting offline progress: \(error.localizedDescription)")
             }
         }
+    }
+
+    private func dispatchMarkProblemCompleted(
+        on webView: WKWebView?,
+        blockID: String,
+        payload: String
+    ) async {
+        guard let webView else { return }
+        let payloadLiteral = payload.jsEscapedForTemplateLiteral()
+        let blockLiteral = blockID.jsEscapedForJavaScriptLiteral()
+        let script = """
+        (function() {
+            const payload = `\(payloadLiteral)`;
+            const blockId = \(blockLiteral);
+
+            function invoke(target) {
+                if (!target) { return false; }
+                try {
+                    if (typeof target.markProblemCompleted === 'function') {
+                        target.markProblemCompleted(payload);
+                        return true;
+                    }
+                } catch (error) {}
+                return false;
+            }
+
+            if (invoke(window)) { return; }
+
+            const frame = document.querySelector('iframe[data-block-id=\"' + blockId + '\"]');
+            if (!frame) { return; }
+
+            if (invoke(frame.contentWindow)) { return; }
+
+            try {
+                if (frame.contentWindow) {
+                    frame.contentWindow.postMessage({ type: 'parent:markProblemCompleted', payload: payload }, '*');
+                }
+            } catch (error) {}
+        })();
+        """
+        await MainActor.run {
+            webView.evaluateJavaScript(script, completionHandler: nil)
+        }
+    }
+}
+
+private extension String {
+    func jsEscapedForJavaScriptLiteral() -> String {
+        let escaped = self
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+            .replacingOccurrences(of: "\n", with: "\\n")
+            .replacingOccurrences(of: "\r", with: "\\r")
+            .replacingOccurrences(of: "\t", with: "\\t")
+        return "\"\(escaped)\""
+    }
+
+    func jsEscapedForTemplateLiteral() -> String {
+        self
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "$", with: "\\$")
     }
 }

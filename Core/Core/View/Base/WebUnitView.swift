@@ -23,6 +23,7 @@ public struct WebUnitView: View {
     @State private var dataUrl: String?
     @State private var fileUrl: String = ""
     private let blockIDResolver: ((WKScriptMessage) -> String?)?
+    private let htmlContent: String?
     
     public init(
         url: String,
@@ -31,7 +32,8 @@ public struct WebUnitView: View {
         connectivity: ConnectivityProtocol,
         injections: [WebviewInjection]?,
         blockID: String,
-        blockIDResolver: ((WKScriptMessage) -> String?)? = nil
+        blockIDResolver: ((WKScriptMessage) -> String?)? = nil,
+        htmlContent: String? = nil
     ) {
         self._viewModel = .init(
             wrappedValue: viewModel
@@ -42,6 +44,7 @@ public struct WebUnitView: View {
         self.injections = injections
         self.blockID = blockID
         self.blockIDResolver = blockIDResolver
+        self.htmlContent = htmlContent
         
         if !self.connectivity.isInternetAvaliable, let dataUrl {
             self.url = dataUrl
@@ -81,7 +84,7 @@ public struct WebUnitView: View {
             ZStack(alignment: .center) {
                 GeometryReader { reader in
                     ScrollView {
-                        if viewModel.cookiesReady || dataUrl != nil {
+                        if viewModel.cookiesReady || dataUrl != nil || htmlContent != nil {
                             WebView(
                                 viewModel: .init(
                                     url: url,
@@ -89,7 +92,8 @@ public struct WebUnitView: View {
                                     openFile: { file in
                                         self.fileUrl = file
                                     },
-                                    injections: injections
+                                    injections: injections,
+                                    htmlContent: htmlContent
                                 ),
                                 isLoading: $isWebViewLoading,
                                 refreshCookies: {

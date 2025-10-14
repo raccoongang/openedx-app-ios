@@ -10,7 +10,6 @@ import Swinject
 import Core
 import Theme
 import WebKit
-import OEXFoundation
 
 struct GroupedWebView: View {
     let items: [CourseUnitDisplayItem.WebContentItem]
@@ -18,7 +17,7 @@ struct GroupedWebView: View {
     let connectivity: ConnectivityProtocol
     let roundedBackgroundEnabled: Bool
 
-    @State private var htmlFileURL: URL?
+    @State private var htmlContent: String?
     @State private var configurationSignature: String = ""
 
     private var combinedInjections: [WebviewInjection] {
@@ -46,18 +45,21 @@ struct GroupedWebView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            if let htmlFileURL {
+        let baseURLString = Container.shared.resolve(ConfigProtocol.self)?.baseURL.absoluteString
+            ?? (items.first.flatMap { sourceMap[$0.blockId] } ?? "")
+        return VStack(spacing: 0) {
+            if let htmlContent {
                 WebUnitView(
-                    url: htmlFileURL.absoluteString,
-                    dataUrl: htmlFileURL.absoluteString,
+                    url: baseURLString,
+                    dataUrl: nil,
                     viewModel: Container.shared.resolve(WebUnitViewModel.self)!,
                     connectivity: connectivity,
                     injections: combinedInjections,
                     blockID: items.first?.blockId ?? "",
                     blockIDResolver: { message in
                         resolveBlockID(from: message)
-                    }
+                    },
+                    htmlContent: htmlContent
                 )
             } else {
                 ProgressView()
@@ -92,21 +94,10 @@ struct GroupedWebView: View {
 
     private func updateHTMLIfNeeded() {
         let signature = sourceSignature()
-        guard signature != configurationSignature || htmlFileURL == nil else { return }
-        do {
-            let html = buildHTML()
-            if let existing = htmlFileURL {
-                try? FileManager.default.removeItem(at: existing)
-            }
-            let fileURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("grouped-\(UUID().uuidString).html")
-            try html.write(to: fileURL, atomically: true, encoding: .utf8)
-            htmlFileURL = fileURL
-            configurationSignature = signature
-        } catch {
-            htmlFileURL = nil
-            debugLog("Failed to create grouped web html: \(error.localizedDescription)")
-        }
+        guard signature != configurationSignature || htmlContent == nil else { return }
+        let html = buildHTML()
+        htmlContent = html
+        configurationSignature = signature
     }
 
     private func buildHTML() -> String {

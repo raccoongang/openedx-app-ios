@@ -27,6 +27,7 @@ public struct WebView: UIViewRepresentable {
     public class ViewModel: ObservableObject {
         
         @Published var url: String
+        @Published var htmlContent: String?
         let baseURL: String
         let injections: [WebviewInjection]?
         var openFile: (String) -> Void
@@ -35,12 +36,14 @@ public struct WebView: UIViewRepresentable {
             url: String,
             baseURL: String,
             openFile: @escaping (String) -> Void,
-            injections: [WebviewInjection]? = nil
+            injections: [WebviewInjection]? = nil,
+            htmlContent: String? = nil
         ) {
             self.url = url
             self.baseURL = baseURL
             self.openFile = openFile
             self.injections = injections
+            self.htmlContent = htmlContent
         }
     }
     
@@ -76,6 +79,7 @@ public struct WebView: UIViewRepresentable {
         var cancellables: [AnyCancellable] = []
         var parent: WebView
         var url: URL?
+        var htmlContent: String?
 
         init(_ parent: WebView) {
             self.parent = parent
@@ -243,8 +247,13 @@ public struct WebView: UIViewRepresentable {
             DispatchQueue.main.async {
                 self.parent.isLoading = true
             }
-            if webview?.url?.absoluteString.isEmpty ?? true,
-               let url = URL(string: parent.viewModel.url) {
+            if let html = parent.viewModel.htmlContent {
+                htmlContent = html
+                url = nil
+                webview?.loadHTMLString(html, baseURL: URL(string: parent.viewModel.baseURL))
+            } else if webview?.url?.absoluteString.isEmpty ?? true,
+                      let url = URL(string: parent.viewModel.url) {
+                self.url = url
                 let request = URLRequest(url: url)
                 webview?.load(request)
             } else {
@@ -310,16 +319,24 @@ public struct WebView: UIViewRepresentable {
         
         webView.customUserAgent = userAgent
         context.coordinator.url = nil
+        context.coordinator.htmlContent = nil
         
         return webView
     }
 
     public func updateUIView(_ webview: WKWebView, context: UIViewRepresentableContext<WebView>) {
-        if let url = URL(string: viewModel.url) {
-            if context.coordinator.url?.absoluteString != url.absoluteString {
-                DispatchQueue.main.async {
-                    isLoading = true
-                }
+        if let html = viewModel.htmlContent {
+            if context.coordinator.htmlContent != html {
+                DispatchQueue.main.async { isLoading = true }
+                context.coordinator.htmlContent = html
+                context.coordinator.url = nil
+                let baseURL = URL(string: viewModel.baseURL)
+                webview.loadHTMLString(html, baseURL: baseURL)
+            }
+        } else if let url = URL(string: viewModel.url) {
+            if context.coordinator.url?.absoluteString != url.absoluteString || context.coordinator.htmlContent != nil {
+                DispatchQueue.main.async { isLoading = true }
+                context.coordinator.htmlContent = nil
                 context.coordinator.url = url
                 let request = URLRequest(url: url)
                 webview.load(request)

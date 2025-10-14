@@ -118,6 +118,14 @@ public struct GroupedContentResizeInjection: WebViewScriptInjectionProtocol {
                     if (!data || typeof data !== 'object') { return; }
                     if (data.type === 'parent:getHeight' || data.type === 'parent:ping') {
                         scheduleMeasure();
+                        return;
+                    }
+                    if (data.type === 'parent:markProblemCompleted') {
+                        if (typeof window.markProblemCompleted === 'function') {
+                            try {
+                                window.markProblemCompleted(data.payload);
+                            } catch (error) { }
+                        }
                     }
                 });
 
