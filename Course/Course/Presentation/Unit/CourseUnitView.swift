@@ -25,7 +25,6 @@ public struct CourseUnitView: View {
         }
     }
     @State var offsetView: CGPoint = .zero
-    @State var showDiscussion: Bool = false
     @Environment(\.isPresented) private var isPresented
     @Environment(\.isHorizontal) private var isHorizontal
     public let playerStateSubject = CurrentValueSubject<VideoPlayerState?, Never>(nil)
@@ -134,11 +133,6 @@ public struct CourseUnitView: View {
             playerStateSubject.send(VideoPlayerState.kill)
             viewModel.router.back()
         }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                showDiscussion = viewModel.selectedLesson().type == .discussion
-            }
-        }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")
@@ -147,6 +141,70 @@ public struct CourseUnitView: View {
                 .ignoresSafeArea()
         )
         .dropdownAnimation(isActive: isDropdownActive, value: showDropdown)
+    }
+
+    @ViewBuilder
+    private func segmentView(
+        segment: CourseUnitDisplayItem.Segment,
+        pageIndex: Int,
+        reader: GeometryProxy
+    ) -> some View {
+        let isActivePage = abs(viewModel.index - pageIndex) <= 1
+        switch segment.kind {
+        case let .webGroup(items):
+            groupedWebView(
+                items: items,
+                isActive: isActivePage,
+                reader: reader
+            )
+        case let .lesson(block, type):
+            switch type {
+            case let .youtube(url, blockID):
+                VStack(spacing: 12) {
+                    if isDropdownActive {
+                        videoTitle(for: block, width: reader.size.width)
+                    }
+                    youtubeView(
+                        block: block,
+                        url: url,
+                        blockID: blockID,
+                        isActive: isActivePage,
+                        reader: reader
+                    )
+                }
+            case let .video(encodedUrl, blockID):
+                VStack(spacing: 12) {
+                    if isDropdownActive {
+                        videoTitle(for: block, width: reader.size.width)
+                    }
+                    videoView(
+                        block: block,
+                        encodedUrl: encodedUrl,
+                        blockID: blockID,
+                        isActive: isActivePage,
+                        reader: reader
+                    )
+                }
+            case let .unknown(url):
+                unknownView(
+                    block: block,
+                    url: url,
+                    isActive: isActivePage,
+                    reader: reader
+                )
+            case let .discussion(blockID, blockKey, title):
+                discussionView(
+                    block: block,
+                    blockID: blockID,
+                    blockKey: blockKey,
+                    title: title,
+                    isActive: isActivePage,
+                    reader: reader
+                )
+            case .web:
+                EmptyView()
+            }
+        }
     }
 
     // MARK: - Content
@@ -168,12 +226,7 @@ public struct CourseUnitView: View {
         UnitStack(isVerticalNavigation: !isHorizontalNavigation, alignment: alignment, spacing: 0) {
             let data = Array(viewModel.displayItems.enumerated())
             ForEach(data, id: \.offset) { index, item in
-                VStack(spacing: 0) {
-                    if isDropdownActive {
-                        videoTitle(for: item, width: reader.size.width)
-                    }
-                    contentView(for: item, index: index, reader: reader)
-                }
+                contentView(for: item, index: index, reader: reader)
                 .frame(
                     width: isHorizontal ? reader.size.width - (isHorizontalNavigation ? 0 : 16) : reader.size.width,
                     height: reader.size.height
@@ -185,20 +238,12 @@ public struct CourseUnitView: View {
         .offset(x: offset.x, y: offset.y)
         .animation(.easeInOut(duration: 0.2), value: viewModel.index)
         .clipped()
-        .onChange(
-            of: viewModel.index,
-            perform: { _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    showDiscussion = viewModel.selectedLesson().type == .discussion
-                }
-            }
-        )
         .onReceive(
             NotificationCenter.default.publisher(
                 for: NSNotification.blockCompletion
             )
-        ) { _ in
-            let blockID = viewModel.selectedLesson().id
+        ) { notification in
+            let blockID = (notification.userInfo?["blockID"] as? String) ?? viewModel.selectedLesson().id
             Task {
                 await viewModel.blockCompletionRequest(blockID: blockID)
             }
@@ -207,51 +252,23 @@ public struct CourseUnitView: View {
 
     @ViewBuilder
     private func contentView(for item: CourseUnitDisplayItem, index: Int, reader: GeometryProxy) -> some View {
-        switch item.content {
-        case let .webGroup(items):
-            groupedWebView(
-                items: items,
-                index: index,
-                reader: reader
-            )
-        case let .lesson(block, type):
-            switch type {
-            case let .youtube(url, blockID):
-                youtubeView(
-                    block: block,
-                    url: url,
-                    blockID: blockID,
-                    index: index,
-                    reader: reader
-                )
-            case let .video(encodedUrl, blockID):
-                videoView(
-                    block: block,
-                    encodedUrl: encodedUrl,
-                    blockID: blockID,
-                    index: index,
-                    reader: reader
-                )
-            case let .unknown(url):
-                unknownView(
-                    block: block,
-                    url: url,
-                    index: index,
-                    reader: reader
-                )
-            case let .discussion(blockID, blockKey, title):
-                discussionView(
-                    block: block,
-                    blockID: blockID,
-                    blockKey: blockKey,
-                    title: title,
-                    index: index,
-                    reader: reader
-                )
-            case .web:
-                EmptyView()
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack(alignment: .leading, spacing: 24) {
+                ForEach(item.segments, id: \.id) { segment in
+                    segmentView(
+                        segment: segment,
+                        pageIndex: index,
+                        reader: reader
+                    )
+                }
             }
+            .padding(.top, 24)
+            .padding(.bottom, 160)
         }
+        .frame(
+            width: isHorizontal ? reader.size.width - (isHorizontalNavigation ? 0 : 16) : reader.size.width,
+            height: reader.size.height
+        )
     }
 
     @ViewBuilder
@@ -259,10 +276,10 @@ public struct CourseUnitView: View {
         block: CourseBlock,
         url: String,
         blockID: String,
-        index: Int,
+        isActive: Bool,
         reader: GeometryProxy
     ) -> some View {
-        if index == viewModel.index {
+        if isActive {
             if viewModel.connectivity.isInternetAvaliable {
                 YouTubeView(
                     name: block.displayName,
@@ -271,13 +288,10 @@ public struct CourseUnitView: View {
                     blockID: blockID,
                     playerStateSubject: playerStateSubject,
                     languages: block.subtitles ?? [],
-                    isOnScreen: index == viewModel.index
+                    isOnScreen: false
                 )
                 .frameLimit(width: reader.size.width)
-                
-                if !isHorizontal {
-                    Spacer(minLength: 150)
-                }
+                .frame(maxHeight: reader.size.height)
             } else {
                 OfflineContentView(
                     isDownloadable: false
@@ -293,11 +307,11 @@ public struct CourseUnitView: View {
         block: CourseBlock,
         encodedUrl: String,
         blockID: String,
-        index: Int,
+        isActive: Bool,
         reader: GeometryProxy
     ) -> some View {
         Group {
-            if index == viewModel.index {
+            if isActive {
                 if viewModel.connectivity.isInternetAvaliable {
                     EncodedVideoView(
                         name: block.displayName,
@@ -306,14 +320,12 @@ public struct CourseUnitView: View {
                         blockID: blockID,
                         playerStateSubject: playerStateSubject,
                         languages: block.subtitles ?? [],
-                        isOnScreen: index == viewModel.index
+                        isOnScreen: false
                     )
                     .padding(.top, 5)
                     .frameLimit(width: reader.size.width)
+                    .frame(maxHeight: reader.size.height)
                     
-                    if !isHorizontal {
-                        Spacer(minLength: 150)
-                    }
                 } else if let offlineURL = videoURLs[blockID] {
                     EncodedVideoView(
                         name: block.displayName,
@@ -322,14 +334,12 @@ public struct CourseUnitView: View {
                         blockID: blockID,
                         playerStateSubject: playerStateSubject,
                         languages: block.subtitles ?? [],
-                        isOnScreen: index == viewModel.index
+                        isOnScreen: false
                     )
                     .padding(.top, 5)
                     .frameLimit(width: reader.size.width)
+                    .frame(maxHeight: reader.size.height)
                     
-                    if !isHorizontal {
-                        Spacer(minLength: 150)
-                    }
                 } else {
                     OfflineContentView(
                         isDownloadable: true
@@ -354,11 +364,11 @@ public struct CourseUnitView: View {
     @ViewBuilder
     private func groupedWebView(
         items: [CourseUnitDisplayItem.WebContentItem],
-        index: Int,
+        isActive: Bool,
         reader: GeometryProxy
     ) -> some View {
         Group {
-            if index >= viewModel.index - 1 && index <= viewModel.index + 1 {
+            if isActive {
                 let offlineURLs = items.reduce(into: [String: URL]()) { result, item in
                     if let stored = webURLs[item.blockId], let url = stored {
                         result[item.blockId] = url
@@ -398,10 +408,10 @@ public struct CourseUnitView: View {
     private func unknownView(
         block: CourseBlock,
         url: String,
-        index: Int,
+        isActive: Bool,
         reader: GeometryProxy
     ) -> some View {
-        if index >= viewModel.index - 1 && index <= viewModel.index + 1 {
+        if isActive {
             if viewModel.connectivity.isInternetAvaliable {
                 NotAvailableOnMobileView(url: url)
                     .frameLimit(width: reader.size.width)
@@ -421,29 +431,18 @@ public struct CourseUnitView: View {
         blockID: String,
         blockKey: String,
         title: String,
-        index: Int,
+        isActive: Bool,
         reader: GeometryProxy
     ) -> some View {
-        if index >= viewModel.index - 1 && index <= viewModel.index + 1 {
+        if isActive {
             if viewModel.connectivity.isInternetAvaliable {
-                VStack {
-                    if showDiscussion {
-                        DiscussionView(
-                            id: viewModel.courseID,
-                            blockID: blockID,
-                            blockKey: blockKey,
-                            title: title,
-                            viewModel: viewModel
-                        )
-                        Spacer(minLength: 100)
-                    } else {
-                        VStack {
-                            Color.clear
-                        }
-                    }
-                }
-                // No need for iPad paddings here because they were added
-                // to PostsView that is placed inside DiscussionView
+                DiscussionView(
+                    id: viewModel.courseID,
+                    blockID: blockID,
+                    blockKey: blockKey,
+                    title: title,
+                    viewModel: viewModel
+                )
             } else {
                 FullScreenErrorView(type: .noInternet)
             }
@@ -459,18 +458,16 @@ public struct CourseUnitView: View {
         return CGPoint(x: x, y: y)
     }
     
-    private func videoTitle(for item: CourseUnitDisplayItem, width: CGFloat) -> some View {
+    private func videoTitle(for block: CourseBlock, width: CGFloat) -> some View {
         HStack {
-            if item.primaryBlock.type == .video {
-                let title = item.primaryBlock.displayName
-                Text(title)
-                    .lineLimit(1)
-                    .font(Theme.Fonts.titleLarge)
-                    .foregroundStyle(Theme.Colors.textPrimary)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 20)
-                Spacer()
-            }
+            let title = block.displayName
+            Text(title)
+                .lineLimit(1)
+                .font(Theme.Fonts.titleLarge)
+                .foregroundStyle(Theme.Colors.textPrimary)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 20)
+            Spacer()
         }
         .frameLimit(width: width)
     }

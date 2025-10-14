@@ -65,9 +65,11 @@ struct AjaxInjection: WebViewScriptInjectionProtocol {
                         || isBlockOf(type: .dragAndDrop, with: requestURL)
                 }
                 if complete {
+                    let blockID = blockID(from: requestURL)
                     NotificationCenter.default.post(
                         name: NSNotification.blockCompletion,
-                        object: nil
+                        object: nil,
+                        userInfo: blockID.map { ["blockID": $0] }
                     )
                 }
             }
@@ -79,6 +81,20 @@ struct AjaxInjection: WebViewScriptInjectionProtocol {
     
     private func isBlockOf(type: XBlockCompletionCallbackType, with requestURL: String) -> Bool {
         return requestURL.contains(type.rawValue)
+    }
+
+    private func blockID(from requestURL: String) -> String? {
+        guard let start = requestURL.range(of: "xblock/")?.upperBound else { return nil }
+        if let handlerEnd = requestURL.range(of: "/handler", range: start..<requestURL.endIndex)?.lowerBound {
+            return String(requestURL[start..<handlerEnd])
+        }
+        if let queryEnd = requestURL[start...].firstIndex(of: "?") {
+            return String(requestURL[start..<queryEnd])
+        }
+        if let slashEnd = requestURL[start...].firstIndex(of: "/") {
+            return String(requestURL[start..<slashEnd])
+        }
+        return String(requestURL[start...])
     }
 }
 

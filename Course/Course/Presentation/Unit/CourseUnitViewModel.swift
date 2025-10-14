@@ -130,38 +130,59 @@ public struct CourseUnitDisplayItem: Identifiable, Equatable {
         public let isDownloadable: Bool
     }
 
-    public enum Content: Equatable {
-        case webGroup(items: [WebContentItem])
-        case lesson(block: CourseBlock, type: LessonType)
+    public struct Segment: Identifiable, Equatable {
+
+        public enum Kind: Equatable {
+            case webGroup(items: [WebContentItem])
+            case lesson(block: CourseBlock, type: LessonType)
+        }
+
+        public let id: String
+        public let blockIndices: [Int]
+        public let kind: Kind
+
+        public var primaryBlock: CourseBlock {
+            switch kind {
+            case let .webGroup(items):
+                return items.first?.block ?? CourseBlock.empty
+            case let .lesson(block, _):
+                return block
+            }
+        }
+
+        public var blocks: [CourseBlock] {
+            switch kind {
+            case let .webGroup(items):
+                return items.map(\.block)
+            case let .lesson(block, _):
+                return [block]
+            }
+        }
     }
 
     public let id: String
-    public let blockIndices: [Int]
-    public let content: Content
+    public let segments: [Segment]
     public let primaryBlock: CourseBlock
+
+    public var blockIndices: [Int] {
+        segments.flatMap(\.blockIndices)
+    }
 
     public var primaryBlockIndex: Int {
         blockIndices.first ?? 0
     }
 
     public var allBlocks: [CourseBlock] {
-        switch content {
-        case let .webGroup(items):
-            return items.map(\.block)
-        case let .lesson(block, _):
-            return [block]
-        }
+        segments.flatMap(\.blocks)
     }
 
     public init(
         id: String,
-        blockIndices: [Int],
-        content: Content,
+        segments: [Segment],
         primaryBlock: CourseBlock
     ) {
         self.id = id
-        self.blockIndices = blockIndices
-        self.content = content
+        self.segments = segments
         self.primaryBlock = primaryBlock
     }
 
@@ -306,7 +327,7 @@ public final class CourseUnitViewModel: ObservableObject {
     func blockCompletionRequest(blockID: String) async {
         do {
             try await interactor.blockCompletionRequest(courseID: courseID, blockID: blockID)
-            setBlockCompletionForSelectedLesson()
+            setBlockCompletion(for: blockID)
         } catch let error {
             if error.isInternetError || error is NoCachedDataError {
                 errorMessage = CoreLocalization.Error.slowOrNoInternetConnection
@@ -420,13 +441,13 @@ public final class CourseUnitViewModel: ObservableObject {
         }
     }
 
-    private func setBlockCompletionForSelectedLesson() {
-        guard let item = displayItems[safe: index] else { return }
-        for blockIndex in item.blockIndices {
-            if verticals[verticalIndex].childs.indices.contains(blockIndex) {
-                verticals[verticalIndex].childs[blockIndex].completion = 1.0
-            }
-        }
+    private func setBlockCompletion(for blockID: String) {
+        guard let data = VerticalData.dataFor(blockId: blockID, in: chapters),
+              data.verticalIndex == verticalIndex,
+              verticals[verticalIndex].childs.indices.contains(data.blockIndex)
+        else { return }
+
+        verticals[verticalIndex].childs[data.blockIndex].completion = 1.0
         NotificationCenter.default.post(
             name: .onBlockCompletion,
             object: nil,
@@ -434,7 +455,7 @@ public final class CourseUnitViewModel: ObservableObject {
                 "chapterID": chapters[chapterIndex].id,
                 "sequentialID": chapters[chapterIndex].childs[sequentialIndex].id,
                 "verticalID": chapters[chapterIndex].childs[sequentialIndex].childs[verticalIndex].id,
-                "blockID": item.primaryBlock.id
+                "blockID": blockID
             ]
         )
     }
@@ -478,10 +499,22 @@ public final class CourseUnitViewModel: ObservableObject {
         }
 
         let blocks = verticals[verticalIndex].childs
-        var items: [CourseUnitDisplayItem] = []
+        var segments: [CourseUnitDisplayItem.Segment] = []
         var mapping: [Int: Int] = [:]
         var currentWebItems: [CourseUnitDisplayItem.WebContentItem] = []
         var currentIndices: [Int] = []
+
+        func flushWebItems() {
+            guard !currentWebItems.isEmpty else { return }
+            let segment = CourseUnitDisplayItem.Segment(
+                id: currentWebItems.map(\.block.id).joined(separator: "-"),
+                blockIndices: currentIndices,
+                kind: .webGroup(items: currentWebItems)
+            )
+            segments.append(segment)
+            currentWebItems.removeAll()
+            currentIndices.removeAll()
+        }
 
         for (index, block) in blocks.enumerated() {
             let lessonType = LessonType.from(block, streamingQuality: streamingQuality)
@@ -497,54 +530,40 @@ public final class CourseUnitViewModel: ObservableObject {
                 currentWebItems.append(webItem)
                 currentIndices.append(index)
             default:
-                if !currentWebItems.isEmpty {
-                    if let primary = currentWebItems.first?.block {
-                        let item = CourseUnitDisplayItem(
-                            id: currentWebItems.map(\.block.id).joined(separator: "-"),
-                            blockIndices: currentIndices,
-                            content: .webGroup(items: currentWebItems),
-                            primaryBlock: primary
-                        )
-                        items.append(item)
-                    }
-                    currentWebItems.removeAll()
-                    currentIndices.removeAll()
-                }
-                let item = CourseUnitDisplayItem(
+                flushWebItems()
+                let segment = CourseUnitDisplayItem.Segment(
                     id: block.id,
                     blockIndices: [index],
-                    content: .lesson(block: block, type: lessonType),
-                    primaryBlock: block
+                    kind: .lesson(block: block, type: lessonType)
                 )
-                items.append(item)
+                segments.append(segment)
             }
         }
 
-        if !currentWebItems.isEmpty {
-            if let primary = currentWebItems.first?.block {
-                let item = CourseUnitDisplayItem(
-                    id: currentWebItems.map(\.block.id).joined(separator: "-"),
-                    blockIndices: currentIndices,
-                    content: .webGroup(items: currentWebItems),
-                    primaryBlock: primary
-                )
-                items.append(item)
-            }
-        }
+        flushWebItems()
 
-        for (displayIndex, item) in items.enumerated() {
-            for blockIndex in item.blockIndices {
-                mapping[blockIndex] = displayIndex
-            }
-        }
-
-        displayItems = items
-        blockIndexToDisplayIndex = mapping
-        if !items.isEmpty {
-            index = min(index, items.count - 1)
-        } else {
+        if segments.isEmpty {
+            displayItems = []
+            blockIndexToDisplayIndex = [:]
             index = 0
+            return
         }
+
+        let itemID = segments.map(\.id).joined(separator: "|")
+        let primaryBlock = segments.first?.primaryBlock ?? CourseBlock.empty
+        let item = CourseUnitDisplayItem(
+            id: itemID,
+            segments: segments,
+            primaryBlock: primaryBlock
+        )
+
+        for blockIndex in item.blockIndices {
+            mapping[blockIndex] = 0
+        }
+
+        displayItems = [item]
+        blockIndexToDisplayIndex = mapping
+        index = 0
     }
 }
 
