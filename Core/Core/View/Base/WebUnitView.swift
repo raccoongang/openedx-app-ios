@@ -8,6 +8,7 @@
 import SwiftUI
 @_spi(Advanced) import SwiftUIIntrospect
 import Theme
+import WebKit
 
 public struct WebUnitView: View {
     
@@ -21,6 +22,7 @@ public struct WebUnitView: View {
     @State private var isFileOpen: Bool = false
     @State private var dataUrl: String?
     @State private var fileUrl: String = ""
+    private let blockIDResolver: ((WKScriptMessage) -> String?)?
     
     public init(
         url: String,
@@ -28,7 +30,8 @@ public struct WebUnitView: View {
         viewModel: WebUnitViewModel,
         connectivity: ConnectivityProtocol,
         injections: [WebviewInjection]?,
-        blockID: String
+        blockID: String,
+        blockIDResolver: ((WKScriptMessage) -> String?)? = nil
     ) {
         self._viewModel = .init(
             wrappedValue: viewModel
@@ -38,6 +41,7 @@ public struct WebUnitView: View {
         self.connectivity = connectivity
         self.injections = injections
         self.blockID = blockID
+        self.blockIDResolver = blockIDResolver
         
         if !self.connectivity.isInternetAvaliable, let dataUrl {
             self.url = dataUrl
@@ -96,7 +100,11 @@ public struct WebUnitView: View {
                                 connectivity: connectivity,
                                 message: { message in
                                     Task {
-                                        await viewModel.syncManager.handleMessage(message: message, blockID: blockID)
+                                        let resolvedBlockID = blockIDResolver?(message) ?? blockID
+                                        await viewModel.syncManager.handleMessage(
+                                            message: message,
+                                            blockID: resolvedBlockID
+                                        )
                                     }
                                 }
                             )

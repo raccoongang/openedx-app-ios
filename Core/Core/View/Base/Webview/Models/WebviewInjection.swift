@@ -66,4 +66,9 @@ public extension WebviewInjection {
         AccessibilityInjection()
             .webviewInjection()
     }
+    
+    static var groupedContentResize: WebviewInjection {
+        GroupedContentResizeInjection()
+            .webviewInjection()
+    }
 }

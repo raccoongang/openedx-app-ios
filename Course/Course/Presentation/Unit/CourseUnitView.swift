@@ -166,13 +166,13 @@ public struct CourseUnitView: View {
         let alignment = UnitAlignment(horizontalAlignment: .top, verticalAlignment: .leading)
         let offset = viewOffset(for: viewModel.index, with: reader.size, insets: reader.safeAreaInsets)
         UnitStack(isVerticalNavigation: !isHorizontalNavigation, alignment: alignment, spacing: 0) {
-            let data = Array(viewModel.verticals[viewModel.verticalIndex].childs.enumerated())
-            ForEach(data, id: \.offset) { index, block in
+            let data = Array(viewModel.displayItems.enumerated())
+            ForEach(data, id: \.offset) { index, item in
                 VStack(spacing: 0) {
                     if isDropdownActive {
-                        videoTitle(block: block, width: reader.size.width)
+                        videoTitle(for: item, width: reader.size.width)
                     }
-                    contentView(for: block, index: index, reader: reader)
+                    contentView(for: item, index: index, reader: reader)
                 }
                 .frame(
                     width: isHorizontal ? reader.size.width - (isHorizontalNavigation ? 0 : 16) : reader.size.width,
@@ -206,55 +206,51 @@ public struct CourseUnitView: View {
     }
 
     @ViewBuilder
-    private func contentView(for block: CourseBlock, index: Int, reader: GeometryProxy) -> some View {
-        switch LessonType.from(block, streamingQuality: viewModel.streamingQuality) {
-        // MARK: YouTube
-        case let .youtube(url, blockID):
-            youtubeView(
-                block: block,
-                url: url,
-                blockID: blockID,
+    private func contentView(for item: CourseUnitDisplayItem, index: Int, reader: GeometryProxy) -> some View {
+        switch item.content {
+        case let .webGroup(items):
+            groupedWebView(
+                items: items,
                 index: index,
                 reader: reader
             )
-        // MARK: Encoded Video
-        case let .video(encodedUrl, blockID):
-            videoView(
-                block: block,
-                encodedUrl: encodedUrl,
-                blockID: blockID,
-                index: index,
-                reader: reader
-            )
-        // MARK: Web
-        case let .web(url, injections, blockId, isDownloadable):
-            webView(
-                block: block,
-                url: url,
-                injections: injections,
-                blockId: blockId,
-                isDownloadable: isDownloadable,
-                index: index,
-                reader: reader
-            )
-        // MARK: Unknown
-        case .unknown(let url):
-            unknownView(
-                block: block,
-                url: url,
-                index: index,
-                reader: reader
-            )
-        // MARK: Discussion
-        case let .discussion(blockID, blockKey, title):
-            discussionView(
-                block: block,
-                blockID: blockID,
-                blockKey: blockKey,
-                title: title,
-                index: index,
-                reader: reader
-            )
+        case let .lesson(block, type):
+            switch type {
+            case let .youtube(url, blockID):
+                youtubeView(
+                    block: block,
+                    url: url,
+                    blockID: blockID,
+                    index: index,
+                    reader: reader
+                )
+            case let .video(encodedUrl, blockID):
+                videoView(
+                    block: block,
+                    encodedUrl: encodedUrl,
+                    blockID: blockID,
+                    index: index,
+                    reader: reader
+                )
+            case let .unknown(url):
+                unknownView(
+                    block: block,
+                    url: url,
+                    index: index,
+                    reader: reader
+                )
+            case let .discussion(blockID, blockKey, title):
+                discussionView(
+                    block: block,
+                    blockID: blockID,
+                    blockKey: blockKey,
+                    title: title,
+                    index: index,
+                    reader: reader
+                )
+            case .web:
+                EmptyView()
+            }
         }
     }
 
@@ -356,36 +352,30 @@ public struct CourseUnitView: View {
     }
 
     @ViewBuilder
-    private func webView(
-        block: CourseBlock,
-        url: String,
-        injections: [WebviewInjection],
-        blockId: String,
-        isDownloadable: Bool,
+    private func groupedWebView(
+        items: [CourseUnitDisplayItem.WebContentItem],
         index: Int,
         reader: GeometryProxy
     ) -> some View {
         Group {
             if index >= viewModel.index - 1 && index <= viewModel.index + 1 {
-                if viewModel.connectivity.isInternetAvaliable {
-                    WebView(
-                        url: url,
-                        localUrl: nil,
-                        injections: injections,
-                        blockID: block.id,
+                let offlineURLs = items.reduce(into: [String: URL]()) { result, item in
+                    if let stored = webURLs[item.blockId], let url = stored {
+                        result[item.blockId] = url
+                    }
+                }
+                let allOfflineAvailable = items.allSatisfy { offlineURLs[$0.blockId] != nil }
+                if viewModel.connectivity.isInternetAvaliable || allOfflineAvailable {
+                    GroupedWebView(
+                        items: items,
+                        offlineURLs: offlineURLs,
+                        connectivity: viewModel.connectivity,
                         roundedBackgroundEnabled: !viewModel.courseUnitProgressEnabled
                     )
-                } else if let offlineURL = webURLs[blockId] {
-                    WebView(
-                        url: url,
-                        localUrl: offlineURL?.absoluteString,
-                        injections: injections,
-                        blockID: block.id,
-                        roundedBackgroundEnabled: !viewModel.courseUnitProgressEnabled
-                    )
+                    .frameLimit(width: reader.size.width)
                 } else {
                     OfflineContentView(
-                        isDownloadable: isDownloadable
+                        isDownloadable: items.contains(where: { $0.isDownloadable })
                     )
                 }
             } else {
@@ -394,8 +384,11 @@ public struct CourseUnitView: View {
         }
         .onAppear {
             Task {
-                if let offlineURL = await viewModel.urlForOfflineContent(blockId: blockId) {
-                    webURLs[blockId] = offlineURL
+                for item in items {
+                    if webURLs[item.blockId] == nil {
+                        let offlineURL = await viewModel.urlForOfflineContent(blockId: item.blockId)
+                        webURLs[item.blockId] = offlineURL
+                    }
                 }
             }
         }
@@ -466,10 +459,10 @@ public struct CourseUnitView: View {
         return CGPoint(x: x, y: y)
     }
     
-    private func videoTitle(block: CourseBlock, width: CGFloat) -> some View {
+    private func videoTitle(for item: CourseUnitDisplayItem, width: CGFloat) -> some View {
         HStack {
-            if block.type == .video {
-                let title = block.displayName
+            if item.primaryBlock.type == .video {
+                let title = item.primaryBlock.displayName
                 Text(title)
                     .lineLimit(1)
                     .font(Theme.Fonts.titleLarge)
@@ -491,16 +484,17 @@ public struct CourseUnitView: View {
                     GeometryReader { reader in
                         VStack {
                             HStack {
-                                let currentBlock = viewModel.verticals[viewModel.verticalIndex]
-                                    .childs[viewModel.index]
-                                if currentBlock.type == .video {
-                                    let title = currentBlock.displayName
-                                    Text(title)
-                                        .lineLimit(1)
-                                        .font(Theme.Fonts.titleLarge)
-                                        .foregroundStyle(Theme.Colors.textPrimary)
-                                        .padding(.leading, isHorizontal ? 30 : 42)
-                                        .padding(.top, isHorizontal ? 14 : 2)
+                                if viewModel.displayItems.indices.contains(viewModel.index) {
+                                    let currentBlock = viewModel.displayItems[viewModel.index].primaryBlock
+                                    if currentBlock.type == .video {
+                                        let title = currentBlock.displayName
+                                        Text(title)
+                                            .lineLimit(1)
+                                            .font(Theme.Fonts.titleLarge)
+                                            .foregroundStyle(Theme.Colors.textPrimary)
+                                            .padding(.leading, isHorizontal ? 30 : 42)
+                                            .padding(.top, isHorizontal ? 14 : 2)
+                                    }
                                     Spacer()
                                 }
                             }

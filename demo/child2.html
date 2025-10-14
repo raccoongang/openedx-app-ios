@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Урок 2</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    .header {
+      background: #fff8f0;
+      border-bottom: 1px solid #ffe2c2;
+      padding: 24px 16px;
+    }
+    .content { padding: 16px; max-width: 900px; }
+    .qa {
+      border-left: 4px solid #ffb65b;
+      padding: 12px 16px;
+      margin: 12px 0;
+      background: #fffaf3;
+      border-radius: 4px;
+    }
+    details {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 12px 0;
+      background: #fcfcfc;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Урок 2: Практика</h2>
+    <div>Раскрывающиеся блоки, интерактив и формочки.</div>
+  </div>
+
+  <div class="content">
+    <div class="qa">
+      <strong>Вопрос:</strong> Как объединить несколько страниц в один скролл?<br>
+      <strong>Ответ:</strong> Растягивать iframe по высоте контента и скроллить родителя.
+    </div>
+
+    <details>
+      <summary>Пошаговый план</summary>
+      <ol>
+        <li>Каждый юнит грузим в свой iframe.</li>
+        <li>Юнит сообщает высоту через postMessage/ResizeObserver.</li>
+        <li>Родитель ставит iframe.style.height = scrollHeight юнита.</li>
+        <li>Итог: у родителя линейный DOM, скролл единый.</li>
+      </ol>
+    </details>
+
+    <form onsubmit="event.preventDefault(); this.reset();">
+      <label>Ваш ответ: <input type="text" placeholder="введите..." /></label>
+      <button type="submit">Отправить</button>
+    </form>
+  </div>
+
+  
+<script>
+  (function () {
+    // Используем window.name, который задал родитель (iframe name="unit-1")
+    const frameId = window.name || 'unknown-frame';
+
+    function postHeight() {
+      // Берём scrollHeight у корня документа (учитывает весь контент)
+      const h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body ? document.body.scrollHeight : 0
+      );
+      window.parent && window.parent.postMessage({ type: 'child:height', id: frameId, height: h }, '*');
+    }
+
+    // Сообщим родителю, что мы готовы
+    window.parent && window.parent.postMessage({ type: 'child:ready', id: frameId }, '*');
+
+    // Слушаем пинги/запросы от родителя
+    window.addEventListener('message', (ev) => {
+      const data = ev.data;
+      if (!data || typeof data !== 'object') return;
+      if (data.type === 'parent:getHeight' || data.type === 'parent:ping') {
+        postHeight();
+      }
+    });
+
+    // Обновляем высоту при загрузке, изображениях, мутирующем контенте и ресайзе
+    function setupObservers() {
+      // Когда DOM готов
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', postHeight, { once: true });
+      } else {
+        postHeight();
+      }
+
+      // После полной загрузки ресурсов
+      window.addEventListener('load', postHeight);
+
+      // ResizeObserver на корневом элементе (меняется высота из-за вёрстки/медиа)
+      if ('ResizeObserver' in window) {
+        const ro = new ResizeObserver(() => postHeight());
+        ro.observe(document.documentElement);
+        if (document.body) ro.observe(document.body);
+      }
+
+      // MutationObserver — если динамически добавляется контент
+      const mo = new MutationObserver(() => postHeight());
+      mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
+
+      // На случай экзотики — периодический пересчёт
+      setInterval(postHeight, 2000);
+    }
+
+    setupObservers();
+
+    // Чтобы у iframe не появлялся собственный скролл, лучше скрыть внутренние полосы
+    // (родитель всё равно растянет iframe по высоте контента)
+    const css = document.createElement('style');
+    css.textContent = `html, body { margin: 0; overflow: hidden !important; }`;
+    document.documentElement.appendChild(css);
+  })();
+</script>
+
+</body>
+</html>

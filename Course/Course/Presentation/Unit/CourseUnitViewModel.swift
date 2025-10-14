@@ -119,6 +119,57 @@ public struct VerticalData: Equatable {
     }
 }
 
+public struct CourseUnitDisplayItem: Identifiable, Equatable {
+
+    public struct WebContentItem: Identifiable, Equatable {
+        public var id: String { block.id }
+        public let block: CourseBlock
+        public let url: String
+        public let injections: [WebviewInjection]
+        public let blockId: String
+        public let isDownloadable: Bool
+    }
+
+    public enum Content: Equatable {
+        case webGroup(items: [WebContentItem])
+        case lesson(block: CourseBlock, type: LessonType)
+    }
+
+    public let id: String
+    public let blockIndices: [Int]
+    public let content: Content
+    public let primaryBlock: CourseBlock
+
+    public var primaryBlockIndex: Int {
+        blockIndices.first ?? 0
+    }
+
+    public var allBlocks: [CourseBlock] {
+        switch content {
+        case let .webGroup(items):
+            return items.map(\.block)
+        case let .lesson(block, _):
+            return [block]
+        }
+    }
+
+    public init(
+        id: String,
+        blockIndices: [Int],
+        content: Content,
+        primaryBlock: CourseBlock
+    ) {
+        self.id = id
+        self.blockIndices = blockIndices
+        self.content = content
+        self.primaryBlock = primaryBlock
+    }
+
+    public func contains(blockId: String) -> Bool {
+        allBlocks.contains(where: { $0.id.contains(blockId) })
+    }
+}
+
 @MainActor
 public final class CourseUnitViewModel: ObservableObject {
     
@@ -128,7 +179,13 @@ public final class CourseUnitViewModel: ObservableObject {
     }
 
     var verticals: [CourseVertical]
-    var verticalIndex: Int
+    var verticalIndex: Int {
+        didSet {
+            guard verticalIndex != oldValue else { return }
+            rebuildDisplayItems()
+            loadIndex()
+        }
+    }
     var courseName: String
     
     @Published var index: Int = 0
@@ -155,6 +212,8 @@ public final class CourseUnitViewModel: ObservableObject {
     let chapters: [CourseChapter]
     let chapterIndex: Int
     let sequentialIndex: Int
+    @Published private(set) var displayItems: [CourseUnitDisplayItem] = []
+    private var blockIndexToDisplayIndex: [Int: Int] = [:]
 
     var streamingQuality: StreamingQuality {
         storage.userSettings?.streamingQuality ?? .auto
@@ -190,33 +249,39 @@ public final class CourseUnitViewModel: ObservableObject {
         self.chapters = chapters
         self.chapterIndex = chapterIndex
         self.sequentialIndex = sequentialIndex
-        self.verticalIndex = verticalIndex
-        self.verticals = chapters[chapterIndex].childs[sequentialIndex].childs
         self.interactor = interactor
         self.config = config
         self.router = router
         self.analytics = analytics
         self.connectivity = connectivity
-        self.manager = manager
         self.storage = storage
+        self.manager = manager
+        self.verticals = chapters[chapterIndex].childs[sequentialIndex].childs
+        self.verticalIndex = min(verticalIndex, max(self.verticals.count - 1, 0))
+        rebuildDisplayItems()
     }
     
     private func selectLesson() -> Int {
-        guard verticals[verticalIndex].childs.count > 0 else { return 0 }
-        let index = verticals[verticalIndex].childs.firstIndex(where: { $0.id.contains(lessonID) }) ?? 0
+        guard !displayItems.isEmpty else { return 0 }
+
+        let sourceBlocks = verticals[verticalIndex].childs
+        guard let blockIndex = sourceBlocks.firstIndex(where: { $0.id.contains(lessonID) }) else {
+            return 0
+        }
+        let index = blockIndexToDisplayIndex[blockIndex] ?? 0
         nextTitles()
         return index
     }
     
     func selectedLesson() -> CourseBlock {
-        return verticals[verticalIndex].childs[index]
+        return displayItems[safe: index]?.primaryBlock ?? CourseBlock.empty
     }
     
     func select(move: LessonAction) {
         switch move {
         case .next:
-            if index != verticals[verticalIndex].childs.count - 1 { index += 1 }
-            let nextBlock = verticals[verticalIndex].childs[index]
+            if index != displayItems.count - 1 { index += 1 }
+            let nextBlock = displayItems[index].primaryBlock
             nextTitles()
             analytics.nextBlockClicked(
                 courseId: courseID,
@@ -227,7 +292,7 @@ public final class CourseUnitViewModel: ObservableObject {
         case .previous:
             if index != 0 { index -= 1 }
             nextTitles()
-            let prevBlock = verticals[verticalIndex].childs[index]
+            let prevBlock = displayItems[index].primaryBlock
             analytics.prevBlockClicked(
                 courseId: courseID,
                 courseName: courseName,
@@ -252,13 +317,19 @@ public final class CourseUnitViewModel: ObservableObject {
     }
 
     func nextTitles() {
+        guard !displayItems.isEmpty else {
+            previousLesson = ""
+            nextLesson = ""
+            return
+        }
+
         if index != 0 {
-            previousLesson = verticals[verticalIndex].childs[index - 1].displayName
+            previousLesson = displayItems[index - 1].primaryBlock.displayName
         } else {
             previousLesson = ""
         }
-        if index != verticals[verticalIndex].childs.count - 1 {
-            nextLesson = verticals[verticalIndex].childs[index + 1].displayName
+        if index != displayItems.count - 1 {
+            nextLesson = displayItems[index + 1].primaryBlock.displayName
         } else {
             nextLesson = ""
         }
@@ -350,7 +421,12 @@ public final class CourseUnitViewModel: ObservableObject {
     }
 
     private func setBlockCompletionForSelectedLesson() {
-        verticals[verticalIndex].childs[index].completion = 1.0
+        guard let item = displayItems[safe: index] else { return }
+        for blockIndex in item.blockIndices {
+            if verticals[verticalIndex].childs.indices.contains(blockIndex) {
+                verticals[verticalIndex].childs[blockIndex].completion = 1.0
+            }
+        }
         NotificationCenter.default.post(
             name: .onBlockCompletion,
             object: nil,
@@ -358,7 +434,7 @@ public final class CourseUnitViewModel: ObservableObject {
                 "chapterID": chapters[chapterIndex].id,
                 "sequentialID": chapters[chapterIndex].childs[sequentialIndex].id,
                 "verticalID": chapters[chapterIndex].childs[sequentialIndex].childs[verticalIndex].id,
-                "blockID": verticals[verticalIndex].childs[index].id
+                "blockID": item.primaryBlock.id
             ]
         )
     }
@@ -392,5 +468,110 @@ public final class CourseUnitViewModel: ObservableObject {
     
     public var currentCourseId: String {
         courseID
+    }
+
+    private func rebuildDisplayItems() {
+        guard verticals.indices.contains(verticalIndex) else {
+            displayItems = []
+            blockIndexToDisplayIndex = [:]
+            return
+        }
+
+        let blocks = verticals[verticalIndex].childs
+        var items: [CourseUnitDisplayItem] = []
+        var mapping: [Int: Int] = [:]
+        var currentWebItems: [CourseUnitDisplayItem.WebContentItem] = []
+        var currentIndices: [Int] = []
+
+        for (index, block) in blocks.enumerated() {
+            let lessonType = LessonType.from(block, streamingQuality: streamingQuality)
+            switch lessonType {
+            case let .web(url, injections, blockId, isDownloadable):
+                let webItem = CourseUnitDisplayItem.WebContentItem(
+                    block: block,
+                    url: url,
+                    injections: injections,
+                    blockId: blockId,
+                    isDownloadable: isDownloadable
+                )
+                currentWebItems.append(webItem)
+                currentIndices.append(index)
+            default:
+                if !currentWebItems.isEmpty {
+                    if let primary = currentWebItems.first?.block {
+                        let item = CourseUnitDisplayItem(
+                            id: currentWebItems.map(\.block.id).joined(separator: "-"),
+                            blockIndices: currentIndices,
+                            content: .webGroup(items: currentWebItems),
+                            primaryBlock: primary
+                        )
+                        items.append(item)
+                    }
+                    currentWebItems.removeAll()
+                    currentIndices.removeAll()
+                }
+                let item = CourseUnitDisplayItem(
+                    id: block.id,
+                    blockIndices: [index],
+                    content: .lesson(block: block, type: lessonType),
+                    primaryBlock: block
+                )
+                items.append(item)
+            }
+        }
+
+        if !currentWebItems.isEmpty {
+            if let primary = currentWebItems.first?.block {
+                let item = CourseUnitDisplayItem(
+                    id: currentWebItems.map(\.block.id).joined(separator: "-"),
+                    blockIndices: currentIndices,
+                    content: .webGroup(items: currentWebItems),
+                    primaryBlock: primary
+                )
+                items.append(item)
+            }
+        }
+
+        for (displayIndex, item) in items.enumerated() {
+            for blockIndex in item.blockIndices {
+                mapping[blockIndex] = displayIndex
+            }
+        }
+
+        displayItems = items
+        blockIndexToDisplayIndex = mapping
+        if !items.isEmpty {
+            index = min(index, items.count - 1)
+        } else {
+            index = 0
+        }
+    }
+}
+
+private extension Array {
+    subscript(safe index: Index) -> Element? {
+        guard indices.contains(index) else { return nil }
+        return self[index]
+    }
+}
+
+private extension CourseBlock {
+    static var empty: CourseBlock {
+        CourseBlock(
+            blockId: "",
+            id: "",
+            courseId: "",
+            topicId: nil,
+            graded: false,
+            due: nil,
+            completion: 0,
+            type: .unknown,
+            displayName: "",
+            studentUrl: "",
+            webUrl: "",
+            encodedVideo: nil,
+            multiDevice: nil,
+            offlineDownload: nil
+        )
     }
 }

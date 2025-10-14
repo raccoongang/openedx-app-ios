@@ -201,11 +201,12 @@ public struct WebView: UIViewRepresentable {
             _ webView: WKWebView,
             decidePolicyFor navigationResponse: WKNavigationResponse
         ) async -> WKNavigationResponsePolicy {
+            guard let response = navigationResponse.response as? HTTPURLResponse,
+                  let url = response.url else {
+                return .allow
+            }
+
             if parent.connectivity.isInternetAvaliable {
-                guard let response = (navigationResponse.response as? HTTPURLResponse),
-                      let url = response.url else {
-                    return .cancel
-                }
                 let baseURL = parent.viewModel.baseURL
                 
                 if (401...404).contains(response.statusCode) || url.absoluteString.hasPrefix(baseURL + "/login") {

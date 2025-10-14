@@ -27,6 +27,7 @@
 		02454CA02A2618E70043052A /* YouTubeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02454C9F2A2618E70043052A /* YouTubeView.swift */; };
 		02454CA22A26190A0043052A /* EncodedVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02454CA12A26190A0043052A /* EncodedVideoView.swift */; };
 		02454CA42A26193F0043052A /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02454CA32A26193F0043052A /* WebView.swift */; };
+		CE83F7A62E5DD81B004E0F7B /* GroupedWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE83F7A52E5DD81B004E0F7B /* GroupedWebView.swift */; };
 		02454CA62A26196C0043052A /* NotAvailableOnMobileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02454CA52A26196C0043052A /* NotAvailableOnMobileView.swift */; };
 		02454CA82A2619890043052A /* DiscussionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02454CA72A2619890043052A /* DiscussionView.swift */; };
 		02454CAA2A2619B40043052A /* LessonProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02454CA92A2619B40043052A /* LessonProgressView.swift */; };
@@ -186,6 +187,7 @@
 		02454CA52A26196C0043052A /* NotAvailableOnMobileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotAvailableOnMobileView.swift; sourceTree = "<group>"; };
 		02454CA72A2619890043052A /* DiscussionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscussionView.swift; sourceTree = "<group>"; };
 		02454CA92A2619B40043052A /* LessonProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonProgressView.swift; sourceTree = "<group>"; };
+		CE83F7A52E5DD81B004E0F7B /* GroupedWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedWebView.swift; sourceTree = "<group>"; };
 		0248C92629C097EB00DC8402 /* CourseVerticalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseVerticalViewModel.swift; sourceTree = "<group>"; };
 		0262148E29AE17C4008BD75A /* HandoutsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoutsViewModelTests.swift; sourceTree = "<group>"; };
 		02635AC62A24F181008062F2 /* ContinueWithView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueWithView.swift; sourceTree = "<group>"; };
@@ -370,6 +372,7 @@
 				02454C9F2A2618E70043052A /* YouTubeView.swift */,
 				02454CA12A26190A0043052A /* EncodedVideoView.swift */,
 				02454CA32A26193F0043052A /* WebView.swift */,
+				CE83F7A52E5DD81B004E0F7B /* GroupedWebView.swift */,
 				02454CA52A26196C0043052A /* NotAvailableOnMobileView.swift */,
 				02454CA72A2619890043052A /* DiscussionView.swift */,
 				02454CA92A2619B40043052A /* LessonProgressView.swift */,
@@ -1067,6 +1070,7 @@
 				067B7B542BED339200D1768F /* YoutubePlayerViewControllerHolder.swift in Sources */,
 				02FFAD0D29E4347300140E46 /* VideoPlayerViewModel.swift in Sources */,
 				02454CA42A26193F0043052A /* WebView.swift in Sources */,
+				CE83F7A62E5DD81B004E0F7B /* GroupedWebView.swift in Sources */,
 				022C64DA29ACEC50000F532B /* HandoutsViewModel.swift in Sources */,
 				02635AC72A24F181008062F2 /* ContinueWithView.swift in Sources */,
 				068DDA622B1E198700FF8CCB /* CourseUnitDropDownTitle.swift in Sources */,

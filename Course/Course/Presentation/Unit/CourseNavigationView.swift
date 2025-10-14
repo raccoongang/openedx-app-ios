@@ -25,18 +25,19 @@ struct CourseNavigationView: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 7) {
-            if viewModel.selectedLesson() == viewModel.verticals[viewModel.verticalIndex].childs.first
-                && viewModel.verticals[viewModel.verticalIndex].childs.count != 1 {
+            let isFirst = viewModel.index == 0
+            let isLast = viewModel.index == viewModel.displayItems.count - 1
+            if isFirst && viewModel.displayItems.count != 1 {
                 nextBigButton
                     .frame(width: 215)
             } else {
-                if viewModel.selectedLesson() == viewModel.verticals[viewModel.verticalIndex].childs.last {
-                    if viewModel.selectedLesson() != viewModel.verticals[viewModel.verticalIndex].childs.first {
+                if isLast {
+                    if !isFirst {
                         prevButton
                     }
                     lastButton
                 } else {
-                    if viewModel.selectedLesson() != viewModel.verticals[viewModel.verticalIndex].childs.first {
+                    if !isFirst {
                         prevButton
                     }
                     

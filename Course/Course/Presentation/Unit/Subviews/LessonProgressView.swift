@@ -23,18 +23,16 @@ struct LessonProgressView: View {
             Spacer()
             VStack {
                 Spacer()
-                let childs = viewModel.verticals[viewModel.verticalIndex].childs
-                ForEach(Array(childs.enumerated()), id: \.offset) { index, _ in
-                    let selected = viewModel.verticals[viewModel.verticalIndex].childs[index]
+                let items = viewModel.displayItems
+                ForEach(Array(items.enumerated()), id: \.offset) { index, _ in
+                    let isSelected = index == viewModel.index
                     Circle()
                         .frame(
-                            width: selected == viewModel.selectedLesson() ? 5 : 3,
-                            height: selected == viewModel.selectedLesson() ? 5 : 3
+                            width: isSelected ? 5 : 3,
+                            height: isSelected ? 5 : 3
                         )
                         .foregroundColor(
-                            selected == viewModel.selectedLesson()
-                            ? .accentColor
-                            : Theme.Colors.textSecondary
+                            isSelected ? .accentColor : Theme.Colors.textSecondary
                         )
                 }
                 Spacer()

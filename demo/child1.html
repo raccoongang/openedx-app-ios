@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Урок 1</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    .hero {
+      padding: 32px 16px;
+      background: linear-gradient(120deg, #f0f9ff, #fff);
+      border-bottom: 1px solid #e6f1f7;
+    }
+    h1 { margin: 0 0 8px; }
+    .content { padding: 16px; max-width: 900px; }
+    .card {
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 12px 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .btn {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>Урок 1: Введение</h1>
+    <div>Этот блок имитирует «шапку юнита» с картинкой и описанием.</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <p>Ниже — контент, который может динамически увеличиваться. Нажми кнопку, чтобы добавить абзацы и проверить, что общий скролл остаётся единым.</p>
+      <button class="btn" id="add">Добавить абзац</button>
+      <div id="dyn"></div>
+    </div>
+
+    <div class="card">
+      <h3>Текстовый блок</h3>
+      <p>Open edX часто рендерит уроки с большим количеством текста, форм и встроенных виджетов. Здесь мы проверяем, что изменение высоты корректно проксируется в родителя.</p>
+      <p>Где пригодится: оценка юнитов как бесшовной ленты в мобильном приложении без множественных WebView.</p>
+    </div>
+
+    <div class="card">
+      <h3>Изображение</h3>
+      <p>Загрузка изображений часто меняет высоту уже после onload страницы.</p>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/640px-Fronalpstock_big.jpg" alt="demo" style="max-width:100%; height:auto; display:block; border-radius: 8px;" />
+    </div>
+  </div>
+
+  <script>
+    const dyn = document.getElementById('dyn');
+    const add = document.getElementById('add');
+    const lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus nec dui at quam vehicula tempor. ";
+    add.addEventListener('click', () => {
+      const p = document.createElement('p');
+      p.textContent = lipsum.repeat(5);
+      dyn.appendChild(p);
+    });
+  </script>
+
+  
+<script>
+  (function () {
+    // Используем window.name, который задал родитель (iframe name="unit-1")
+    const frameId = window.name || 'unknown-frame';
+
+    function postHeight() {
+      // Берём scrollHeight у корня документа (учитывает весь контент)
+      const h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body ? document.body.scrollHeight : 0
+      );
+      window.parent && window.parent.postMessage({ type: 'child:height', id: frameId, height: h }, '*');
+    }
+
+    // Сообщим родителю, что мы готовы
+    window.parent && window.parent.postMessage({ type: 'child:ready', id: frameId }, '*');
+
+    // Слушаем пинги/запросы от родителя
+    window.addEventListener('message', (ev) => {
+      const data = ev.data;
+      if (!data || typeof data !== 'object') return;
+      if (data.type === 'parent:getHeight' || data.type === 'parent:ping') {
+        postHeight();
+      }
+    });
+
+    // Обновляем высоту при загрузке, изображениях, мутирующем контенте и ресайзе
+    function setupObservers() {
+      // Когда DOM готов
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', postHeight, { once: true });
+      } else {
+        postHeight();
+      }
+
+      // После полной загрузки ресурсов
+      window.addEventListener('load', postHeight);
+
+      // ResizeObserver на корневом элементе (меняется высота из-за вёрстки/медиа)
+      if ('ResizeObserver' in window) {
+        const ro = new ResizeObserver(() => postHeight());
+        ro.observe(document.documentElement);
+        if (document.body) ro.observe(document.body);
+      }
+
+      // MutationObserver — если динамически добавляется контент
+      const mo = new MutationObserver(() => postHeight());
+      mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
+
+      // На случай экзотики — периодический пересчёт
+      setInterval(postHeight, 2000);
+    }
+
+    setupObservers();
+
+    // Чтобы у iframe не появлялся собственный скролл, лучше скрыть внутренние полосы
+    // (родитель всё равно растянет iframe по высоте контента)
+    const css = document.createElement('style');
+    css.textContent = `html, body { margin: 0; overflow: hidden !important; }`;
+    document.documentElement.appendChild(css);
+  })();
+</script>
+
+</body>
+</html>

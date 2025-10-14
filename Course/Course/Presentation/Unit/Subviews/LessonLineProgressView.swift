@@ -22,11 +22,11 @@ struct LessonLineProgressView: View {
             Theme.Colors.background
             HStack(spacing: 8) {
                 let vertical = viewModel.verticals[viewModel.verticalIndex]
-                let data = Array(vertical.childs.enumerated())
+                let data = Array(viewModel.displayItems.enumerated())
                 ForEach(data, id: \.offset) { index, item in
-                    let selected = viewModel.verticals[viewModel.verticalIndex].childs[index]
-                    let isSelected = selected == viewModel.selectedLesson()
-                    let isDone = item.completion == 1.0 || vertical.completion == 1.0
+                    let isSelected = index == viewModel.index
+                    let isItemDone = item.allBlocks.allSatisfy { $0.completion == 1.0 }
+                    let isDone = isItemDone || vertical.completion == 1.0
                     if  isSelected && isDone {
                         Theme.Colors.progressSelectedAndDone
                             .frame(height: 7)

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVP: Единый скролл из нескольких уроков</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      background: white;
+      border-bottom: 1px solid #eee;
+      padding: 12px 16px;
+      z-index: 2;
+    }
+    .hint {
+      color: #666;
+      font-size: 14px;
+    }
+    .unit-frame {
+      width: 100%;
+      border: 0;
+      display: block;             /* убираем лишние пробелы/щели */
+      min-height: 100px;          /* чтобы не было скачков до первого измерения */
+    }
+    .unit-wrapper {
+      /* просто визуально отделяем блоки уроков */
+      padding: 16px 0;
+      background:
+        linear-gradient(#fafafa, #fff 40px) top/100% 40px no-repeat;
+    }
+    .divider {
+      height: 1px;
+      background: #eee;
+      margin: 16px 0;
+    }
+    .footer-space {
+      height: 64px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>MVP: единая лента курса</strong>
+    <div class="hint">Скролль ниже — внутри по факту два iframes, но высота каждого подгоняется под контент, поэтому страница ощущается как единая.</div>
+  </header>
+
+  <div class="unit-wrapper">
+    <iframe
+      class="unit-frame"
+      name="unit-1"
+      src="child1.html"
+      loading="eager"
+      referrerpolicy="no-referrer"
+      sandbox="allow-scripts allow-forms allow-popups allow-modals allow-pointer-lock allow-downloads"
+    ></iframe>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="unit-wrapper">
+    <iframe
+      class="unit-frame"
+      name="unit-2"
+      src="child2.html"
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      sandbox="allow-scripts allow-forms allow-popups allow-modals allow-pointer-lock allow-downloads"
+    ></iframe>
+  </div>
+
+  <div class="footer-space"></div>
+
+  <script>
+    // Родитель получает высоту от каждого фрейма (через postMessage) и подгоняет iframe.style.height
+    // Это даёт сквозной скролл без внутренних полос прокрутки.
+    (function () {
+      const MIN_HEIGHT = 80;           // нижний порог, избегаем 0
+      const MAX_HEIGHT = 1000000;      // предохранитель на случай "утечки" измерений
+      const frames = Array.from(document.querySelectorAll('.unit-frame'));
+
+      // Храним последнюю высоту, чтобы не дёргать DOM без нужды
+      const lastHeights = new Map();
+
+      // Утилита установки высоты (с предохранителями)
+      function setHeight(iframe, px) {
+        const safe = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, Math.floor(px)));
+        const prev = lastHeights.get(iframe);
+        if (prev !== safe) {
+          iframe.style.height = safe + 'px';
+          lastHeights.set(iframe, safe);
+        }
+      }
+
+      // Отправка "пинг" детям — вдруг они хотят пересчитать высоту.
+      function pingChildren() {
+        for (const iframe of frames) {
+          try {
+            iframe.contentWindow.postMessage({ type: 'parent:ping' }, '*');
+          } catch (e) {
+            // игнор: может быть не готово
+          }
+        }
+      }
+
+      // Слушаем сообщения от детей
+      window.addEventListener('message', (ev) => {
+        const data = ev.data;
+        if (!data || typeof data !== 'object') return;
+
+        // Ожидаем формат: { type: 'child:height', id: 'unit-1', height: number }
+        if (data.type === 'child:height' && typeof data.height === 'number') {
+          const target = frames.find(f => f.name === data.id);
+          if (target) setHeight(target, data.height);
+          return;
+        }
+
+        // Ребёнок готов — можем попросить высоту (не обязательно, они и сами шлют)
+        if (data.type === 'child:ready' && typeof data.id === 'string') {
+          try {
+            const target = frames.find(f => f.name === data.id);
+            if (target && target.contentWindow) {
+              target.contentWindow.postMessage({ type: 'parent:getHeight' }, '*');
+            }
+          } catch {}
+          return;
+        }
+      });
+
+      // При ресайзе окна пингуем детей (например, меняется ширина — меняется высота контента).
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => pingChildren(), 100);
+      });
+
+      // На всякий случай периодический пинг (например, если внутри динамика/ленивая подгрузка)
+      setInterval(pingChildren, 1500);
+    })();
+  </script>
+</body>
+</html>
