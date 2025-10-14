@@ -53,14 +53,21 @@ public struct GroupedContentResizeInjection: WebViewScriptInjectionProtocol {
                     var body = document.body || doc;
                     if (!doc) { return; }
                     var viewport = Math.max(window.innerHeight || 0, doc.clientHeight || 0);
-                    var height = Math.max(
-                        doc.scrollHeight || 0,
-                        doc.offsetHeight || 0,
-                        doc.clientHeight || 0,
-                        body ? body.scrollHeight || 0 : 0,
-                        body ? body.offsetHeight || 0 : 0,
-                        body ? body.clientHeight || 0 : 0
-                    );
+                    var bodyHeight = body ? (body.scrollHeight || body.offsetHeight || body.clientHeight || 0) : 0;
+                    var docHeight = doc ? (doc.scrollHeight || doc.offsetHeight || doc.clientHeight || 0) : 0;
+                    var height = bodyHeight;
+
+                    if (!height && docHeight) {
+                        height = docHeight;
+                    }
+
+                    if (docHeight && height && docHeight > height && (docHeight - height) <= 6) {
+                        height = docHeight;
+                    }
+
+                    if (!height) {
+                        height = docHeight || MIN_HEIGHT;
+                    }
                     height = clampHeight(height);
                     var overflow = Math.max(0, height - viewport);
 
