@@ -274,7 +274,9 @@ public struct CourseBlock: Hashable, Identifiable, Sendable, Equatable {
     public var offlineDownload: OfflineDownload?
 
     public var isDownloadable: Bool {
-        encodedVideo?.isDownloadable ?? false || offlineDownload?.isDownloadable ?? false
+        if encodedVideo?.isDownloadable == true { return true }
+        if offlineDownload?.isDownloadable == true { return true }
+        return supportsWebArchiveDownload
     }
     
     public var fileSize: Int? {
@@ -329,6 +331,21 @@ public struct CourseBlock: Hashable, Identifiable, Sendable, Equatable {
         self.encodedVideo = encodedVideo
         self.multiDevice = multiDevice
         self.offlineDownload = offlineDownload
+    }
+
+    private var supportsWebArchiveDownload: Bool {
+        guard offlineDownload == nil else { return false }
+        switch type {
+        case .html, .problem:
+            return hasLoadableURL
+        default:
+            return false
+        }
+    }
+
+    private var hasLoadableURL: Bool {
+        !studentUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !webUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 

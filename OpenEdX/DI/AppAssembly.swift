@@ -102,12 +102,20 @@ class AppAssembly: Assembly {
         container.register(CorePersistenceProtocol.self) { r in
             CorePersistence(container: r.resolve(DatabaseManager.self)!.getPersistentContainer())
         }.inObjectScope(.container)
+
+        container.register(OfflineWebArchiveServiceProtocol.self) { @MainActor r in
+            OfflineWebArchiveService(
+                authInteractor: r.resolve(AuthInteractorProtocol.self)!,
+                config: r.resolve(ConfigProtocol.self)!
+            )
+        }.inObjectScope(.container)
         
         container.register(DownloadManagerProtocol.self) { @MainActor r in
             DownloadManager(
                 persistence: r.resolve(CorePersistenceProtocol.self)!,
                 appStorage: r.resolve(CoreStorage.self)!,
-                connectivity: r.resolve(ConnectivityProtocol.self)!
+                connectivity: r.resolve(ConnectivityProtocol.self)!,
+                webArchiveService: r.resolve(OfflineWebArchiveServiceProtocol.self)!
             )
         }.inObjectScope(.container)
         

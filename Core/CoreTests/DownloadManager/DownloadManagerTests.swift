@@ -9,12 +9,36 @@ import XCTest
 import SwiftyMocky
 @testable import Core
 
+final class OfflineWebArchiveServiceStub: OfflineWebArchiveServiceProtocol, @unchecked Sendable {
+    var result: OfflineWebArchiveResult = .init(
+        fileURL: URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("stub.webarchive"),
+        originalURL: URL(string: "https://example.com")!,
+        size: 1024
+    )
+    var error: Error?
+    
+    func archivePage(
+        sourceURLString: String,
+        fileName: String,
+        destinationDirectory: URL,
+        progress: @escaping @Sendable (Double) -> Void
+    ) async throws -> OfflineWebArchiveResult {
+        if let error {
+            throw error
+        }
+        progress(0.1)
+        progress(1.0)
+        return result
+    }
+}
+
 @MainActor
 final class DownloadManagerTests: XCTestCase {
     
     var persistence: CorePersistenceProtocolMock!
     var storage: CoreStorageMock!
     var connectivity: ConnectivityProtocolMock!
+    var webArchiveService: OfflineWebArchiveServiceStub!
     
     override func setUp() {
         super.setUp()
@@ -22,10 +46,20 @@ final class DownloadManagerTests: XCTestCase {
         let mockTask = createMockDownloadTask()
         storage = CoreStorageMock()
         connectivity = ConnectivityProtocolMock()
+        webArchiveService = OfflineWebArchiveServiceStub()
         Given(persistence, .getDownloadDataTasks(willReturn: [mockTask]))
         Given(connectivity, .isInternetAvaliable(getter: true))
         Given(connectivity, .internetReachableSubject(getter: .init(.reachable)))
         Given(storage, .user(getter: .init(id: 19, username: "username", email: "email", name: "name")))
+    }
+
+    private func makeManager() -> DownloadManager {
+        DownloadManager(
+            persistence: persistence,
+            appStorage: storage,
+            connectivity: connectivity,
+            webArchiveService: webArchiveService
+        )
     }
     
     // MARK: - Test Add to Queue
@@ -34,11 +68,7 @@ final class DownloadManagerTests: XCTestCase {
         // Given
         Given(connectivity, .isMobileData(getter: false))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         Given(storage, .userSettings(getter: UserSettings(
             wifiOnly: true,
@@ -65,11 +95,7 @@ final class DownloadManagerTests: XCTestCase {
         )))
         Given(connectivity, .isMobileData(getter: true))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         let blocks = [createMockCourseBlock()]
         
@@ -94,11 +120,7 @@ final class DownloadManagerTests: XCTestCase {
 //        Given(persistence, .nextBlockForDownloading(willReturn: mockTask))
         Given(connectivity, .isMobileData(getter: false))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         try await downloadManager.resumeDownloading()
@@ -114,11 +136,7 @@ final class DownloadManagerTests: XCTestCase {
         let task = createMockDownloadTask()
         Given(connectivity, .isMobileData(getter: false))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         try await downloadManager.cancelDownloading(task: task)
@@ -135,11 +153,7 @@ final class DownloadManagerTests: XCTestCase {
         Given(connectivity, .isMobileData(getter: false))
         Given(persistence, .getDownloadDataTasksForCourse(.value(courseId), willReturn: tasks))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         try await downloadManager.cancelDownloading(courseId: courseId)
@@ -158,11 +172,7 @@ final class DownloadManagerTests: XCTestCase {
         Given(connectivity, .isMobileData(getter: false))
         Given(persistence, .getDownloadDataTasksForCourse(.value(block.courseId), willReturn: [task]))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         await downloadManager.delete(blocks: [block], courseId: block.courseId)
@@ -185,11 +195,7 @@ final class DownloadManagerTests: XCTestCase {
         Given(connectivity, .isMobileData(getter: false))
         Given(persistence, .downloadDataTask(for: .value(task.id), willReturn: task))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         let url = await downloadManager.fileUrl(for: task.id)
@@ -207,11 +213,7 @@ final class DownloadManagerTests: XCTestCase {
         let blocks = [createMockCourseBlock(videoSize: 1_200_000_000)] // 1.2 GB
         Given(connectivity, .isMobileData(getter: false))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         let isLarge = await downloadManager.isLargeVideosSize(blocks: blocks)
@@ -225,11 +227,7 @@ final class DownloadManagerTests: XCTestCase {
         let blocks = [createMockCourseBlock(videoSize: 500_000_000)] // 500 MB
         Given(connectivity, .isMobileData(getter: false))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         let isLarge = await downloadManager.isLargeVideosSize(blocks: blocks)
@@ -250,11 +248,7 @@ final class DownloadManagerTests: XCTestCase {
         Given(connectivity, .isMobileData(getter: false))
         Given(persistence, .getDownloadDataTasks(willReturn: expectedTasks))
         
-        let downloadManager = DownloadManager(
-            persistence: persistence,
-            appStorage: storage,
-            connectivity: connectivity
-        )
+        let downloadManager = makeManager()
         
         // When
         let tasks = await downloadManager.getDownloadTasks()

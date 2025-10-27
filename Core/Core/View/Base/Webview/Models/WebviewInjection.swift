@@ -66,4 +66,9 @@ public extension WebviewInjection {
         AccessibilityInjection()
             .webviewInjection()
     }
+
+    static var offlineReadOnly: WebviewInjection {
+        OfflineReadOnlyInjection()
+            .webviewInjection()
+    }
 }

@@ -1,0 +1,832 @@
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="en"><![endif]-->
+<!--[if !IE]><!--><html lang="en"><!--<![endif]-->
+<head dir="ltr">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+  <title>
+
+ DemoX Courseware | axim-ccpv LMS
+</title>
+
+
+  
+
+  <script type="text/javascript" nonce="c04c4c2d8dfc47cb99128a3259e" src="//local.adguard.org?ts=1761559235757&amp;type=content-script&amp;dmn=axim-ccpv-dev.raccoongang.net&amp;url=https%3A%2F%2Faxim-ccpv-dev.raccoongang.net%2Fxblock%2Fblock-v1%3AOpenedX%2BDemoX%2BDemoCourse%2Btype%40vertical%2Bblock%40dacc88e550bd48db93899979bff1b086&amp;app=com.google.Chrome&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="c04c4c2d8dfc47cb99128a3259e" src="//local.adguard.org?ts=1761559235757&amp;name=AdGuard%20Extra&amp;type=user-script"></script><script type="text/javascript" src="/static/js/i18n/en/djangojs.0f66acafc573.js"></script>
+  <script type="text/javascript" src="/static/js/ie11_find_array.67b5a9edd5d5.js"></script>
+  
+  <link rel="icon" type="image/x-icon" href="/static/images/favicon.03ffbbf95a0d.ico"/>
+
+  
+
+  
+  
+
+    <link href="/static/css/lms-style-vendor.68e48093f5dd.css" rel="stylesheet" type="text/css" />
+
+
+
+    
+  
+
+    <link href="/static/css/lms-main-v1.90366a72e379.css" rel="stylesheet" type="text/css" />
+
+
+
+
+    
+    
+<script type="text/javascript" src="/static/js/lms-main_vendor.4126ac02965c.js" charset="utf-8"></script>
+
+
+    
+    
+<script type="text/javascript" src="/static/js/lms-application.074dc588ef8a.js" charset="utf-8"></script>
+
+
+
+  
+    
+    
+    <script type="text/javascript" src="/static/bundles/commons.20bdac4aef0c44b02b02.0aec685f1bf4.js" ></script>
+
+
+
+  <script>
+    window.baseUrl = "/static/";
+    (function (require) {
+      require.config({
+          baseUrl: window.baseUrl
+      });
+    }).call(this, require || RequireJS.require);
+  </script>
+  <script type="text/javascript" src="/static/lms/js/require-config.30c1582aaf08.js"></script>
+  
+    <script type="text/javascript">
+        (function (require) {
+          require.config({
+              paths: {
+                'course_bookmarks/js/views/bookmark_button': 'course_bookmarks/js/views/bookmark_button.99159f5f5649',
+'js/views/message_banner': 'js/views/message_banner.141974fd4f5d',
+'moment': 'common/js/vendor/moment-with-locales.8afc1b9c35cd',
+'moment-timezone': 'common/js/vendor/moment-timezone-with-data.daaf3159f5d2',
+'js/courseware/course_info_events': 'js/courseware/course_info_events.2fc35b57627f',
+'js/courseware/accordion_events': 'js/courseware/accordion_events.6064c7809de5',
+'js/dateutil_factory': 'js/dateutil_factory.05a361148818',
+'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events',
+'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.474ff5ba9de3',
+'js/student_account/logistration_factory': 'js/student_account/logistration_factory.df4e41783d02',
+'js/courseware/courseware_factory': 'js/courseware/courseware_factory.1504fc10caef',
+'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.f9c69d089f31',
+'js/groups/discussions_management/discussions_dashboard_factory': 'js/discussions_management/views/discussions_dashboard_factory.2e10d9097343',
+'draggabilly': 'js/vendor/draggabilly.26caba6f7187',
+'hls': 'common/js/vendor/hls.3026d7d10201'
+            }
+          });
+        }).call(this, require || RequireJS.require);
+    </script>
+  
+
+  
+
+  
+
+    <link href="/static/css/lms-style-course-vendor.730dda42e3c1.css" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+
+    <link href="/static/css/lms-course.3afbed5d4411.css" rel="stylesheet" type="text/css" />
+
+
+
+
+<script type="text/javascript" src="/static/js/jquery.autocomplete.964a0bfb4fd2.js" async></script>
+<script type="text/javascript" src="/static/js/src/tooltip_manager.d611f4446ebd.js" async></script>
+
+<link href="/static/css/vendor/jquery.autocomplete.896181d3ec33.css" rel="preload" type="text/css" as="style">
+  <link rel='stylesheet' href='/static/css-builtin-blocks/HtmlBlockDisplay.9c90d3d0d69f.css' type='text/css'>
+<link rel='stylesheet' href='/static/css-builtin-blocks/ProblemBlockDisplay.53d04508efe8.css' type='text/css'>
+
+
+<script type="text/javascript">
+  var $$course_id = "course\u002Dv1:OpenedX+DemoX+DemoCourse";
+</script>
+
+
+  
+
+  
+
+
+  
+
+
+<script type="application/json" id="user-metadata">
+    null
+</script>
+
+  
+
+  
+
+
+  
+
+
+<!-- dummy Segment -->
+<script type="text/javascript">
+  var analytics = {
+    track: function() { return; },
+    trackLink: function() { return; },
+    pageview: function() { return; },
+    page: function() { return; }
+  };
+</script>
+<!-- end dummy Segment -->
+
+
+  <meta name="path_prefix" content="">
+  
+
+  <meta name="openedx-release-line" content="master" />
+
+
+
+
+
+
+
+</head>
+
+<body class="ltr view-in-course view-courseware courseware  lang_en">
+
+
+<div id="page-prompt"></div>
+    
+    <a class="nav-skip sr-only sr-only-focusable" href="#main">Skip to main content</a>
+
+
+    
+
+
+
+
+
+
+
+
+
+
+    <div class="marketing-hero"></div>
+
+    <div class="content-wrapper main-container" id="content" dir="ltr">
+      
+
+
+
+
+
+
+
+
+<script type="text/template" id="image-modal-tpl">
+    <div class="wrapper-modal wrapper-modal-image">
+  <section class="image-link">
+    <%= smallHTML%> <% // xss-lint: disable=underscore-not-escaped %>
+    <a href="#" class="modal-ui-icon action-fullscreen" role="button">
+      <span class="label">
+        <span class="icon fa fa-arrows-alt fa-large" aria-hidden="true"></span> <%- gettext("Fullscreen") %>
+      </span>
+    </a>
+  </section>
+
+  <section class="image-modal">
+    <section class="image-content">
+      <div class="image-wrapper">
+        <img alt="<%- largeALT %>, <%- gettext('Large') %>" src="<%- largeSRC %>" />
+      </div>
+
+      <a href="#" class="modal-ui-icon action-close" role="button">
+        <span class="label">
+          <span class="icon fa fa-remove fa-large" aria-hidden="true"></span> <%- gettext("Close") %>
+        </span>
+      </a>
+
+      <ul class="image-controls">
+        <li class="image-control">
+          <a href="#" class="modal-ui-icon action-zoom-in" role="button">
+            <span class="label">
+              <span class="icon fa fa fa-search-plus fa-large" aria-hidden="true"></span> <%- gettext("Zoom In") %>
+            </span>
+          </a>
+        </li>
+
+        <li class="image-control">
+          <a href="#" class="modal-ui-icon action-zoom-out is-disabled" aria-disabled="true" role="button">
+            <span class="label">
+              <span class="icon fa fa fa-search-minus fa-large" aria-hidden="true"></span> <%- gettext("Zoom Out") %>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </section>
+</div>
+
+</script>
+
+
+
+
+
+
+
+
+
+<div class="course-wrapper chromeless">
+  <section class="course-content" id="course-content"      data-enable-completion-on-view-service="false"     style="display: block; width: auto; margin: 0;"
+  >
+      <main id="main" aria-label="Content">
+        
+<div class="xblock xblock-student_view xblock-student_view-vertical" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="VerticalStudentView" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="vertical" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@vertical+block@dacc88e550bd48db93899979bff1b086" data-request-token="14b039c6b31d11f09cca32f82a01f3c8" data-graded="True" data-has-score="False">
+  
+
+
+
+
+
+  <h2 class="hd hd-2 unit-title">Single-Select Multiple Choice Problems</h2>
+
+
+
+
+<div class="vert-mod">
+    <div class="vert vert-0" data-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@dd810c6113a446469334c6f3d1e377b5" id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@dd810c6113a446469334c6f3d1e377b5">
+        
+<div class="xblock xblock-student_view xblock-student_view-html xmodule_display xmodule_HtmlBlock" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="XBlockToXModuleShim" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="html" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@dd810c6113a446469334c6f3d1e377b5" data-request-token="14b039c6b31d11f09cca32f82a01f3c8" data-graded="True" data-has-score="False">
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    {"xmodule-type": "HTMLModule"}
+  </script>
+  <div class="single-select">
+<div class="boxed-row">
+<p>A <strong>single-select multiple choice problem </strong>assesses a student's knowledge or understanding by presenting a question with multiple answer choices, where the student must select only one correct option, commonly used for formative or summative assessments in a course. </p>
+<p>Rich text, images, hints and feedback can all be incorporated into multiple choice questions. </p>
+<div class="documentation">
+<p><span class="material-symbols-outlined">menu_book</span><a href="https://docs.openedx.org/en/latest/educators/concepts/exercise_tools/about_single_select.html" target="_blank" rel="noopener">Documentation</a> </p>
+</div>
+</div>
+</div>
+</div>
+
+    </div>
+    <div class="vert vert-1" data-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@7ec3167b131a4d9ebf09da8353ef17d6" id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@7ec3167b131a4d9ebf09da8353ef17d6">
+        
+<div class="xblock xblock-student_view xblock-student_view-html xmodule_display xmodule_HtmlBlock" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="XBlockToXModuleShim" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="html" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@7ec3167b131a4d9ebf09da8353ef17d6" data-request-token="14b039c6b31d11f09cca32f82a01f3c8" data-graded="True" data-has-score="False">
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    {"xmodule-type": "HTMLModule"}
+  </script>
+  <div class="try-it short-content">
+<h3>Try it!</h3>
+<p>Try the two problems below. </p>
+<p>In the second example, you can opt to receive hints and view an explanation of the correct answer. </p>
+</div>
+</div>
+
+    </div>
+    <div class="vert vert-2" data-id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@870b16e640d541af94a308caac834d2e" id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@870b16e640d541af94a308caac834d2e">
+        
+<div class="xblock xblock-student_view xblock-student_view-problem xmodule_display xmodule_ProblemBlock" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="XBlockToXModuleShim" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="problem" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@870b16e640d541af94a308caac834d2e" data-request-token="14b039c6b31d11f09cca32f82a01f3c8" data-graded="True" data-has-score="True">
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    {"xmodule-type": "Problem"}
+  </script>
+  <div id="problem_870b16e640d541af94a308caac834d2e" class="problems-wrapper" role="group"
+     aria-labelledby="870b16e640d541af94a308caac834d2e-problem-title"
+     data-problem-id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@870b16e640d541af94a308caac834d2e" data-url="/courses/course-v1:OpenedX+DemoX+DemoCourse/xblock/block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@870b16e640d541af94a308caac834d2e/handler/xmodule_handler"
+     data-problem-score="0"
+     data-problem-total-possible="1"
+     data-attempts-used="7"
+     data-content="
+
+
+
+&lt;h3 class=&#34;hd hd-3 problem-header&#34; id=&#34;870b16e640d541af94a308caac834d2e-problem-title&#34; aria-describedby=&#34;block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@870b16e640d541af94a308caac834d2e-problem-progress&#34; tabindex=&#34;-1&#34;&gt;
+  Basic Multiple Choice
+&lt;/h3&gt;
+
+&lt;div class=&#34;problem-progress&#34; id=&#34;block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@870b16e640d541af94a308caac834d2e-problem-progress&#34;&gt;&lt;/div&gt;
+
+&lt;div class=&#34;problem&#34;&gt;
+  &lt;div&gt;
+  &lt;div class=&#34;wrapper-problem-response&#34; tabindex=&#34;-1&#34; aria-label=&#34;Question 1&#34; role=&#34;group&#34;&gt;&lt;div class=&#34;choicegroup capa_inputtype&#34; id=&#34;inputtype_870b16e640d541af94a308caac834d2e_2_1&#34;&gt;
+    &lt;fieldset aria-describedby=&#34;status_870b16e640d541af94a308caac834d2e_2_1&#34;&gt;
+        &lt;legend id=&#34;870b16e640d541af94a308caac834d2e_2_1-legend&#34; class=&#34;response-fieldset-legend field-group-hd&#34;&gt;Which animal was often used as a symbol for Ancient Rome?&lt;/legend&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_870b16e640d541af94a308caac834d2e_2_1&#34; id=&#34;input_870b16e640d541af94a308caac834d2e_2_1_choice_0&#34; class=&#34;field-input input-radio&#34; value=&#34;choice_0&#34;/&gt;&lt;label id=&#34;870b16e640d541af94a308caac834d2e_2_1-choice_0-label&#34; for=&#34;input_870b16e640d541af94a308caac834d2e_2_1_choice_0&#34; class=&#34;response-label field-label label-inline&#34; aria-describedby=&#34;status_870b16e640d541af94a308caac834d2e_2_1&#34;&gt;
+                &lt;div&gt;
+                    Lion
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_870b16e640d541af94a308caac834d2e_2_1&#34; id=&#34;input_870b16e640d541af94a308caac834d2e_2_1_choice_1&#34; class=&#34;field-input input-radio&#34; value=&#34;choice_1&#34;/&gt;&lt;label id=&#34;870b16e640d541af94a308caac834d2e_2_1-choice_1-label&#34; for=&#34;input_870b16e640d541af94a308caac834d2e_2_1_choice_1&#34; class=&#34;response-label field-label label-inline&#34; aria-describedby=&#34;status_870b16e640d541af94a308caac834d2e_2_1&#34;&gt;
+                &lt;div&gt;
+                    Tiger
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_870b16e640d541af94a308caac834d2e_2_1&#34; id=&#34;input_870b16e640d541af94a308caac834d2e_2_1_choice_2&#34; class=&#34;field-input input-radio submitted&#34; value=&#34;choice_2&#34; checked=&#34;true&#34;/&gt;&lt;label id=&#34;870b16e640d541af94a308caac834d2e_2_1-choice_2-label&#34; for=&#34;input_870b16e640d541af94a308caac834d2e_2_1_choice_2&#34; class=&#34;response-label field-label label-inline choicegroup_incorrect&#34; aria-describedby=&#34;status_870b16e640d541af94a308caac834d2e_2_1&#34;&gt;
+                &lt;div&gt;
+                    Elephant
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+        &lt;span id=&#34;answer_870b16e640d541af94a308caac834d2e_2_1&#34;/&gt;
+    &lt;/fieldset&gt;
+    &lt;div class=&#34;indicator-container&#34;&gt;
+          
+
+&lt;span class=&#34;status incorrect&#34; id=&#34;status_870b16e640d541af94a308caac834d2e_2_1&#34; data-tooltip=&#34;This answer is incorrect.&#34;&gt;
+  &lt;span class=&#34;sr&#34;&gt;incorrect&lt;/span&gt;&lt;span class=&#34;status-icon&#34; aria-hidden=&#34;true&#34;/&gt;
+&lt;/span&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+  &lt;div class=&#34;action&#34;&gt;
+    &lt;input type=&#34;hidden&#34; name=&#34;problem_id&#34; value=&#34;Basic Multiple Choice&#34; /&gt;
+
+    &lt;div class=&#34;problem-action-buttons-wrapper&#34;&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;submit-attempt-container&#34;&gt;
+      &lt;button type=&#34;button&#34; class=&#34;submit btn-brand&#34; data-submitting=&#34;Submitting&#34; data-value=&#34;Submit&#34; data-should-enable-submit-button=&#34;True&#34; aria-describedby=&#34;submission_feedback_870b16e640d541af94a308caac834d2e&#34; &gt;
+          &lt;span class=&#34;submit-label&#34;&gt;Submit&lt;/span&gt;
+      &lt;/button&gt;
+
+      &lt;div class=&#34;submission-feedback &#34; id=&#34;submission_feedback_870b16e640d541af94a308caac834d2e&#34;&gt;
+        &lt;span class=&#34;sr&#34;&gt;Some problems have options such as save, reset, hints, or show answer. These options follow the Submit button.&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+    
+
+
+&lt;div class=&#34;notification warning notification-gentle-alert
+      is-hidden&#34;
+     tabindex=&#34;-1&#34;&gt;
+    &lt;span class=&#34;icon fa fa-exclamation-circle&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;
+    &lt;span class=&#34;notification-message&#34; aria-describedby=&#34;870b16e640d541af94a308caac834d2e-problem-title&#34;&gt;
+    &lt;/span&gt;
+    &lt;div class=&#34;notification-btn-wrapper&#34;&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn review-btn sr&#34;&gt;Review&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+    
+
+
+&lt;div class=&#34;notification warning notification-save
+      is-hidden&#34;
+     tabindex=&#34;-1&#34;&gt;
+    &lt;span class=&#34;icon fa fa-save&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;
+    &lt;span class=&#34;notification-message&#34; aria-describedby=&#34;870b16e640d541af94a308caac834d2e-problem-title&#34;&gt;None
+    &lt;/span&gt;
+    &lt;div class=&#34;notification-btn-wrapper&#34;&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn review-btn sr&#34;&gt;Review&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+    
+    
+
+
+&lt;div class=&#34;notification general notification-show-answer
+      is-hidden&#34;
+     tabindex=&#34;-1&#34;&gt;
+    &lt;span class=&#34;icon fa fa-info-circle&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;
+    &lt;span class=&#34;notification-message&#34; aria-describedby=&#34;870b16e640d541af94a308caac834d2e-problem-title&#34;&gt;Answers are displayed within the problem
+    &lt;/span&gt;
+    &lt;div class=&#34;notification-btn-wrapper&#34;&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn review-btn sr&#34;&gt;Review&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;script&gt;
+    function emit_event(message) {
+        parent.postMessage(message, &#39;*&#39;);
+    }
+&lt;/script&gt;
+"
+     data-graded="True">
+    <p class="loading-spinner">
+        <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+        <span class="sr">Loading&hellip;</span>
+    </p>
+</div>
+
+</div>
+
+    </div>
+    <div class="vert vert-3" data-id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@ef8c3814d2ce47c6927a8310bba4b849" id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@ef8c3814d2ce47c6927a8310bba4b849">
+        
+<div class="xblock xblock-student_view xblock-student_view-problem xmodule_display xmodule_ProblemBlock" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="XBlockToXModuleShim" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="problem" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@ef8c3814d2ce47c6927a8310bba4b849" data-request-token="14b039c6b31d11f09cca32f82a01f3c8" data-graded="True" data-has-score="True">
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    {"xmodule-type": "Problem"}
+  </script>
+  <div id="problem_ef8c3814d2ce47c6927a8310bba4b849" class="problems-wrapper" role="group"
+     aria-labelledby="ef8c3814d2ce47c6927a8310bba4b849-problem-title"
+     data-problem-id="block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@ef8c3814d2ce47c6927a8310bba4b849" data-url="/courses/course-v1:OpenedX+DemoX+DemoCourse/xblock/block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@ef8c3814d2ce47c6927a8310bba4b849/handler/xmodule_handler"
+     data-problem-score="1"
+     data-problem-total-possible="1"
+     data-attempts-used="7"
+     data-content="
+
+
+
+&lt;h3 class=&#34;hd hd-3 problem-header&#34; id=&#34;ef8c3814d2ce47c6927a8310bba4b849-problem-title&#34; aria-describedby=&#34;block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@ef8c3814d2ce47c6927a8310bba4b849-problem-progress&#34; tabindex=&#34;-1&#34;&gt;
+  Multiple Choice with Hints and Feedback
+&lt;/h3&gt;
+
+&lt;div class=&#34;problem-progress&#34; id=&#34;block-v1:OpenedX+DemoX+DemoCourse+type@problem+block@ef8c3814d2ce47c6927a8310bba4b849-problem-progress&#34;&gt;&lt;/div&gt;
+
+&lt;div class=&#34;problem&#34;&gt;
+  &lt;div&gt;
+  &lt;div class=&#34;wrapper-problem-response&#34; tabindex=&#34;-1&#34; aria-label=&#34;Question 1&#34; role=&#34;group&#34;&gt;&lt;p&gt;
+      &lt;img style=&#34;width: 100%;&#34; src=&#34;/assets/courseware/v1/135301dd10ba54600563653ee2174b53/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Abacus.png&#34; alt=&#34;An abacus with two beads pushed up in the last column, 1 bead in the 2nd to last, and one bead pushed down on the top right. &#34;/&gt;
+    &lt;/p&gt;
+    &lt;div class=&#34;choicegroup capa_inputtype&#34; id=&#34;inputtype_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;&gt;
+    &lt;fieldset aria-describedby=&#34;status_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;&gt;
+        &lt;legend id=&#34;ef8c3814d2ce47c6927a8310bba4b849_2_1-legend&#34; class=&#34;response-fieldset-legend field-group-hd&#34;&gt;In the traditional abacus shown above, what number is represented?&lt;/legend&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34; id=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_0&#34; class=&#34;field-input input-radio&#34; value=&#34;choice_0&#34;/&gt;&lt;label id=&#34;ef8c3814d2ce47c6927a8310bba4b849_2_1-choice_0-label&#34; for=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_0&#34; class=&#34;response-label field-label label-inline&#34; aria-describedby=&#34;status_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;&gt;
+                &lt;div&gt;
+                    3
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34; id=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_1&#34; class=&#34;field-input input-radio&#34; value=&#34;choice_1&#34;/&gt;&lt;label id=&#34;ef8c3814d2ce47c6927a8310bba4b849_2_1-choice_1-label&#34; for=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_1&#34; class=&#34;response-label field-label label-inline&#34; aria-describedby=&#34;status_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;&gt;
+                &lt;div&gt;
+                    8
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34; id=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_2&#34; class=&#34;field-input input-radio&#34; value=&#34;choice_2&#34;/&gt;&lt;label id=&#34;ef8c3814d2ce47c6927a8310bba4b849_2_1-choice_2-label&#34; for=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_2&#34; class=&#34;response-label field-label label-inline&#34; aria-describedby=&#34;status_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;&gt;
+                &lt;div&gt;
+                    12
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34; id=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_3&#34; class=&#34;field-input input-radio&#34; value=&#34;choice_3&#34;/&gt;&lt;label id=&#34;ef8c3814d2ce47c6927a8310bba4b849_2_1-choice_3-label&#34; for=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_3&#34; class=&#34;response-label field-label label-inline&#34; aria-describedby=&#34;status_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;&gt;
+                &lt;div&gt;
+                    16
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+          
+          &lt;div class=&#34;field&#34;&gt;
+            &lt;input type=&#34;radio&#34; name=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34; id=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_4&#34; class=&#34;field-input input-radio submitted&#34; value=&#34;choice_4&#34; checked=&#34;true&#34;/&gt;&lt;label id=&#34;ef8c3814d2ce47c6927a8310bba4b849_2_1-choice_4-label&#34; for=&#34;input_ef8c3814d2ce47c6927a8310bba4b849_2_1_choice_4&#34; class=&#34;response-label field-label label-inline choicegroup_correct&#34; aria-describedby=&#34;status_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;&gt;
+                &lt;div&gt;
+                    17
+                &lt;/div&gt;
+            &lt;/label&gt;
+          &lt;/div&gt;
+        &lt;span id=&#34;answer_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34;/&gt;
+    &lt;/fieldset&gt;
+    &lt;div class=&#34;indicator-container&#34;&gt;
+          
+
+&lt;span class=&#34;status correct&#34; id=&#34;status_ef8c3814d2ce47c6927a8310bba4b849_2_1&#34; data-tooltip=&#34;This answer is correct.&#34;&gt;
+  &lt;span class=&#34;sr&#34;&gt;correct&lt;/span&gt;&lt;span class=&#34;status-icon&#34; aria-hidden=&#34;true&#34;/&gt;
+&lt;/span&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;solution-span&#34;&gt;
+ &lt;span id=&#34;solution_ef8c3814d2ce47c6927a8310bba4b849_solution_1&#34;/&gt;
+&lt;/div&gt;&lt;/div&gt;
+  
+&lt;/div&gt;
+  &lt;div class=&#34;action&#34;&gt;
+    &lt;input type=&#34;hidden&#34; name=&#34;problem_id&#34; value=&#34;Multiple Choice with Hints and Feedback&#34; /&gt;
+      &lt;div class=&#34;problem-hint&#34;&gt;
+        
+
+
+&lt;div class=&#34;notification problem-hint notification-hint
+      is-hidden&#34;
+     tabindex=&#34;-1&#34;&gt;
+    &lt;span class=&#34;icon fa fa-question&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;
+    &lt;span class=&#34;notification-message&#34; aria-describedby=&#34;ef8c3814d2ce47c6927a8310bba4b849-problem-title&#34;&gt;
+    &lt;/span&gt;
+    &lt;div class=&#34;notification-btn-wrapper&#34;&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn hint-button&#34;&gt;
+          Next Hint
+        &lt;/button&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn review-btn sr&#34;&gt;Review&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+      &lt;/div&gt;
+
+    &lt;div class=&#34;problem-action-buttons-wrapper&#34;&gt;
+      &lt;span class=&#34;problem-action-button-wrapper&#34;&gt;
+          &lt;button type=&#34;button&#34; class=&#34;hint-button problem-action-btn btn-link btn-small&#34; data-value=&#34;Hint&#34; &gt;Hint&lt;/button&gt;
+      &lt;/span&gt;
+      &lt;span class=&#34;problem-action-button-wrapper&#34;&gt;
+          &lt;button type=&#34;button&#34; class=&#34;show problem-action-btn btn-link btn-small&#34; aria-describedby=&#34;ef8c3814d2ce47c6927a8310bba4b849-problem-title&#34;&gt;&lt;span class=&#34;show-label&#34;&gt;Show answer&lt;/span&gt;&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;submit-attempt-container&#34;&gt;
+      &lt;button type=&#34;button&#34; class=&#34;submit btn-brand&#34; data-submitting=&#34;Submitting&#34; data-value=&#34;Submit&#34; data-should-enable-submit-button=&#34;True&#34; aria-describedby=&#34;submission_feedback_ef8c3814d2ce47c6927a8310bba4b849&#34; &gt;
+          &lt;span class=&#34;submit-label&#34;&gt;Submit&lt;/span&gt;
+      &lt;/button&gt;
+
+      &lt;div class=&#34;submission-feedback &#34; id=&#34;submission_feedback_ef8c3814d2ce47c6927a8310bba4b849&#34;&gt;
+        &lt;span class=&#34;sr&#34;&gt;Some problems have options such as save, reset, hints, or show answer. These options follow the Submit button.&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+    
+
+
+&lt;div class=&#34;notification warning notification-gentle-alert
+      is-hidden&#34;
+     tabindex=&#34;-1&#34;&gt;
+    &lt;span class=&#34;icon fa fa-exclamation-circle&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;
+    &lt;span class=&#34;notification-message&#34; aria-describedby=&#34;ef8c3814d2ce47c6927a8310bba4b849-problem-title&#34;&gt;
+    &lt;/span&gt;
+    &lt;div class=&#34;notification-btn-wrapper&#34;&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn review-btn sr&#34;&gt;Review&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+    
+
+
+&lt;div class=&#34;notification warning notification-save
+      is-hidden&#34;
+     tabindex=&#34;-1&#34;&gt;
+    &lt;span class=&#34;icon fa fa-save&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;
+    &lt;span class=&#34;notification-message&#34; aria-describedby=&#34;ef8c3814d2ce47c6927a8310bba4b849-problem-title&#34;&gt;None
+    &lt;/span&gt;
+    &lt;div class=&#34;notification-btn-wrapper&#34;&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn review-btn sr&#34;&gt;Review&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+    
+    
+
+
+&lt;div class=&#34;notification general notification-show-answer
+      is-hidden&#34;
+     tabindex=&#34;-1&#34;&gt;
+    &lt;span class=&#34;icon fa fa-info-circle&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;
+    &lt;span class=&#34;notification-message&#34; aria-describedby=&#34;ef8c3814d2ce47c6927a8310bba4b849-problem-title&#34;&gt;Answers are displayed within the problem
+    &lt;/span&gt;
+    &lt;div class=&#34;notification-btn-wrapper&#34;&gt;
+        &lt;button type=&#34;button&#34; class=&#34;btn btn-default btn-small notification-btn review-btn sr&#34;&gt;Review&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;script&gt;
+    function emit_event(message) {
+        parent.postMessage(message, &#39;*&#39;);
+    }
+&lt;/script&gt;
+"
+     data-graded="True">
+    <p class="loading-spinner">
+        <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+        <span class="sr">Loading&hellip;</span>
+    </p>
+</div>
+
+</div>
+
+    </div>
+    <div class="vert vert-4" data-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@f1cd3645a04f446ba979fbb01c5228b5" id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@f1cd3645a04f446ba979fbb01c5228b5">
+        
+<div class="xblock xblock-student_view xblock-student_view-html xmodule_display xmodule_HtmlBlock" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="XBlockToXModuleShim" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="html" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@f1cd3645a04f446ba979fbb01c5228b5" data-request-token="14b039c6b31d11f09cca32f82a01f3c8" data-graded="True" data-has-score="False">
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    {"xmodule-type": "HTMLModule"}
+  </script>
+  <div id="feedback-container">
+<p>Do you find this page useful?</p>
+<div id="feedback">
+    <button class="emoji-button" onclick="sendFeedbackToAPI('Single-Select Multiple Choice Problems', 3, '5807e2176d1459d6ebe183b6edce994c')" data-emoji="😀">😀</button>
+    <button class="emoji-button" onclick="sendFeedbackToAPI('Single-Select Multiple Choice Problems', 2, '5807e2176d1459d6ebe183b6edce994c')" data-emoji="😐">😐</button>
+    <button class="emoji-button" onclick="sendFeedbackToAPI('Single-Select Multiple Choice Problems', 1, '5807e2176d1459d6ebe183b6edce994c')" data-emoji="😞">😞</button>
+</div>
+</div>
+</div>
+
+    </div>
+    <div class="vert vert-5" data-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@c136b9c30ef24daebf9021b393d97e00" id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@c136b9c30ef24daebf9021b393d97e00">
+        
+<div class="xblock xblock-student_view xblock-student_view-html xmodule_display xmodule_HtmlBlock" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="XBlockToXModuleShim" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="html" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@html+block@c136b9c30ef24daebf9021b393d97e00" data-request-token="14b039c6b31d11f09cca32f82a01f3c8" data-graded="True" data-has-score="False">
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    {"xmodule-type": "HTMLModule"}
+  </script>
+  <script src="/assets/courseware/v1/613ded6aae5267f4877d98cb8539cfae/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/feedback.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" type="text/css" href="/assets/courseware/v1/911f0d1ac424861100db6c65e2504841/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/cm_style_guide_demox.css"  />
+</div>
+
+    </div>
+</div>
+
+
+
+  
+  <script type="text/javascript">
+    (function (require) {
+        require(['/static/js/dateutil_factory.05a361148818.js?raw'], function () {
+          require(['js/dateutil_factory'], function (DateUtilFactory) {
+            
+    DateUtilFactory.transform('.localized-datetime');
+
+          });
+        });
+    }).call(this, require || RequireJS.require);
+  </script>
+
+
+<script>
+    function emit_event(message) {
+        parent.postMessage(message, '*');
+    }
+</script>
+
+</div>
+
+      </main>
+  </section>
+</div>
+
+
+
+      
+    </div>
+
+
+
+  
+  
+  <script type="text/javascript" src="/static/common/js/vendor/jquery.scrollTo.d45857185e4d.js" async></script>
+  <script type="text/javascript" src="/static/js/vendor/flot/jquery.flot.d3d45ff0c6a8.js" async></script>
+
+  
+    
+<script type="text/javascript" src="/static/js/lms-courseware.9517dcd2081d.js" charset="utf-8"></script>
+
+
+
+    
+
+
+
+
+<script type="text/javascript">
+    // Fast Preview was introduced in 2.5. However, it
+    // causes undesirable flashing/font size changes when
+    // MathJax is used for interactive preview (equation editor).
+    // Setting processSectionDelay to 0 (see below) fully eliminates
+    // fast preview, but to reduce confusion, we are also setting
+    // the option as displayed in the context menu to false.
+    // When upgrading to 2.6, check if this variable name changed.
+    window.MathJax = {
+      menuSettings: {CHTMLpreview: false}
+    };
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    messageStyle: "none",
+    CommonHTML: { linebreaks: { automatic: true } },
+    SVG: { linebreaks: { automatic: true } },
+    "HTML-CSS": { linebreaks: { automatic: true } },
+    tex2jax: {
+      inlineMath: [
+        ["\\(","\\)"],
+        ['[mathjaxinline]','[/mathjaxinline]']
+      ],
+      displayMath: [
+        ["\\[","\\]"],
+        ['[mathjax]','[/mathjax]']
+      ]
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+
+  // In order to eliminate all flashing during interactive
+  // preview, it is necessary to set processSectionDelay to 0
+  // (remove delay between input and output phases). This
+  // effectively disables fast preview, regardless of
+  // the fast preview setting as shown in the context menu.
+  MathJax.Hub.processSectionDelay = 0;
+
+  MathJax.Hub.signal.Interest(function(message) {
+    if(message[0] === "End Math") {
+        set_mathjax_display_div_settings();
+    }
+  });
+  function set_mathjax_display_div_settings() {
+    $('.MathJax_Display').each(function( index ) {
+      this.setAttribute('tabindex', '0');
+      this.setAttribute('aria-live', 'off');
+      this.removeAttribute('role');
+      this.removeAttribute('aria-readonly');
+    });
+  }
+</script>
+
+<script type="text/javascript">
+    // Activating Mathjax accessibility files
+    window.MathJax = {
+        menuSettings: {
+            collapsible: true,
+            autocollapse: false,
+            explorer: true
+        }
+    };
+    window.addEventListener('resize', MJrenderer);
+
+    let t = -1;
+    let delay = 1000;
+    let oldWidth = document.documentElement.scrollWidth;
+    function MJrenderer() {
+      // don't rerender if the window is the same size as before
+      if (t >= 0) {
+        window.clearTimeout(t);
+      }
+      if (oldWidth !== document.documentElement.scrollWidth) {
+        t = window.setTimeout(function() {
+          oldWidth = document.documentElement.scrollWidth;
+          MathJax.Hub.Queue(
+            ["Rerender", MathJax.Hub],
+          );
+          t = -1;
+        }, delay);
+      }
+    };
+</script>
+
+<!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+     It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+     MathJax extension libraries -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script>
+
+
+<script src='/static/bundles/HtmlBlockDisplay.8d9c8a540fe37fec15f0.97f3f173484c.js' type='application/javascript'></script>
+<script src='/static/bundles/XModuleShim.2f45c02e8122faacc008.4f236cb82fa3.js' type='application/javascript'></script>
+<script src='/static/bundles/ProblemBlockDisplay.9f34ec439d0ee8e9327b.78c96781597d.js' type='application/javascript'></script>
+<script src='/static/bundles/VerticalStudentView.d190f63ce42f3c55187b.2ffe1006ba0c.js' type='application/javascript'></script>
+
+
+
+  
+
+
+
+  <script type="text/javascript" src="/static/js/vendor/noreferrer.aa62a3e70ffa.js" charset="utf-8"></script>
+  <script type="text/javascript" src="/static/js/utils/navigation.5a78fd05918f.js" charset="utf-8"></script>
+  <script type="text/javascript" src="/static/js/header/header.5d27dd11cfda.js"></script>
+  
+  <script type="text/javascript" src="/static/js/src/jquery_extend_patch.54dddef28d15.js"></script>
+  <div id="lean_overlay"></div>
+
+</body>
+</html>
+
+

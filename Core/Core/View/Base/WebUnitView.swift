@@ -33,14 +33,17 @@ public struct WebUnitView: View {
         self._viewModel = .init(
             wrappedValue: viewModel
         )
-        self.url = url
-        self.dataUrl = dataUrl
         self.connectivity = connectivity
-        self.injections = injections
+        let shouldUseLocalContent = !connectivity.isInternetAvaliable && dataUrl != nil
+        self.url = shouldUseLocalContent ? (dataUrl ?? url) : url
+        self.dataUrl = dataUrl
         self.blockID = blockID
-        
-        if !self.connectivity.isInternetAvaliable, let dataUrl {
-            self.url = dataUrl
+        if shouldUseLocalContent {
+            var appliedInjections = injections ?? []
+            appliedInjections.append(.offlineReadOnly)
+            self.injections = appliedInjections
+        } else {
+            self.injections = injections
         }
     }
     

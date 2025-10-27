@@ -90,6 +90,8 @@ public final class CorePersistence: CorePersistenceProtocol {
             var fileSize: Int32?
             var fileName: String?
             
+            var downloadType: DownloadType = .video
+
             if let html = block.offlineDownload {
                 let fileUrl = html.fileUrl
                 url = fileUrl
@@ -99,6 +101,13 @@ public final class CorePersistence: CorePersistenceProtocol {
                    let folderUrl = URL(string: folderName)?.deletingPathExtension() {
                     fileName = folderUrl.absoluteString
                 }
+                downloadType = block.type == .problem ? .problem : .html
+            } else if block.type == .html || block.type == .problem {
+                let preferredURL = block.studentUrl.isEmpty ? block.webUrl : block.studentUrl
+                url = preferredURL
+                fileExtension = "webarchive"
+                fileName = DownloadDataTask.offlineHTMLFileName(for: block.id, fileExtension: "webarchive")
+                downloadType = block.type == .problem ? .problem : .html
             } else if let encodedVideo = block.encodedVideo,
                       let video = encodedVideo.video(downloadQuality: downloadQuality),
                       let videoUrl = video.url {
@@ -108,6 +117,7 @@ public final class CorePersistence: CorePersistenceProtocol {
                 }
                 fileExtension = URL(string: videoUrl)?.pathExtension
                 fileName = "\(block.id).\(fileExtension ?? "")"
+                downloadType = .video
             } else { return nil }
             
             var dictionary = [
@@ -120,12 +130,14 @@ public final class CorePersistence: CorePersistenceProtocol {
                 "displayName": block.displayName,
                 "progress": Double.zero,
                 "state": DownloadState.waiting.rawValue,
-                "type": block.offlineDownload != nil ? DownloadType.html.rawValue : DownloadType.video.rawValue,
+                "type": downloadType.rawValue,
                 "fileSize": fileSize ?? 0,
                 "actualSize": 0
             ]
             if let lastModified = block.offlineDownload?.lastModified {
                 dictionary["lastModified"] = lastModified
+            } else if downloadType == .html || downloadType == .problem {
+                dictionary["lastModified"] = Date().dateToString(style: .iso8601, useRelativeDates: false)
             }
             return dictionary
         }

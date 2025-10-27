@@ -60,6 +60,15 @@ public struct DownloadDataTask: Identifiable, Hashable, Sendable {
         String(format: "%.2fMB", fileSizeInMb)
     }
 
+    public var isWebArchive: Bool {
+        switch type {
+        case .html, .problem:
+            return fileName.lowercased().hasSuffix(".webarchive")
+        case .video:
+            return false
+        }
+    }
+
     public init(
         id: String,
         blockId: String,
@@ -113,12 +122,26 @@ public struct DownloadDataTask: Identifiable, Hashable, Sendable {
         let url: URL
         let fileExtension: String
         let fileSize: Int
+        let shouldSanitizeHTMLName: Bool
         if let html = block.offlineDownload, let htmlUrl = URL(string: html.fileUrl) {
             url = htmlUrl
             fileExtension = url.pathExtension
             fileSize = html.fileSize
             self.lastModified = html.lastModified
-            self.type = .html
+            if block.type == .problem {
+                self.type = .problem
+            } else {
+                self.type = .html
+            }
+            shouldSanitizeHTMLName = false
+        } else if block.type == .html || block.type == .problem,
+                  let pageURL = DownloadDataTask.resolvePageURL(block: block) {
+            url = pageURL
+            fileExtension = "webarchive"
+            fileSize = 0
+            self.lastModified = nil
+            self.type = block.type == .problem ? .problem : .html
+            shouldSanitizeHTMLName = true
         } else if let video = block.encodedVideo?.video(downloadQuality: downloadQuality),
                   let videoUrlString = video.url,
                   let videoUrl = URL(string: videoUrlString) {
@@ -126,8 +149,18 @@ public struct DownloadDataTask: Identifiable, Hashable, Sendable {
             fileExtension = videoUrl.pathExtension
             fileSize = video.fileSize ?? 0
             self.type = .video
+            shouldSanitizeHTMLName = false
         } else { return nil }
-        let fileName = "\(block.id).\(fileExtension)"
+        let fileName: String
+        if shouldSanitizeHTMLName {
+            fileName = DownloadDataTask.offlineHTMLFileName(for: block.id, fileExtension: fileExtension)
+        } else if fileExtension.lowercased() == "zip" {
+            fileName = url.deletingPathExtension().lastPathComponent
+        } else if fileExtension.isEmpty {
+            fileName = block.id
+        } else {
+            fileName = "\(block.id).\(fileExtension)"
+        }
         
         let downloadDataId = "\(userId)_\(block.id)"
         self.id = downloadDataId
@@ -142,6 +175,40 @@ public struct DownloadDataTask: Identifiable, Hashable, Sendable {
         self.state = .waiting
         self.fileSize = fileSize
         self.actualSize = 0
+    }
+
+    private static func resolvePageURL(block: CourseBlock) -> URL? {
+        if let studentURL = URL(string: block.studentUrl), studentURL.scheme != nil {
+            return studentURL
+        }
+
+        if let webURL = URL(string: block.webUrl), webURL.scheme != nil {
+            return webURL
+        }
+
+        if let studentURL = URL(string: block.studentUrl),
+           studentURL.scheme == nil,
+           let base = URL(string: block.webUrl),
+           base.scheme != nil {
+            return URL(string: block.studentUrl, relativeTo: base)?.absoluteURL
+        }
+
+        return nil
+    }
+
+    public static func offlineHTMLFileName(for blockId: String, fileExtension: String) -> String {
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_"))
+        let sanitizedScalars = blockId.unicodeScalars.map { scalar -> Character in
+            allowed.contains(scalar) ? Character(scalar) : "_"
+        }
+        var sanitized = String(sanitizedScalars)
+        if sanitized.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            sanitized = UUID().uuidString.replacingOccurrences(of: "-", with: "_")
+        }
+        guard !fileExtension.isEmpty else {
+            return sanitized
+        }
+        return "\(sanitized).\(fileExtension)"
     }
 }
 
@@ -203,6 +270,7 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
     private let persistence: CorePersistenceProtocol
     private let appStorage: CoreStorage
     private let connectivity: ConnectivityProtocol
+    private let webArchiveService: OfflineWebArchiveServiceProtocol
     private var downloadRequest: DownloadRequest?
     nonisolated
     private let currentDownloadEventPublisher: PassthroughSubject<DownloadManagerEvent, Never> = .init()
@@ -228,11 +296,13 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
     public init(
         persistence: CorePersistenceProtocol,
         appStorage: CoreStorage,
-        connectivity: ConnectivityProtocol
+        connectivity: ConnectivityProtocol,
+        webArchiveService: OfflineWebArchiveServiceProtocol
     ) {
         self.persistence = persistence
         self.appStorage = appStorage
         self.connectivity = connectivity
+        self.webArchiveService = webArchiveService
         if let userId = appStorage.user?.id {
             persistence.set(userId: userId)
             Task {
@@ -473,6 +543,9 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
         let path = filesFolderUrl
         switch data.type {
         case .html, .problem:
+            if data.isWebArchive {
+                return path?.appendingPathComponent(data.fileName)
+            }
             if let folderUrl = URL(string: data.url) {
                 let folder = folderUrl.deletingPathExtension().lastPathComponent
                 return path?.appendingPathComponent(folder).appendingPathComponent(indexPage)
@@ -491,6 +564,9 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
         let path = filesFolderUrl
         switch data.type {
         case .html, .problem:
+            if data.isWebArchive {
+                return path?.appendingPathComponent(data.fileName)
+            }
             if let folderUrl = URL(string: data.url) {
                 let folder = folderUrl.deletingPathExtension().lastPathComponent
                 return path?.appendingPathComponent(folder)
@@ -645,13 +721,27 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
     
     private func downloadHTMLWithProgress(_ download: DownloadDataTask) async throws {
         guard state != .paused else { return }
-        guard let url = URL(string: download.url), let folderURL = self.filesFolderUrl else {
+        guard let folderURL = self.filesFolderUrl else {
             delete(tasks: [download])
             Task {
                 try await newDownload()
             }
             return
         }
+
+        if download.isWebArchive {
+            await downloadWebArchive(download, destinationDirectory: folderURL)
+            return
+        }
+
+        guard let url = URL(string: download.url) else {
+            delete(tasks: [download])
+            Task {
+                try await newDownload()
+            }
+            return
+        }
+
         if let index = queue.firstIndex(where: {$0.id == download.id}) {
             queue[index].state = .inProgress
             persistence.updateTask(task: queue[index])
@@ -692,6 +782,80 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
         }
         state = .downloading
         currentDownloadEventPublisher.send(.started(download))
+    }
+
+    private func downloadWebArchive(_ download: DownloadDataTask, destinationDirectory: URL) async {
+        if let index = queue.firstIndex(where: { $0.id == download.id }) {
+            queue[index].state = .loadingStructure
+            queue[index].progress = 0
+            persistence.updateTask(task: queue[index])
+        }
+
+        currentDownloadTask = download
+        currentDownloadTask?.state = .loadingStructure
+        state = .downloading
+        currentDownloadEventPublisher.send(.started(download))
+        debugLog(">>>WEB Start archive", download.blockId, download.url)
+
+        let fileName = download.fileName.isEmpty ? "\(download.blockId).webarchive" : download.fileName
+
+        do {
+            let result = try await webArchiveService.archivePage(
+                sourceURLString: download.url,
+                fileName: fileName,
+                destinationDirectory: destinationDirectory
+            ) { [weak self] value in
+                guard let self else { return }
+                Task {
+                    await self.handleWebArchiveProgress(progress: value, for: download)
+                }
+            }
+
+            if let index = queue.firstIndex(where: { $0.id == download.id }) {
+                queue[index].state = .finished
+                queue[index].progress = 1.0
+                queue[index].actualSize = result.size
+                persistence.updateTask(task: queue[index])
+            }
+
+            var finishedTask = download
+            finishedTask.state = .finished
+            finishedTask.progress = 1.0
+            finishedTask.actualSize = result.size
+            await setCurrentTask(with: finishedTask)
+            currentDownloadEventPublisher.send(.finished(finishedTask))
+            debugLog(">>>WEB Archive saved", finishedTask.blockId, finishedTask.fileName, finishedTask.actualSize)
+            try? await newDownload()
+        } catch {
+            await handleWebArchiveFailure(for: download, error: error)
+        }
+    }
+
+    private func handleWebArchiveProgress(progress: Double, for download: DownloadDataTask) async {
+        var task = download
+        task.state = .loadingStructure
+        task.progress = progress
+        await setCurrentTask(with: task)
+        currentDownloadEventPublisher.send(.progress(task))
+        debugLog(">>>WEB Progress", download.blockId, String(format: "%.0f%%", progress * 100))
+    }
+
+    private func handleWebArchiveFailure(for download: DownloadDataTask, error: Error) async {
+        if let index = queue.firstIndex(where: { $0.id == download.id }) {
+            queue[index].state = .waiting
+            queue[index].progress = 0
+            persistence.updateTask(task: queue[index])
+        }
+
+        if error.isInternetError {
+            currentDownloadTask?.state = .waiting
+            currentDownloadEventPublisher.send(.paused([download]))
+        } else {
+            failedDownloads.append(download)
+        }
+
+        debugLog(">>>WEB Failed", download.blockId, error.localizedDescription)
+        try? await newDownload()
     }
     
     private func completeHTMLDownload(with response: AFDownloadResponse<URL>, for download: DownloadDataTask) async {

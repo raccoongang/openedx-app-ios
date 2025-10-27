@@ -1,0 +1,707 @@
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="en"><![endif]-->
+<!--[if !IE]><!--><html lang="en"><!--<![endif]-->
+<head dir="ltr">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+  <title>
+
+ DemoX Courseware | axim-ccpv LMS
+</title>
+
+
+  
+
+  <script type="text/javascript" nonce="c04c4c2d8dfc47cb99128a3259e" src="//local.adguard.org?ts=1761562833910&amp;type=content-script&amp;dmn=axim-ccpv-dev.raccoongang.net&amp;url=https%3A%2F%2Faxim-ccpv-dev.raccoongang.net%2Fxblock%2Fblock-v1%3AOpenedX%2BDemoX%2BDemoCourse%2Btype%40drag-and-drop-v2%2Bblock%401feb18be7d7c481bb075d943ffb04893&amp;app=com.apple.Safari&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="c04c4c2d8dfc47cb99128a3259e" src="//local.adguard.org?ts=1761562833910&amp;name=AdGuard%20Extra&amp;type=user-script"></script><script type="text/javascript" src="/static/js/i18n/en/djangojs.0f66acafc573.js"></script>
+  <script type="text/javascript" src="/static/js/ie11_find_array.67b5a9edd5d5.js"></script>
+  
+  <link rel="icon" type="image/x-icon" href="/static/images/favicon.03ffbbf95a0d.ico"/>
+
+  
+
+  
+  
+
+    <link href="/static/css/lms-style-vendor.68e48093f5dd.css" rel="stylesheet" type="text/css" />
+
+
+
+    
+  
+
+    <link href="/static/css/lms-main-v1.90366a72e379.css" rel="stylesheet" type="text/css" />
+
+
+
+
+    
+    
+<script type="text/javascript" src="/static/js/lms-main_vendor.4126ac02965c.js" charset="utf-8"></script>
+
+
+    
+    
+<script type="text/javascript" src="/static/js/lms-application.074dc588ef8a.js" charset="utf-8"></script>
+
+
+
+  
+    
+    
+    <script type="text/javascript" src="/static/bundles/commons.20bdac4aef0c44b02b02.0aec685f1bf4.js" ></script>
+
+
+
+  <script>
+    window.baseUrl = "/static/";
+    (function (require) {
+      require.config({
+          baseUrl: window.baseUrl
+      });
+    }).call(this, require || RequireJS.require);
+  </script>
+  <script type="text/javascript" src="/static/lms/js/require-config.30c1582aaf08.js"></script>
+  
+    <script type="text/javascript">
+        (function (require) {
+          require.config({
+              paths: {
+                'course_bookmarks/js/views/bookmark_button': 'course_bookmarks/js/views/bookmark_button.99159f5f5649',
+'js/views/message_banner': 'js/views/message_banner.141974fd4f5d',
+'moment': 'common/js/vendor/moment-with-locales.8afc1b9c35cd',
+'moment-timezone': 'common/js/vendor/moment-timezone-with-data.daaf3159f5d2',
+'js/courseware/course_info_events': 'js/courseware/course_info_events.2fc35b57627f',
+'js/courseware/accordion_events': 'js/courseware/accordion_events.6064c7809de5',
+'js/dateutil_factory': 'js/dateutil_factory.05a361148818',
+'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events',
+'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.474ff5ba9de3',
+'js/student_account/logistration_factory': 'js/student_account/logistration_factory.df4e41783d02',
+'js/courseware/courseware_factory': 'js/courseware/courseware_factory.1504fc10caef',
+'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.f9c69d089f31',
+'js/groups/discussions_management/discussions_dashboard_factory': 'js/discussions_management/views/discussions_dashboard_factory.2e10d9097343',
+'draggabilly': 'js/vendor/draggabilly.26caba6f7187',
+'hls': 'common/js/vendor/hls.3026d7d10201'
+            }
+          });
+        }).call(this, require || RequireJS.require);
+    </script>
+  
+
+  
+
+  
+
+    <link href="/static/css/lms-style-course-vendor.730dda42e3c1.css" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+
+    <link href="/static/css/lms-course.3afbed5d4411.css" rel="stylesheet" type="text/css" />
+
+
+
+
+<script type="text/javascript" src="/static/js/jquery.autocomplete.964a0bfb4fd2.js" async></script>
+<script type="text/javascript" src="/static/js/src/tooltip_manager.d611f4446ebd.js" async></script>
+
+<link href="/static/css/vendor/jquery.autocomplete.896181d3ec33.css" rel="preload" type="text/css" as="style">
+  <link rel='stylesheet' href='/static/xblock/resources/drag_and_drop_v2/public/css/drag_and_drop.fe8fcb1a6ea9.css' type='text/css'>
+
+
+<script type="text/javascript">
+  var $$course_id = "course\u002Dv1:OpenedX+DemoX+DemoCourse";
+</script>
+
+
+  
+
+  
+
+
+  
+
+
+<script type="application/json" id="user-metadata">
+    null
+</script>
+
+  
+
+  
+
+
+  
+
+
+<!-- dummy Segment -->
+<script type="text/javascript">
+  var analytics = {
+    track: function() { return; },
+    trackLink: function() { return; },
+    pageview: function() { return; },
+    page: function() { return; }
+  };
+</script>
+<!-- end dummy Segment -->
+
+
+  <meta name="path_prefix" content="">
+  
+
+  <meta name="openedx-release-line" content="master" />
+
+
+
+
+
+
+
+</head>
+
+<body class="ltr view-in-course view-courseware courseware  lang_en">
+
+
+<div id="page-prompt"></div>
+    
+    <a class="nav-skip sr-only sr-only-focusable" href="#main">Skip to main content</a>
+
+
+    
+
+
+
+
+
+
+
+
+
+
+    <div class="marketing-hero"></div>
+
+    <div class="content-wrapper main-container" id="content" dir="ltr">
+      
+
+
+
+
+
+
+
+
+<script type="text/template" id="image-modal-tpl">
+    <div class="wrapper-modal wrapper-modal-image">
+  <section class="image-link">
+    <%= smallHTML%> <% // xss-lint: disable=underscore-not-escaped %>
+    <a href="#" class="modal-ui-icon action-fullscreen" role="button">
+      <span class="label">
+        <span class="icon fa fa-arrows-alt fa-large" aria-hidden="true"></span> <%- gettext("Fullscreen") %>
+      </span>
+    </a>
+  </section>
+
+  <section class="image-modal">
+    <section class="image-content">
+      <div class="image-wrapper">
+        <img alt="<%- largeALT %>, <%- gettext('Large') %>" src="<%- largeSRC %>" />
+      </div>
+
+      <a href="#" class="modal-ui-icon action-close" role="button">
+        <span class="label">
+          <span class="icon fa fa-remove fa-large" aria-hidden="true"></span> <%- gettext("Close") %>
+        </span>
+      </a>
+
+      <ul class="image-controls">
+        <li class="image-control">
+          <a href="#" class="modal-ui-icon action-zoom-in" role="button">
+            <span class="label">
+              <span class="icon fa fa fa-search-plus fa-large" aria-hidden="true"></span> <%- gettext("Zoom In") %>
+            </span>
+          </a>
+        </li>
+
+        <li class="image-control">
+          <a href="#" class="modal-ui-icon action-zoom-out is-disabled" aria-disabled="true" role="button">
+            <span class="label">
+              <span class="icon fa fa fa-search-minus fa-large" aria-hidden="true"></span> <%- gettext("Zoom Out") %>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </section>
+</div>
+
+</script>
+
+
+
+
+
+
+
+
+
+<div class="course-wrapper chromeless">
+  <section class="course-content" id="course-content"      data-enable-completion-on-view-service="false"     style="display: block; width: auto; margin: 0;"
+  >
+      <main id="main" aria-label="Content">
+        
+
+
+
+
+<div class="xblock xblock-student_view xblock-student_view-drag-and-drop-v2" data-course-id="course-v1:OpenedX+DemoX+DemoCourse" data-init="DragAndDropBlock" data-runtime-class="LmsRuntime" data-runtime-version="1" data-block-type="drag-and-drop-v2" data-usage-id="block-v1:OpenedX+DemoX+DemoCourse+type@drag-and-drop-v2+block@1feb18be7d7c481bb075d943ffb04893" data-request-token="81f1486cb32811f08aba32f82a01f3c8" data-graded="True" data-has-score="True">
+  <script type="json/xblock-args" class="xblock-json-init-args">
+    {"block_id": "block-v1:OpenedX+DemoX+DemoCourse+type@drag-and-drop-v2+block@1feb18be7d7c481bb075d943ffb04893", "display_name": "Drag and Drop", "type": "drag-and-drop-v2", "weight": 1.0, "mode": "standard", "zones": [{"align": "center", "description": "Use this zone to associate an image of the part of the brain located behind the ears.", "height": "258", "title": "Bottom left", "uid": "bottom", "width": "430", "x": "310", "y": "310"}, {"align": "center", "description": "Use this zone to label the part of the brain located behind the ears with its name.", "height": "60", "title": "Label for bottom left", "uid": "zone-1", "width": "210", "x": "288", "y": "622"}, {"align": "center", "description": "Use this zone to associate an image of the part of the brain located at the very back of the skull.", "height": "230", "title": "Right", "uid": "zone-2", "width": "190", "x": "680", "y": "250"}, {"align": "center", "description": "Use this zone to label the part of the brain located at the very back of the skull.", "height": "60", "title": "Label for Right", "uid": "zone-3", "width": "210", "x": "765", "y": "115"}, {"align": "center", "description": "Use this zone to label the part of the brain located at the top and back of the skull.", "height": "60", "title": "Top-Back", "uid": "zone-5", "width": "210", "x": "565", "y": "22"}, {"align": "center", "description": "Use this zone to label the part of the brain located at the top and back of the skull.", "height": "60", "title": "Top-Front", "uid": "zone-6", "width": "210", "x": "35", "y": "51"}, {"align": "center", "description": "Use this zone to label the part of the brain located at the bottom and back of the skull.", "height": "60", "title": "Lower-back", "uid": "zone-7", "width": "210", "x": "733", "y": "625"}, {"align": "center", "description": "Use this zone to associate an image of the part of the brain located at the very top center of the head", "height": "200", "title": "Top", "uid": "zone-9", "width": "380", "x": "430", "y": "90"}], "max_attempts": null, "graded": true, "weighted_max_score": 1.0, "max_items_per_zone": 1, "url_name": "1feb18be7d7c481bb075d943ffb04893", "display_zone_labels": false, "display_zone_borders": false, "display_zone_borders_dragging": true, "items": [{"displayName": "Frontal Lobe", "id": 0, "imageDescription": "", "imageURL": "", "noPadding": false, "expandedImageURL": ""}, {"displayName": "Parietal Lobe", "id": 1, "imageDescription": "", "imageURL": "", "noPadding": false, "expandedImageURL": ""}, {"displayName": "Occipital Lobe", "id": 2, "imageDescription": "", "imageURL": "", "noPadding": false, "expandedImageURL": ""}, {"displayName": "Cerebellum", "id": 3, "imageDescription": "", "imageURL": "", "noPadding": false, "expandedImageURL": ""}, {"displayName": "Temporal Lobe", "id": 4, "imageDescription": "", "imageURL": "", "noPadding": false, "expandedImageURL": ""}, {"displayName": "Yellow Lobe", "id": 5, "imageDescription": "A part of the brain highlighted in yellow that looks like it is responsible for management of taste, hearing, sight, touch, and smell", "imageURL": "/assets/courseware/v1/1f7e55c6829571bd7d55b238b84f80a1/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Brain_yellow.png", "noPadding": true, "expandedImageURL": "/assets/courseware/v1/1f7e55c6829571bd7d55b238b84f80a1/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Brain_yellow.png"}, {"displayName": "Blue Lobe", "id": 6, "imageDescription": "A part of the brain highlighted in blue that seems responsible for visuospatial processing, distance and depth perception, color determination, object and face recognition, and memory formation", "imageURL": "/assets/courseware/v1/c84e53af7d17691543d38a4abeec3917/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Brain_red.png", "noPadding": true, "widthPercent": "25", "expandedImageURL": "/assets/courseware/v1/c84e53af7d17691543d38a4abeec3917/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Brain_red.png"}, {"displayName": "Green Lobe", "id": 7, "imageDescription": "A part of the brain highlighted in green that seems intended to process auditory information and encode memory", "imageURL": "/assets/courseware/v1/4d8b1c8653eb1e1da261e8cb9d889cfd/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Brain_green.png", "noPadding": true, "expandedImageURL": "/assets/courseware/v1/4d8b1c8653eb1e1da261e8cb9d889cfd/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Brain_green.png"}], "title": "Drag and Drop", "show_title": true, "problem_text": "Drag the missing parts of the brain onto the image, and then label all parts", "show_problem_header": true, "target_img_expanded_url": "/assets/courseware/v1/052be2eb9181576773bea557d16f96ac/asset-v1:OpenedX+DemoX+DemoCourse+type@asset+block/Brain_target_sm.png", "target_img_description": "A representation of a human brain. The upper left section of the brain is displayed, as is the lower stem.", "item_background_color": "transparent", "item_text_color": "black", "has_deadline_passed": false, "answer_available": false}
+  </script>
+  
+<div class="themed-xblock xblock--drag-and-drop">
+  <span class="fa fa-spin fa-spinner initial-load-spinner" aria-hidden="true"></span>
+  Loading drag and drop problem.
+</div>
+
+</div>
+
+<div class="wrap-instructor-info">
+  <a class="instructor-info-action" href="#1feb18be7d7c481bb075d943ffb04893_debug" rel="leanModal" id="1feb18be7d7c481bb075d943ffb04893_trig">Staff Debug Info</a>
+
+</div>
+
+<div aria-hidden="true" role="dialog" tabindex="-1" id="1feb18be7d7c481bb075d943ffb04893_xqa-modal" class="modal xqa-modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>axim-ccpv LMS Content Quality Assessment</h2>
+    </header>
+
+    <form id="1feb18be7d7c481bb075d943ffb04893_xqa_form" class="xqa_form">
+      <label for="1feb18be7d7c481bb075d943ffb04893_xqa_entry">Comment</label>
+      <input tabindex="0" id="1feb18be7d7c481bb075d943ffb04893_xqa_entry" type="text" placeholder="comment">
+      <label for="1feb18be7d7c481bb075d943ffb04893_xqa_tag">Tag</label>
+      <span style="color:black;vertical-align: -10pt">Optional tag (eg &#34;done&#34; or &#34;broken&#34;):&nbsp;</span>
+      <input id="1feb18be7d7c481bb075d943ffb04893_xqa_tag" type="text" placeholder="tag" style="width:80px;display:inline">
+      <div class="submit">
+        <button name="submit" type="submit">Add comment</button>
+      </div>
+      <hr>
+      <div id="1feb18be7d7c481bb075d943ffb04893_xqa_log_data"></div>
+    </form>
+
+  </div>
+</div>
+
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="1feb18be7d7c481bb075d943ffb04893_debug" >
+  <div class="inner-wrapper">
+    <header>
+      <h2>Staff Debug: Drag and Drop</h2>
+    </header>
+
+    <hr />
+    <div class="staff_actions">
+      <h3>Actions</h3>
+      <div>
+        <label for="sd_fu_1feb18be7d7c481bb075d943ffb04893">Username:</label>
+        <input type="text" tabindex="0" id="sd_fu_1feb18be7d7c481bb075d943ffb04893" placeholder="Eddie"/>
+      </div>
+      <div>
+        <label for="sd_fs_1feb18be7d7c481bb075d943ffb04893">Score (for override only):</label>
+        <input type="text" tabindex="0" id="sd_fs_1feb18be7d7c481bb075d943ffb04893" placeholder="0"/>
+        <label for="sd_fs_1feb18be7d7c481bb075d943ffb04893"> / 1</label>
+      </div>
+      <div data-location="block-v1:OpenedX+DemoX+DemoCourse+type@drag-and-drop-v2+block@1feb18be7d7c481bb075d943ffb04893" data-location-name="1feb18be7d7c481bb075d943ffb04893" data-course-id="course-v1:OpenedX+DemoX+DemoCourse">
+        [
+        <button type="button" class="btn-link staff-debug-reset">Reset Learner&#39;s Attempts to Zero</button>
+        |
+        <button type="button" class="btn-link staff-debug-sdelete">Delete Learner&#39;s State</button>
+        |
+        <button type="button" class="btn-link staff-debug-rescore">Rescore Learner&#39;s Submission</button>
+        |
+        <button type="button" class="btn-link staff-debug-rescore-if-higher">Rescore Only If Score Improves</button>
+        |
+        <button type="button" class="btn-link staff-debug-override-score">Override Score</button>
+        ]
+      </div>
+      <div id="result_1feb18be7d7c481bb075d943ffb04893"></div>
+    </div>
+
+    <div class="staff_info" style="display:block">
+      is_released = &lt;font color=&#39;red&#39;&gt;Yes!&lt;/font&gt;
+      location = block-v1:OpenedX+DemoX+DemoCourse+type@drag-and-drop-v2+block@1feb18be7d7c481bb075d943ffb04893
+
+      <table summary="Module Fields">
+        <tr><th>Module Fields</th></tr>
+        <tr><td style="width:25%">name</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">parent</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">block-v1:OpenedX+DemoX+DemoCourse+type@vertical+block@86854570ab8b4eb3b3dc8d4a5de311f8</pre></td></tr>
+        <tr><td style="width:25%">tags</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">[]</pre></td></tr>
+        <tr><td style="width:25%">display_name</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">Drag and Drop</pre></td></tr>
+        <tr><td style="width:25%">course_edit_method</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">Studio</pre></td></tr>
+        <tr><td style="width:25%">days_early_for_beta</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">due</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">edxnotes</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">edxnotes_visibility</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">True</pre></td></tr>
+        <tr><td style="width:25%">giturl</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">graceperiod</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">0:00:00</pre></td></tr>
+        <tr><td style="width:25%">graded</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">True</pre></td></tr>
+        <tr><td style="width:25%">group_access</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">{}</pre></td></tr>
+        <tr><td style="width:25%">hide_from_toc</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">in_entrance_exam</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">matlab_api_key</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">max_attempts</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">relative_weeks_due</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">rerandomize</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">never</pre></td></tr>
+        <tr><td style="width:25%">self_paced</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">True</pre></td></tr>
+        <tr><td style="width:25%">show_correctness</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">always</pre></td></tr>
+        <tr><td style="width:25%">show_reset_button</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">showanswer</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">finished</pre></td></tr>
+        <tr><td style="width:25%">start</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">2020-01-01 00:00:00+00:00</pre></td></tr>
+        <tr><td style="width:25%">static_asset_path</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;"></pre></td></tr>
+        <tr><td style="width:25%">use_latex_compiler</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">user_partitions</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">[UserPartition(id=18587404, name=&#39;Content Groups&#39;, description=&#39;The groups in this configuration can be mapped to cohorts in the Instructor Dashboard.&#39;, groups=[Group(id=1819362822, name=&#39;Content Group A&#39;), Group(id=259161138, name=&#39;Test&#39;), Group(id=205150518, name=&#39;Content Group B&#39;)], scheme=&lt;class &#39;openedx.core.djangoapps.course_groups.partition_scheme.CohortPartitionScheme&#39;&gt;, parameters={}, active=True)]</pre></td></tr>
+        <tr><td style="width:25%">video_auto_advance</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">video_bumper</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">{}</pre></td></tr>
+        <tr><td style="width:25%">video_speed_optimizations</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">True</pre></td></tr>
+        <tr><td style="width:25%">visible_to_staff_only</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">xqa_key</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">chrome</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">default_tab</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">format</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">source_file</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">None</pre></td></tr>
+        <tr><td style="width:25%">attempts</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">0</pre></td></tr>
+        <tr><td style="width:25%">completed</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">False</pre></td></tr>
+        <tr><td style="width:25%">data</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">{&#39;displayBorders&#39;: False, &#39;displayBordersDragging&#39;: True, &#39;displayLabels&#39;: False, &#39;explanation&#39;: &#39;&#39;, &#39;feedback&#39;: {&#39;finish&#39;: &#39;Good work! You have completed this drag and drop problem.&#39;, &#39;start&#39;: &#39;Drag the items onto the image above.&#39;}, &#39;items&#39;: [{&#39;displayName&#39;: &#39;Frontal Lobe&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 0, &#39;imageDescription&#39;: &#39;&#39;, &#39;imageURL&#39;: &#39;&#39;, &#39;noPadding&#39;: False, &#39;zones&#39;: [&#39;zone-6&#39;]}, {&#39;displayName&#39;: &#39;Parietal Lobe&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 1, &#39;imageDescription&#39;: &#39;&#39;, &#39;imageURL&#39;: &#39;&#39;, &#39;noPadding&#39;: False, &#39;zones&#39;: [&#39;zone-5&#39;]}, {&#39;displayName&#39;: &#39;Occipital Lobe&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 2, &#39;imageDescription&#39;: &#39;&#39;, &#39;imageURL&#39;: &#39;&#39;, &#39;noPadding&#39;: False, &#39;zones&#39;: [&#39;zone-3&#39;]}, {&#39;displayName&#39;: &#39;Cerebellum&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 3, &#39;imageDescription&#39;: &#39;&#39;, &#39;imageURL&#39;: &#39;&#39;, &#39;noPadding&#39;: False, &#39;zones&#39;: [&#39;zone-7&#39;]}, {&#39;displayName&#39;: &#39;Temporal Lobe&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 4, &#39;imageDescription&#39;: &#39;&#39;, &#39;imageURL&#39;: &#39;&#39;, &#39;noPadding&#39;: False, &#39;zones&#39;: [&#39;zone-1&#39;]}, {&#39;displayName&#39;: &#39;Yellow Lobe&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 5, &#39;imageDescription&#39;: &#39;A part of the brain highlighted in yellow that looks like it is responsible for management of taste, hearing, sight, touch, and smell&#39;, &#39;imageURL&#39;: &#39;/static/Brain_yellow.png&#39;, &#39;noPadding&#39;: True, &#39;zones&#39;: [&#39;zone-9&#39;]}, {&#39;displayName&#39;: &#39;Blue Lobe&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 6, &#39;imageDescription&#39;: &#39;A part of the brain highlighted in blue that seems responsible for visuospatial processing, distance and depth perception, color determination, object and face recognition, and memory formation&#39;, &#39;imageURL&#39;: &#39;/static/Brain_red.png&#39;, &#39;noPadding&#39;: True, &#39;widthPercent&#39;: &#39;25&#39;, &#39;zones&#39;: [&#39;zone-2&#39;]}, {&#39;displayName&#39;: &#39;Green Lobe&#39;, &#39;feedback&#39;: {&#39;correct&#39;: &#39;&#39;, &#39;incorrect&#39;: &#39;&#39;}, &#39;id&#39;: 7, &#39;imageDescription&#39;: &#39;A part of the brain highlighted in green that seems intended to process auditory information and encode memory&#39;, &#39;imageURL&#39;: &#39;/static/Brain_green.png&#39;, &#39;noPadding&#39;: True, &#39;zones&#39;: [&#39;bottom&#39;]}], &#39;targetImg&#39;: &#39;/static/Brain_target_sm.png&#39;, &#39;targetImgDescription&#39;: &#39;A representation of a human brain. The upper left section of the brain is displayed, as is the lower stem.&#39;, &#39;zones&#39;: [{&#39;align&#39;: &#39;center&#39;, &#39;description&#39;: &#39;Use this zone to associate an image of the part of the brain located behind the ears.&#39;, &#39;height&#39;: &#39;258&#39;, &#39;title&#39;: &#39;Bottom left&#39;, &#39;uid&#39;: &#39;bottom&#39;, &#39;width&#39;: &#39;430&#39;, &#39;x&#39;: &#39;310&#39;, &#39;y&#39;: &#39;310&#39;}, {&#39;align&#39;: &#39;center&#39;, &#39;description&#39;: &#39;Use this zone to label the part of the brain located behind the ears with its name.&#39;, &#39;height&#39;: &#39;60&#39;, &#39;title&#39;: &#39;Label for bottom left&#39;, &#39;uid&#39;: &#39;zone-1&#39;, &#39;width&#39;: &#39;210&#39;, &#39;x&#39;: &#39;288&#39;, &#39;y&#39;: &#39;622&#39;}, {&#39;align&#39;: &#39;center&#39;, &#39;description&#39;: &#39;Use this zone to associate an image of the part of the brain located at the very back of the skull.&#39;, &#39;height&#39;: &#39;230&#39;, &#39;title&#39;: &#39;Right&#39;, &#39;uid&#39;: &#39;zone-2&#39;, &#39;width&#39;: &#39;190&#39;, &#39;x&#39;: &#39;680&#39;, &#39;y&#39;: &#39;250&#39;}, {&#39;align&#39;: &#39;&#39;, &#39;description&#39;: &#39;Use this zone to label the part of the brain located at the very back of the skull.&#39;, &#39;height&#39;: &#39;60&#39;, &#39;title&#39;: &#39;Label for Right&#39;, &#39;uid&#39;: &#39;zone-3&#39;, &#39;width&#39;: &#39;210&#39;, &#39;x&#39;: &#39;765&#39;, &#39;y&#39;: &#39;115&#39;}, {&#39;align&#39;: &#39;&#39;, &#39;description&#39;: &#39;Use this zone to label the part of the brain located at the top and back of the skull.&#39;, &#39;height&#39;: &#39;60&#39;, &#39;title&#39;: &#39;Top-Back&#39;, &#39;uid&#39;: &#39;zone-5&#39;, &#39;width&#39;: &#39;210&#39;, &#39;x&#39;: &#39;565&#39;, &#39;y&#39;: &#39;22&#39;}, {&#39;align&#39;: &#39;center&#39;, &#39;description&#39;: &#39;Use this zone to label the part of the brain located at the top and back of the skull.&#39;, &#39;height&#39;: &#39;60&#39;, &#39;title&#39;: &#39;Top-Front&#39;, &#39;uid&#39;: &#39;zone-6&#39;, &#39;width&#39;: &#39;210&#39;, &#39;x&#39;: &#39;35&#39;, &#39;y&#39;: &#39;51&#39;}, {&#39;align&#39;: &#39;&#39;, &#39;description&#39;: &#39;Use this zone to label the part of the brain located at the bottom and back of the skull.&#39;, &#39;height&#39;: &#39;60&#39;, &#39;title&#39;: &#39;Lower-back&#39;, &#39;uid&#39;: &#39;zone-7&#39;, &#39;width&#39;: &#39;210&#39;, &#39;x&#39;: &#39;733&#39;, &#39;y&#39;: &#39;625&#39;}, {&#39;align&#39;: &#39;&#39;, &#39;description&#39;: &#39;Use this zone to associate an image of the part of the brain located at the very top center of the head&#39;, &#39;height&#39;: &#39;200&#39;, &#39;title&#39;: &#39;Top&#39;, &#39;uid&#39;: &#39;zone-9&#39;, &#39;width&#39;: &#39;380&#39;, &#39;x&#39;: &#39;430&#39;, &#39;y&#39;: &#39;90&#39;}]}</pre></td></tr>
+        <tr><td style="width:25%">grade</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">0</pre></td></tr>
+        <tr><td style="width:25%">item_background_color</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">transparent</pre></td></tr>
+        <tr><td style="width:25%">item_state</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">{}</pre></td></tr>
+        <tr><td style="width:25%">item_text_color</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">black</pre></td></tr>
+        <tr><td style="width:25%">max_items_per_zone</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">1</pre></td></tr>
+        <tr><td style="width:25%">mode</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">standard</pre></td></tr>
+        <tr><td style="width:25%">question_text</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">Drag the missing parts of the brain onto the image, and then label all parts</pre></td></tr>
+        <tr><td style="width:25%">raw_earned</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">0.0</pre></td></tr>
+        <tr><td style="width:25%">raw_possible</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">1.0</pre></td></tr>
+        <tr><td style="width:25%">show_question_header</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">True</pre></td></tr>
+        <tr><td style="width:25%">show_title</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">True</pre></td></tr>
+        <tr><td style="width:25%">weight</td><td><pre style="display:inline-block; margin: 0; overflow-wrap: anywhere;">1.0</pre></td></tr>
+      </table>
+      <table>
+        <tr><th>XML attributes</th></tr>
+      </table>
+      category = DragAndDropBlockWithMixins
+    </div>
+  </div>
+</div>
+
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="1feb18be7d7c481bb075d943ffb04893_history">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Submission History Viewer</h2>
+    </header>
+    <form id="1feb18be7d7c481bb075d943ffb04893_history_form">
+      <label for="1feb18be7d7c481bb075d943ffb04893_history_student_username">Learner&#39;s axim-ccpv LMS email address or username:</label>
+      <input tabindex="0" id="1feb18be7d7c481bb075d943ffb04893_history_student_username" type="text" placeholder="Enter the learner email address or username"/>
+      <input type="hidden" id="1feb18be7d7c481bb075d943ffb04893_history_location" value="block-v1:OpenedX+DemoX+DemoCourse+type@drag-and-drop-v2+block@1feb18be7d7c481bb075d943ffb04893"/>
+      <div class="submit">
+        <button name="submit" type="submit">View History</button>
+      </div>
+    </form>
+
+    <div id="1feb18be7d7c481bb075d943ffb04893_history_text" class="staff_info" style="display:block">
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+// assumes courseware.html's loaded this method.
+$(function () {
+    setup_debug('1feb18be7d7c481bb075d943ffb04893',
+        null,
+        {
+            'location': 'block\u002Dv1:OpenedX+DemoX+DemoCourse+type@drag\u002Dand\u002Ddrop\u002Dv2+block@1feb18be7d7c481bb075d943ffb04893',
+            'xqa_key': '',
+            'category': 'DragAndDropBlockWithMixins',
+            'user': 'Eddie'
+        }
+    );
+});
+</script>
+
+      </main>
+  </section>
+</div>
+
+
+
+      
+    </div>
+
+
+
+  
+  
+  <script type="text/javascript" src="/static/common/js/vendor/jquery.scrollTo.d45857185e4d.js" async></script>
+  <script type="text/javascript" src="/static/js/vendor/flot/jquery.flot.d3d45ff0c6a8.js" async></script>
+
+  
+    
+<script type="text/javascript" src="/static/js/lms-courseware.9517dcd2081d.js" charset="utf-8"></script>
+
+
+
+    
+
+
+
+
+<script type="text/javascript">
+    // Fast Preview was introduced in 2.5. However, it
+    // causes undesirable flashing/font size changes when
+    // MathJax is used for interactive preview (equation editor).
+    // Setting processSectionDelay to 0 (see below) fully eliminates
+    // fast preview, but to reduce confusion, we are also setting
+    // the option as displayed in the context menu to false.
+    // When upgrading to 2.6, check if this variable name changed.
+    window.MathJax = {
+      menuSettings: {CHTMLpreview: false}
+    };
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    messageStyle: "none",
+    CommonHTML: { linebreaks: { automatic: true } },
+    SVG: { linebreaks: { automatic: true } },
+    "HTML-CSS": { linebreaks: { automatic: true } },
+    tex2jax: {
+      inlineMath: [
+        ["\\(","\\)"],
+        ['[mathjaxinline]','[/mathjaxinline]']
+      ],
+      displayMath: [
+        ["\\[","\\]"],
+        ['[mathjax]','[/mathjax]']
+      ]
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+
+  // In order to eliminate all flashing during interactive
+  // preview, it is necessary to set processSectionDelay to 0
+  // (remove delay between input and output phases). This
+  // effectively disables fast preview, regardless of
+  // the fast preview setting as shown in the context menu.
+  MathJax.Hub.processSectionDelay = 0;
+
+  MathJax.Hub.signal.Interest(function(message) {
+    if(message[0] === "End Math") {
+        set_mathjax_display_div_settings();
+    }
+  });
+  function set_mathjax_display_div_settings() {
+    $('.MathJax_Display').each(function( index ) {
+      this.setAttribute('tabindex', '0');
+      this.setAttribute('aria-live', 'off');
+      this.removeAttribute('role');
+      this.removeAttribute('aria-readonly');
+    });
+  }
+</script>
+
+<script type="text/javascript">
+    // Activating Mathjax accessibility files
+    window.MathJax = {
+        menuSettings: {
+            collapsible: true,
+            autocollapse: false,
+            explorer: true
+        }
+    };
+    window.addEventListener('resize', MJrenderer);
+
+    let t = -1;
+    let delay = 1000;
+    let oldWidth = document.documentElement.scrollWidth;
+    function MJrenderer() {
+      // don't rerender if the window is the same size as before
+      if (t >= 0) {
+        window.clearTimeout(t);
+      }
+      if (oldWidth !== document.documentElement.scrollWidth) {
+        t = window.setTimeout(function() {
+          oldWidth = document.documentElement.scrollWidth;
+          MathJax.Hub.Queue(
+            ["Rerender", MathJax.Hub],
+          );
+          t = -1;
+        }, delay);
+      }
+    };
+</script>
+
+<!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+     It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+     MathJax extension libraries -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script>
+
+  	
+
+<script type="text/javascript" src="/static/js/vendor/jquery.leanModal.6ea11cc05012.js"></script>
+<script type="text/javascript" src="/static/js/staff_debug_actions.144de6703bcd.js"></script>
+<script type="text/javascript">
+
+function setup_debug(element_id, edit_link, staff_context){
+    var staffDebugTrigger = $('#' + element_id + '_trig'),
+        xqaLogTrigger = $('#' + element_id + '_xqa_log'),
+        historyTrigger = $("#" + element_id + "_history_trig"),
+        debugModalSelector = '#' + element_id + '_debug',
+        historyModalSelector = '#' + element_id + '_history',
+        xqaModalSelector = '#' + element_id + '_xqa-modal',
+        leanOverlaySelector = $('#lean_overlay');
+
+    staffDebugTrigger.leanModal();
+    xqaLogTrigger.leanModal();
+    $('#' + element_id + '_xqa_form').submit(function () {sendlog(element_id, edit_link, staff_context);});
+
+    historyTrigger.leanModal();
+
+    $('#' + element_id + '_history_form').submit(
+        function () {
+            var username_or_email = $("#" + element_id + "_history_student_username").val();
+            var location = $("#" + element_id + "_history_location").val();
+            // xss-lint: disable=mako-invalid-js-filter
+            $("#" + element_id + "_history_text").load('/courses/' + "course-v1%3AOpenedX%2BDemoX%2BDemoCourse" +
+                "/submission_history/" + encodeURIComponent(username_or_email) + "/" + location);
+            return false;
+        }
+    );
+
+    DialogTabControls.setKeydownListener($(debugModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListener($(historyModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListener($(xqaModalSelector), leanOverlaySelector);
+
+    staffDebugTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(debugModalSelector);
+        $(debugModalSelector).attr("aria-hidden", "false");
+    });
+
+    historyTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(historyModalSelector);
+        $(historyModalSelector).attr("aria-hidden", "false");
+    });
+
+    xqaLogTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(xqaModalSelector);
+        $(xqaModalSelector).attr("aria-hidden", "false");
+    });
+
+    leanOverlaySelector.click(function () {
+        $(xqaModalSelector).attr("aria-hidden", "true");
+        $(historyModalSelector).attr("aria-hidden", "true");
+        $(debugModalSelector).attr("aria-hidden", "true");
+      })
+}
+
+function sendlog(element_id, edit_link, staff_context){
+
+    var xqaLog = {
+            authkey: staff_context.xqa_key,
+            location: staff_context.location,
+            category : staff_context.category,
+            'username' : staff_context.user.username,
+            'return' : 'query',
+            format : 'html',
+            email : staff_context.user.email,
+            tag:$('#' + element_id + '_xqa_tag').val(),
+            entry: $('#' + element_id + '_xqa_entry').val()
+        };
+
+    $.ajax({
+        //# xss-lint: disable=mako-invalid-js-filter
+        url: 'http://your_xqa_server.com/log',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaLog),
+        crossDomain: true,
+        dataType: 'jsonp',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
+        timeout : 1000,
+        success: function(result) {
+                // xss-lint: disable=javascript-jquery-html
+                $('#' + element_id + '_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');
+            console.log('error!');
+        }
+    });
+    return false;
+};
+
+function getlog(element_id, staff_context){
+
+    var xqaQuery = {
+        authkey: staff_context.xqa_key,
+        location: staff_context.location,
+        format: 'html'
+    };
+
+    $.ajax({
+        // xss-lint: disable=mako-invalid-js-filter
+        url: 'http://your_xqa_server.com/query',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaQuery),
+        crossDomain: true,
+        dataType: 'jsonp',
+        timeout : 1000,
+        success: function(result) {
+            // xss-lint: disable=javascript-jquery-html
+            $('#' + element_id + '_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');
+        }
+    });
+
+
+};
+</script>
+
+
+<script src='/static/xblock/resources/drag_and_drop_v2/public/js/vendor/virtual-dom-1.3.0.min.bccf7a0f26eb.js' type='application/javascript'></script>
+<script src='/static/xblock/resources/drag_and_drop_v2/public/js/drag_and_drop.9d2df0fcc9f4.js' type='application/javascript'></script>
+<script src='/static/js/xblock.v1-i18n/drag_and_drop_v2/en.3839c0ef9c44.js' type='application/javascript'></script>
+
+
+
+  
+
+
+
+  <script type="text/javascript" src="/static/js/vendor/noreferrer.aa62a3e70ffa.js" charset="utf-8"></script>
+  <script type="text/javascript" src="/static/js/utils/navigation.5a78fd05918f.js" charset="utf-8"></script>
+  <script type="text/javascript" src="/static/js/header/header.5d27dd11cfda.js"></script>
+  
+  <script type="text/javascript" src="/static/js/src/jquery_extend_patch.54dddef28d15.js"></script>
+  <div id="lean_overlay"></div>
+
+</body>
+</html>
+
+

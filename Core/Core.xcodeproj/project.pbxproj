@@ -163,6 +163,8 @@
 		CEC8753A2D7845DB00A2626C /* DownloadActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC875352D7845DB00A2626C /* DownloadActionView.swift */; };
 		CEC8753B2D7845DB00A2626C /* DownloadErrorAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC875362D7845DB00A2626C /* DownloadErrorAlertView.swift */; };
 		CEC8753F2D786F7B00A2626C /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8753E2D786F7B00A2626C /* ArrayExtension.swift */; };
+		CED430032D099F0600C7AD89 /* OfflineReadOnlyInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED430022D099F0600C7AD89 /* OfflineReadOnlyInjection.swift */; };
+		CED430012D099F0500C7AD89 /* OfflineWebArchiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED430002D099F0500C7AD89 /* OfflineWebArchiveService.swift */; };
 		CED42FFC2D099F0400C7AD89 /* DownloadManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED42FFB2D099F0400C7AD89 /* DownloadManagerMock.swift */; };
 		CEF4AA1E2DBA41C4006C4F0A /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4AA1D2DBA41C4006C4F0A /* StringExtension.swift */; };
 		CFC84952299F8B890055E497 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC84951299F8B890055E497 /* Debounce.swift */; };
@@ -381,6 +383,8 @@
 		CEC875362D7845DB00A2626C /* DownloadErrorAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadErrorAlertView.swift; sourceTree = "<group>"; };
 		CEC875372D7845DB00A2626C /* DeviceStorageFullAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStorageFullAlertView.swift; sourceTree = "<group>"; };
 		CEC8753E2D786F7B00A2626C /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
+		CED430022D099F0600C7AD89 /* OfflineReadOnlyInjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineReadOnlyInjection.swift; sourceTree = "<group>"; };
+		CED430002D099F0500C7AD89 /* OfflineWebArchiveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineWebArchiveService.swift; sourceTree = "<group>"; };
 		CED42FFB2D099F0400C7AD89 /* DownloadManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerMock.swift; sourceTree = "<group>"; };
 		CEF4AA1D2DBA41C4006C4F0A /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		CFC84951299F8B890055E497 /* Debounce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
@@ -559,6 +563,7 @@
 				06BEEA0D2B6A55C500D25A97 /* ColorInversionInjection.swift */,
 				06619EAC2B90918B001FAADE /* ReadabilityInjection.swift */,
 				06619EAE2B973B25001FAADE /* AccessibilityInjection.swift */,
+				CED430022D099F0600C7AD89 /* OfflineReadOnlyInjection.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -699,6 +704,7 @@
 				0236961E28F9A2F600EEF206 /* AuthEndpoint.swift */,
 				029A132B2C2471F8005FB830 /* OfflineSyncEndpoint.swift */,
 				02A4833929B8A9AB00D33F33 /* DownloadManager.swift */,
+				CED430002D099F0500C7AD89 /* OfflineWebArchiveService.swift */,
 				CED42FFB2D099F0400C7AD89 /* DownloadManagerMock.swift */,
 				029A13272C246AE6005FB830 /* OfflineSyncManager.swift */,
 			);
@@ -1179,6 +1185,7 @@
 				06619EAD2B90918B001FAADE /* ReadabilityInjection.swift in Sources */,
 				029A13262C2457D9005FB830 /* OfflineProgress.swift in Sources */,
 				06619EAF2B973B25001FAADE /* AccessibilityInjection.swift in Sources */,
+				CED430032D099F0600C7AD89 /* OfflineReadOnlyInjection.swift in Sources */,
 				BAFB99822B0E2354007D09F9 /* FacebookConfig.swift in Sources */,
 				02935B732BCECAD000B22F66 /* Data_PrimaryEnrollment.swift in Sources */,
 				027BD3B32909475900392132 /* Publishers+KeyboardState.swift in Sources */,
@@ -1207,6 +1214,7 @@
 				02512FF0299533DF0024D438 /* CoreDataHandlerProtocol.swift in Sources */,
 				0260E58028FD792800BBBE18 /* WebUnitViewModel.swift in Sources */,
 				02A4833A29B8A9AB00D33F33 /* DownloadManager.swift in Sources */,
+				CED430012D099F0500C7AD89 /* OfflineWebArchiveService.swift in Sources */,
 				9784D47E2BF7762800AFEFFF /* FullScreenErrorView.swift in Sources */,
 				027BD3AE2909475000392132 /* KeyboardScrollerOptions.swift in Sources */,
 				BAFB99922B14E23D007D09F9 /* AppleSignInConfig.swift in Sources */,

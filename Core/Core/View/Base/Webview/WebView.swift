@@ -244,8 +244,9 @@ public struct WebView: UIViewRepresentable {
             }
             if webview?.url?.absoluteString.isEmpty ?? true,
                let url = URL(string: parent.viewModel.url) {
-                let request = URLRequest(url: url)
-                webview?.load(request)
+                if let webview {
+                    parent.load(url, on: webview)
+                }
             } else {
                 webview?.reload()
             }
@@ -320,14 +321,23 @@ public struct WebView: UIViewRepresentable {
                     isLoading = true
                 }
                 context.coordinator.url = url
-                let request = URLRequest(url: url)
-                webview.load(request)
+                load(url, on: webview)
             }
         }
     }
 
     public static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
         uiView.clear()
+    }
+
+    private func load(_ url: URL, on webview: WKWebView) {
+        if url.isFileURL {
+            let directoryURL = url.deletingLastPathComponent()
+            webview.loadFileURL(url, allowingReadAccessTo: directoryURL)
+        } else {
+            let request = URLRequest(url: url)
+            webview.load(request)
+        }
     }
 }
 
