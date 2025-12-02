@@ -107,13 +107,21 @@ struct OfflineView: View {
                                 )
                                 .padding(.top, 36)
                                 
-                                if viewModel.downloadedFilesSize == 0 && viewModel.totalFilesSize != 0 {
+                                if viewModel.totalFilesSize > 0 {
+                                    if viewModel.downloadedFilesSize == 0 {
+                                        Text(CourseLocalization.Course.Offline.youCanDownload)
+                                            .font(Theme.Fonts.labelLarge)
+                                            .foregroundColor(Theme.Colors.textPrimary)
+                                            .padding(.top, 8)
+                                            .padding(.bottom, 16)
+                                    }
+                                } else if viewModel.hasDownloadableContent {
                                     Text(CourseLocalization.Course.Offline.youCanDownload)
                                         .font(Theme.Fonts.labelLarge)
                                         .foregroundColor(Theme.Colors.textPrimary)
                                         .padding(.top, 8)
                                         .padding(.bottom, 16)
-                                } else if viewModel.downloadedFilesSize == 0 && viewModel.totalFilesSize == 0 {
+                                } else {
                                     Text(CourseLocalization.Course.Offline.youCantDownload)
                                         .font(Theme.Fonts.labelLarge)
                                         .foregroundColor(Theme.Colors.textPrimary)
@@ -167,7 +175,7 @@ struct OfflineView: View {
     private var downloadAll: some View {
         if viewModel.connectivity.isInternetAvaliable
             && ((viewModel.totalFilesSize - viewModel.downloadedFilesSize != 0)
-            || (viewModel.totalFilesSize == 0 && viewModel.downloadedFilesSize == 0)) {
+            || (viewModel.hasDownloadableContent && viewModel.totalFilesSize == 0)) {
             Button(action: {
                 Task {
                     switch viewModel.downloadAllButtonState {
@@ -186,7 +194,7 @@ struct OfflineView: View {
                         .font(Theme.Fonts.bodyMedium)
                 }
                 .foregroundStyle(
-                    viewModel.totalFilesSize == 0
+                    (viewModel.totalFilesSize == 0 && !viewModel.hasDownloadableContent)
                     ? Theme.Colors.disabledButtonText
                     : viewModel.downloadAllButtonState.textColor
                 )
@@ -195,14 +203,14 @@ struct OfflineView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(
-                            viewModel.totalFilesSize == 0
+                            (viewModel.totalFilesSize == 0 && !viewModel.hasDownloadableContent)
                             ? .clear
                             : viewModel.downloadAllButtonState.color,
                             lineWidth: 2
                         )
                 )
                 .background(
-                    viewModel.totalFilesSize == 0
+                    (viewModel.totalFilesSize == 0 && !viewModel.hasDownloadableContent)
                     ? Theme.Colors.disabledButton
                     : viewModel.downloadAllButtonState == .start ? viewModel.downloadAllButtonState.color : .clear
                 )

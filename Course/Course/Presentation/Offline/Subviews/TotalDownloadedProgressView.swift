@@ -26,12 +26,14 @@ public struct TotalDownloadedProgressView: View {
     public var body: some View {
         VStack(alignment: .center, spacing: 6) {
             HStack {
-                Text(downloadedFilesSize.formattedFileSize())
-                    .foregroundStyle(
-                        totalFilesSize == 0
-                        ? Theme.Colors.textSecondaryLight
-                        : Theme.Colors.success
-                    )
+                if downloadedFilesSize > 0 || totalFilesSize != 0 {
+                    Text(downloadedFilesSize.formattedFileSize())
+                        .foregroundStyle(
+                            totalFilesSize == 0
+                            ? Theme.Colors.textSecondaryLight
+                            : Theme.Colors.success
+                        )
+                }
                 Spacer()
                 if totalFilesSize != 0 {
                     Text(readyToDownload.formattedFileSize())
@@ -39,20 +41,22 @@ public struct TotalDownloadedProgressView: View {
             }
             .font(Theme.Fonts.titleLarge)
             HStack {
-                CoreAssets.deleteDownloading.swiftUIImage.renderingMode(.template)
+                if downloadedFilesSize > 0 || totalFilesSize == 0 {
+                    CoreAssets.deleteDownloading.swiftUIImage.renderingMode(.template)
+                        .foregroundStyle(
+                            totalFilesSize == 0
+                            ? Theme.Colors.textSecondaryLight
+                            : Theme.Colors.success
+                        )
+                    Text(totalFilesSize == 0
+                         ? CourseLocalization.Course.TotalProgress.avaliableToDownload
+                         : CourseLocalization.Course.TotalProgress.downloaded)
                     .foregroundStyle(
                         totalFilesSize == 0
                         ? Theme.Colors.textSecondaryLight
                         : Theme.Colors.success
                     )
-                Text(totalFilesSize == 0
-                     ? CourseLocalization.Course.TotalProgress.avaliableToDownload
-                     : CourseLocalization.Course.TotalProgress.downloaded)
-                .foregroundStyle(
-                    totalFilesSize == 0
-                    ? Theme.Colors.textSecondaryLight
-                    : Theme.Colors.success
-                )
+                }
                 Spacer()
                 if totalFilesSize != 0 {
                     CoreAssets.startDownloading.swiftUIImage

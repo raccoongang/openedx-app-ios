@@ -36,6 +36,7 @@ public struct CourseDownloadValue: Sendable, Equatable {
         totalFilesSize: 0,
         downloadedFilesSize: 0,
         largestBlocks: [],
+        hasDownloadableContent: false,
         state: .start
     )
     public var currentDownloadTask: DownloadDataTask?
@@ -47,6 +48,7 @@ public struct CourseDownloadValue: Sendable, Equatable {
     public let totalFilesSize: Int
     public let downloadedFilesSize: Int
     public let largestBlocks: [CourseBlock]
+    public let hasDownloadableContent: Bool
     let state: OfflineView.DownloadAllState
     
     mutating func setCurrentDownloadTask(task: DownloadDataTask?) {
@@ -164,12 +166,14 @@ public final class CourseDownloadHelper: CourseDownloadHelperProtocol, @unchecke
                 var downloadedFilesSize: Int = 0
                 var largestBlocks: [(block: CourseBlock, task: DownloadDataTask)] = []
                 var downloadState: OfflineView.DownloadAllState = .start
+                var hasDownloadableBlocks = false
                 for chapter in courseStructure.childs {
                     for sequential in chapter.childs {
                         var sequentialsChilds: [DownloadViewState] = []
                         for vertical in sequential.childs {
                             var verticalsChilds: [DownloadViewState] = []
                             for block in vertical.childs where block.isDownloadable {
+                                hasDownloadableBlocks = true
                                 if var download = courseDownloadTasks.first(where: { $0.blockId == block.id }) {
                                     if download.state == .finished, download.actualSize > 0 {
                                         downloadedFilesSize += download.actualSize
@@ -250,6 +254,7 @@ public final class CourseDownloadHelper: CourseDownloadHelperProtocol, @unchecke
                     totalFilesSize: totalFilesSize,
                     downloadedFilesSize: downloadedFilesSize,
                     largestBlocks: largestBlocks.map { $0.block },
+                    hasDownloadableContent: hasDownloadableBlocks,
                     state: downloadState
                 )
 

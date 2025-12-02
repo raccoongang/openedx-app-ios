@@ -88,6 +88,7 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
     @Published var totalFilesSize: Int = 1
     @Published var downloadedFilesSize: Int = 0
     @Published var largestDownloadBlocks: [CourseBlock] = []
+    @Published var hasDownloadableContent: Bool = false
     @Published var downloadAllButtonState: OfflineView.DownloadAllState = .start
     @Published var expandedSections: [String: Bool] = [:]
     @Published var courseDeadlines: CourseDates?
@@ -1085,6 +1086,7 @@ public final class CourseContainerViewModel: BaseCourseViewModel {
             downloadedFilesSize = value.downloadedFilesSize
             totalFilesSize = value.totalFilesSize
             largestDownloadBlocks = value.largestBlocks
+            hasDownloadableContent = value.hasDownloadableContent
         }
     }
 
