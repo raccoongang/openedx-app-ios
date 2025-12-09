@@ -751,6 +751,7 @@ public class Router: AuthorizationRouter,
             profileDidEdit: profileDidEdit
         )
         let controller = UIHostingController(rootView: view)
+        controller.navigationItem.hidesBackButton = true
         navigationController.pushViewController(controller, animated: true)
     }
     

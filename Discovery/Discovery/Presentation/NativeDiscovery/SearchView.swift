@@ -151,6 +151,7 @@ public struct SearchView: View {
                         }
                     }
                 }
+
                 // MARK: - Error Alert
                 if viewModel.showError {
                     VStack {
@@ -165,8 +166,6 @@ public struct SearchView: View {
                     }
                 }
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationBarHidden(true)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now()) {
                     withAnimation(.easeIn(duration: 0.3)) {
@@ -180,6 +179,9 @@ public struct SearchView: View {
             }
             .avoidKeyboard(dismissKeyboardByTap: true)
             .background(Theme.Colors.background.ignoresSafeArea())
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationBarBackButtonHidden(false)
+            .navigationBarHidden(true)
         }
     }
     

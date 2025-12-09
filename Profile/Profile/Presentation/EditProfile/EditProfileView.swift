@@ -218,10 +218,24 @@ public struct EditProfileView: View {
                 ToolbarItem(
                     placement: .navigationBarLeading,
                     content: {
-                        BackNavigationButton(color: Theme.Colors.accentColor) {
-                            viewModel.backButtonTapped()
+                        if #available(iOS 26, *) {
+                            Button(action: {
+                                viewModel.backButtonTapped()
+                            }) {
+                                HStack {
+                                    CoreAssets.arrowLeft.swiftUIImage.renderingMode(.template)
+                                        .foregroundColor(Theme.Colors.accentColor)
+                                }
+                            }
+                            .accessibilityIdentifier("back_button")
+                            .accessibilityLabel(CoreLocalization.back)
+                        } else {
+
+                            BackNavigationButton(color: Theme.Colors.accentColor) {
+                                viewModel.backButtonTapped()
+                            }
+                            .offset(x: -8, y: -1.5)
                         }
-                        .offset(x: -8, y: -1.5)
                     }
                 )
                 ToolbarItem(placement: .navigationBarTrailing, content: {
