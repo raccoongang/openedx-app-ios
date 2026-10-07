@@ -703,6 +703,16 @@ final class CourseContainerViewModelTests: XCTestCase {
         )
     }
 
+    func testOutlineInputs_withNewCompletion_doNotCompareEqual() {
+        // SwiftUI redraws the outline only when its inputs compare unequal.
+        let started = course(withAssignment: [block("problem", .problem, completion: 0)])
+        let finished = course(withAssignment: [block("problem", .problem, completion: 1)])
+
+        XCTAssertNotEqual(started, finished)
+        XCTAssertNotEqual(started.childs[0], finished.childs[0])
+        XCTAssertNotEqual(started.childs[0].childs[0], finished.childs[0].childs[0])
+    }
+
     func testSectionIndicatorWhileDownloading_opensDownloadsListInsteadOfCancelling() async {
         let downloadManager = DownloadManagerProtocolMock()
         let viewModel = makeViewModel(manager: downloadManager)
