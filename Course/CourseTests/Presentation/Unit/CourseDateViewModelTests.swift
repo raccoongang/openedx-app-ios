@@ -530,6 +530,83 @@ final class CourseDateViewModelTests: XCTestCase {
         XCTAssertEqual(BlockStatus.status(of: ""), .event, "Incorrect mapping for 'event'")
     }
 
+    // MARK: - Dates tab refresh
+
+    private func makeDatesViewModel(interactor: CourseInteractorProtocolMock) -> CourseDatesViewModel {
+        // A course opened straight on the Dates tab has no outline cached yet.
+        interactor.getLoadedCourseBlocksHandler = { _ in throw NoCachedDataError() }
+        return CourseDatesViewModel(
+            interactor: interactor,
+            router: CourseRouterMock(),
+            cssInjector: CSSInjectorMock(),
+            connectivity: ConnectivityProtocolMock(),
+            config: ConfigProtocolMock(),
+            courseID: "1",
+            courseName: "a",
+            analytics: CourseAnalyticsMock(),
+            calendarManager: CalendarManagerProtocolMock()
+        )
+    }
+
+    private var pastDueDates: CourseDates {
+        CourseDates(
+            datesBannerInfo: DatesBannerInfo(
+                missedDeadlines: true,
+                contentTypeGatingEnabled: false,
+                missedGatedContent: false,
+                verifiedUpgradeLink: nil,
+                status: .resetDatesBanner
+            ),
+            courseDateBlocks: [],
+            hasEnded: false,
+            learnerIsFullAccess: true,
+            userTimezone: nil
+        )
+    }
+
+    private func waitUntil(_ condition: @MainActor () -> Bool) async {
+        let deadline = Date().addingTimeInterval(2)
+        while !condition() && Date() < deadline {
+            try? await Task.sleep(for: .milliseconds(20))
+        }
+    }
+
+    func testGetCourseDates_whenCourseOutlineIsNotCachedYet_doesNotShowError() async {
+        let interactor = CourseInteractorProtocolMock()
+        let dates = pastDueDates
+        interactor.getCourseDatesHandler = { _ in dates }
+        let viewModel = makeDatesViewModel(interactor: interactor)
+
+        await viewModel.getCourseDates(courseID: "1")
+
+        XCTAssertNotNil(viewModel.courseDates)
+        XCTAssertNil(viewModel.errorMessage)
+        XCTAssertFalse(viewModel.showError)
+    }
+
+    func testRefreshRequestedByCourse_whenDatesAreShown_keepsThemOnScreen() async {
+        let interactor = CourseInteractorProtocolMock()
+        let dates = pastDueDates
+        interactor.getCourseDatesHandler = { _ in dates }
+        let viewModel = makeDatesViewModel(interactor: interactor)
+        await viewModel.getCourseDates(courseID: "1")
+
+        let refreshed = expectation(description: "dates refreshed")
+        let blanked = expectation(description: "list replaced by a spinner")
+        blanked.isInverted = true
+        interactor.getCourseDatesHandler = { [weak viewModel] _ in
+            if await MainActor.run(body: { viewModel?.isShowProgress == true || viewModel?.courseDates == nil }) {
+                blanked.fulfill()
+            }
+            refreshed.fulfill()
+            return dates
+        }
+        NotificationCenter.default.post(name: .getCourseDates, object: "1")
+
+        await fulfillment(of: [refreshed, blanked], timeout: 1)
+        XCTAssertEqual(interactor.getCourseDatesCallCount, 2)
+    }
+
     func testDateWithFractionalSecondsAfterNoon_isParsedExactly() {
         var utc = Calendar(identifier: .gregorian)
         utc.timeZone = TimeZone(identifier: "UTC")!
