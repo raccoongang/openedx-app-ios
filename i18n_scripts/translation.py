@@ -50,7 +50,7 @@ def parse_arguments():
 @contextmanager
 def change_directory(new_dir: Path):
     """
-    Context manager to execute `os.chidir`.
+    Context manager to execute `os.chdir`.
 
     Usage:
 
@@ -69,7 +69,7 @@ def change_directory(new_dir: Path):
 
 def get_modules_dir(override: Path = None) -> Path:
     """
-    Gets the modeles directory (repository root directory).
+    Gets the modules directory (repository root directory).
     """
     if override:
         return override
@@ -109,13 +109,13 @@ def get_translation_file_path(modules_dir: Path, module_name, lang_dir, create_d
 
 def get_modules_to_translate(modules_dir: Path):
     """
-    Retrieve the names of modules that have translation files for a specified language.
+    Retrieve the names of modules that have translation files for the English language.
 
     Parameters:
         modules_dir (Path): The path to the directory containing all the modules.
 
     Returns:
-        list of str: A list of module names that have translation files for the specified language.
+        list of str: A list of module names that have English translation files.
     """
     try:
         modules_list = [
@@ -208,6 +208,13 @@ def get_languages_dirs(modules_dir: Path):
         raise
 
 
+def ensure_utf8(file_path: Path):
+    raw = file_path.read_bytes()
+    if raw[:2] in (b'\xff\xfe', b'\xfe\xff'):
+        text = raw.decode('utf-16')
+        file_path.write_text(text, encoding='utf-8')
+
+
 def get_translations_from_file(modules_dir, lang_dir):
     """
     Get translations from the translation file in the 'I18N' directory and distribute them into the appropriate
@@ -225,6 +232,7 @@ def get_translations_from_file(modules_dir, lang_dir):
     translations = defaultdict(list)
     try:
         translations_file_path = get_translation_file_path(modules_dir, I18N_MODULE_NAME, lang_dir)
+        ensure_utf8(translations_file_path)
         lang_list = localizable.parse_strings(filename=translations_file_path)
         for translation_entry in lang_list:
             module_name, key_remainder = translation_entry['key'].split('.', maxsplit=1)
@@ -399,7 +407,7 @@ def add_localizable(xcode_project: XcodeProject, localizable_relative_path: Path
 
 def add_translation_files_to_xcode(modules_dir: Path = None):
     """
-    Add Localizable.strings files pulled from Transifex to XCode.
+    Add Localizable.strings files pulled from Transifex (or split from I18N) to XCode projects.
     """
     try:
         modules_dir = get_modules_dir(override=modules_dir)

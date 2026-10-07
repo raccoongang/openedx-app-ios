@@ -42,6 +42,8 @@ public struct Theme: Sendable {
         nonisolated(unsafe) public private(set) static var textPrimary = ThemeAssets.textPrimary.swiftUIColor
         nonisolated(unsafe) public private(set) static var textSecondary = ThemeAssets.textSecondary.swiftUIColor
         nonisolated(unsafe) public private(set) static var textSecondaryLight = ThemeAssets.textSecondaryLight.swiftUIColor
+        nonisolated(unsafe) public private(set) static var textSecondaryDark = ThemeAssets.textSecondaryDark.swiftUIColor
+        nonisolated(unsafe) public private(set) static var textTertiary = ThemeAssets.textTertiary.swiftUIColor
         nonisolated(unsafe) public private(set) static var textInputBackground = ThemeAssets.textInputBackground.swiftUIColor
         nonisolated(unsafe) public private(set) static var textInputStroke = ThemeAssets.textInputStroke.swiftUIColor
         nonisolated(unsafe) public private(set) static var textInputUnfocusedBackground = ThemeAssets.textInputUnfocusedBackground.swiftUIColor
@@ -63,6 +65,7 @@ public struct Theme: Sendable {
         nonisolated(unsafe) public private(set) static var success = ThemeAssets.success.swiftUIColor
         nonisolated(unsafe) public private(set) static var primaryButtonTextColor = ThemeAssets.primaryButtonTextColor.swiftUIColor
         nonisolated(unsafe) public private(set) static var toggleSwitchColor = ThemeAssets.toggleSwitchColor.swiftUIColor
+        nonisolated(unsafe) public private(set) static var tabbarInactiveColor = ThemeAssets.tabbarInactiveColor.swiftUIColor
         nonisolated(unsafe) public private(set) static var textInputTextColor = ThemeAssets.textInputTextColor.swiftUIColor
         nonisolated(unsafe) public private(set) static var textInputPlaceholderColor = ThemeAssets.textInputPlaceholderColor.swiftUIColor
         nonisolated(unsafe) public private(set) static var infoColor = ThemeAssets.infoColor.swiftUIColor
@@ -80,9 +83,15 @@ public struct Theme: Sendable {
         nonisolated(unsafe) public private(set) static var primaryCardUpgradeBG = ThemeAssets.primaryCardCourseUpgradeBG.swiftUIColor
         nonisolated(unsafe) public private(set) static var primaryCardProgressBG = ThemeAssets.primaryCardProgressBG.swiftUIColor
         nonisolated(unsafe) public private(set) static var courseProgressBG = ThemeAssets.courseProgressBG.swiftUIColor
+        nonisolated(unsafe) public private(set) static var circleProgressBG = ThemeAssets.circleProgressBG.swiftUIColor
+        nonisolated(unsafe) public private(set) static var progressPercentage = ThemeAssets.progressPercentage.swiftUIColor
+        nonisolated(unsafe) public private(set) static var progressLineBG = ThemeAssets.progressLineBG.swiftUIColor
         nonisolated(unsafe) public private(set) static var resumeButtonBG = ThemeAssets.resumeButtonBG.swiftUIColor
         nonisolated(unsafe) public private(set) static var resumeButtonText = ThemeAssets.resumeButtonText.swiftUIColor
         nonisolated(unsafe) public private(set) static var socialAuthColor = ThemeAssets.socialAuthColor.swiftUIColor
+        nonisolated(unsafe) public private(set) static var assignmentColor = ThemeAssets.assignmentStroke.swiftUIColor
+        nonisolated(unsafe) public private(set) static var emptyStateIconColor = ThemeAssets.emptyStateIconColor.swiftUIColor
+        nonisolated(unsafe) public private(set) static var secondaryContentColor = ThemeAssets.secondaryContentColor.swiftUIColor
 
         public static func update(
             accentColor: Color = ThemeAssets.accentColor.swiftUIColor,
@@ -108,6 +117,7 @@ public struct Theme: Sendable {
             textPrimary: Color = ThemeAssets.textPrimary.swiftUIColor,
             textSecondary: Color = ThemeAssets.textSecondary.swiftUIColor,
             textSecondaryLight: Color = ThemeAssets.textSecondaryLight.swiftUIColor,
+            textTertiary: Color = ThemeAssets.textTertiary.swiftUIColor,
             textInputBackground: Color = ThemeAssets.textInputBackground.swiftUIColor,
             textInputStroke: Color = ThemeAssets.textInputStroke.swiftUIColor,
             textInputUnfocusedBackground: Color = ThemeAssets.textInputUnfocusedBackground.swiftUIColor,
@@ -128,7 +138,9 @@ public struct Theme: Sendable {
             textInputTextColor: Color = ThemeAssets.textInputTextColor.swiftUIColor,
             textInputPlaceholderColor: Color = ThemeAssets.textInputPlaceholderColor.swiftUIColor,
             infoColor: Color = ThemeAssets.infoColor.swiftUIColor,
-            irreversibleAlert: Color = ThemeAssets.irreversibleAlert.swiftUIColor
+            irreversibleAlert: Color = ThemeAssets.irreversibleAlert.swiftUIColor,
+            emptyStateIconColor: Color = ThemeAssets.emptyStateIconColor.swiftUIColor,
+            secondaryContentColor: Color = ThemeAssets.secondaryContentColor.swiftUIColor
         ) {
             self.accentColor = accentColor
             self.accentXColor = accentXColor
@@ -153,6 +165,7 @@ public struct Theme: Sendable {
             self.textPrimary = textPrimary
             self.textSecondary = textSecondary
             self.textSecondaryLight = textSecondaryLight
+            self.textTertiary = textTertiary
             self.textInputBackground = textInputBackground
             self.textInputStroke = textInputStroke
             self.textInputUnfocusedBackground = textInputUnfocusedBackground
@@ -174,6 +187,8 @@ public struct Theme: Sendable {
             self.textInputPlaceholderColor = textInputPlaceholderColor
             self.infoColor = infoColor
             self.irreversibleAlert = irreversibleAlert
+            self.emptyStateIconColor = emptyStateIconColor
+            self.secondaryContentColor = secondaryContentColor
         }
     }
     // swiftlint:enable line_length

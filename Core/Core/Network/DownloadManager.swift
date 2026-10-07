@@ -15,6 +15,7 @@ public enum DownloadState: String, Sendable {
     case waiting
     case inProgress
     case finished
+    case loadingStructure
 
     public var order: Int {
         switch self {
@@ -24,6 +25,8 @@ public enum DownloadState: String, Sendable {
             return 2
         case .finished:
             return 3
+        case .loadingStructure:
+            return 4
         }
     }
 }
@@ -146,7 +149,7 @@ public class NoWiFiError: LocalizedError, @unchecked Sendable {
     public init() {}
 }
 
-//sourcery: AutoMockable
+/// @mockable
 public protocol DownloadManagerProtocol: Sendable {
     func getCurrentDownloadTask() async -> DownloadDataTask?
     func eventPublisher() -> AnyPublisher<DownloadManagerEvent, Never>
@@ -171,6 +174,7 @@ public protocol DownloadManagerProtocol: Sendable {
     func removeAppSupportDirectoryUnusedContent()
     func delete(blocks: [CourseBlock], courseId: String) async
     func downloadTask(for blockId: String) async -> DownloadDataTask?
+    func getFreeDiskSpace() -> Int?
 }
 
 public enum DownloadManagerEvent: Sendable {
@@ -243,21 +247,7 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
     }
     
     private func addObsevers() async {
-        await connectivity.internetReachableSubject
-            .sink {[weak self] state in
-                guard let self else { return }
-                Task {
-                    switch state {
-                    case .notReachable:
-                        await self.waitingAll()
-                    case .reachable:
-                        try? await self.resumeDownloading()
-                    case .none:
-                        return
-                    }
-                }
-            }
-            .store(in: &cancellables)
+        observeConnectivity()
         
         NotificationCenter.default.publisher(for: .tryDownloadAgain)
             .compactMap { $0.object as? [DownloadDataTask] }
@@ -267,6 +257,26 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
                 }
             }
             .store(in: &cancellables)
+    }
+    
+    nonisolated private func observeConnectivity() {
+        Task { @MainActor [connectivity] in
+            withObservationTracking {
+                _ = connectivity.internetState
+            } onChange: {
+                Task { [connectivity] in
+                    switch await connectivity.internetState {
+                    case .notReachable:
+                        await self.waitingAll()
+                    case .reachable:
+                        try? await self.resumeDownloading()
+                    case .none:
+                        break
+                    }
+                    self.observeConnectivity()
+                }
+            }
+        }
     }
     
     private func tryDownloadAgain(downloads: [DownloadDataTask]) async {
@@ -382,9 +392,7 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
         }
 
         delete(tasks: [task])
-        Task {
-            try await newDownload()
-        }
+        currentDownloadEventPublisher.send(.canceled([task]))
     }
 
     public func cancelDownloading(courseId: String) async throws {
@@ -889,6 +897,19 @@ public actor DownloadManager: DownloadManagerProtocol, @unchecked Sendable {
         } catch {
             debugPrint("Error reading contents of Application Support directory: \(error)")
         }
+    }
+    
+    nonisolated
+    public func getFreeDiskSpace() -> Int? {
+        do {
+            let attributes = try FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory() as String)
+            if let freeSpace = attributes[.systemFreeSize] as? Int64 {
+                return Int(freeSpace)
+            }
+        } catch {
+            print("Error retrieving free disk space: \(error.localizedDescription)")
+        }
+        return nil
     }
 }
 

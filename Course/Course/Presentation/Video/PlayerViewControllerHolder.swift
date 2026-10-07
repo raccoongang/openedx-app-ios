@@ -9,6 +9,7 @@
 @preconcurrency import Combine
 import Core
 
+/// @mockable
 @MainActor
 public protocol PlayerViewControllerHolderProtocol: AnyObject, Sendable {
     var url: URL? { get }
@@ -230,7 +231,12 @@ extension AVPlayerViewController: PlayerControllerProtocol, @retroactive Sendabl
     }
     
     public func seekTo(to date: Date) {
-        player?.seek(to: date)
+        player?.seek(
+                to: CMTime(
+                    seconds: date.secondsSinceMidnight(),
+                    preferredTimescale: CMTimeScale(NSEC_PER_SEC)
+                )
+            )
     }
     
     public func stop() {

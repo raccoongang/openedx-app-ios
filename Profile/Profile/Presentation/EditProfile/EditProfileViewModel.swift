@@ -18,16 +18,18 @@ public struct Changes: Equatable, Sendable {
 }
 
 @MainActor
-public class EditProfileViewModel: ObservableObject {
+@Observable
+public class EditProfileViewModel {
     
-    @Published private(set) var userModel: UserProfile
-    @Published private(set) var selectedCountry: PickerItem?
-    @Published private(set) var selectedSpokeLanguage: PickerItem?
-    @Published private(set) var selectedYearOfBirth: PickerItem?
-
+    private(set) var userModel: UserProfile
+    private(set) var selectedCountry: PickerItem?
+    private(set) var selectedSpokeLanguage: PickerItem?
+    private(set) var selectedYearOfBirth: PickerItem?
+    
     var profileDidEdit: (((UserProfile?, UIImage?)) -> Void)?
     var oldAvatar: UIImage?
-
+    
+    private let minimumFullAccountAge = 13
     private let currentYear = Calendar.current.component(.year, from: Date())
     public let profileTypes: [ProfileType] = [.full, .limited]
     private var years: [PickerFields.Option] = []
@@ -45,7 +47,6 @@ public class EditProfileViewModel: ObservableObject {
         ProfileLocalization.Edit.Fields.spokenLangugae
     )
     
-    @Published
     public var profileChanges: Changes = .init(
         shortBiography: "",
         profileType: .limited,
@@ -54,14 +55,14 @@ public class EditProfileViewModel: ObservableObject {
         isAvatarSaved: false
     )
     
-    @Published public var inputImage: UIImage?
+    public var inputImage: UIImage?
     private(set) var isYongUser: Bool = false
     private(set) var isEditable: Bool = true
     
-    @Published var isChanged = false
-    @Published private(set) var isShowProgress = false
-    @Published var showError: Bool = false
-    @Published var showAlert: Bool = false
+     var isChanged = false
+     private(set) var isShowProgress = false
+     var showError: Bool = false
+     var showAlert: Bool = false
     
     var errorMessage: String? {
         didSet {
@@ -77,6 +78,16 @@ public class EditProfileViewModel: ObservableObject {
                 showAlert = alertMessage != nil
             }
         }
+    }
+    
+    public var canEditAvatar: Bool {
+        guard let year = yearsConfiguration.text != "" ? Int(yearsConfiguration.text) : userModel.yearOfBirth else {
+            return false
+        }
+        if currentYear - year < minimumFullAccountAge {
+            return false
+        }
+        return profileChanges.profileType == .full
     }
     
     let router: ProfileRouter
@@ -97,6 +108,7 @@ public class EditProfileViewModel: ObservableObject {
         self.spokenLanguages = interactor.getSpokenLanguages()
         self.countries = interactor.getCountries()
         generateYears()
+        profileChanges.profileType = userModel.isFullProfile ? .full : .limited
     }
     
     func resizeImage(image: UIImage, longSideSize: Double) {
@@ -126,7 +138,6 @@ public class EditProfileViewModel: ObservableObject {
         isShowProgress = true
         do {
             if try await interactor.deleteProfilePicture() {
-                inputImage = CoreAssets.noAvatar.image
                 isShowProgress = false
             }
         } catch {
@@ -162,7 +173,14 @@ public class EditProfileViewModel: ObservableObject {
         } else {
             yearOfBirth = userModel.yearOfBirth
         }
-        if yearOfBirth == 0 || currentYear - yearOfBirth < 13 {
+        
+        if yearOfBirth == 0 {
+            if profileChanges.profileType == .limited {
+                alertMessage = ProfileLocalization.Edit.tooYongUser
+            } else {
+                profileChanges.profileType.toggle()
+            }
+        } else if currentYear - yearOfBirth < minimumFullAccountAge {
             alertMessage = ProfileLocalization.Edit.tooYongUser
         } else {
             profileChanges.profileType.toggle()
@@ -172,30 +190,27 @@ public class EditProfileViewModel: ObservableObject {
     }
     
     func checkProfileType() {
+        let yearOfBirth: Int
         if yearsConfiguration.text != "" {
-            let yearOfBirth = yearsConfiguration.text
-            if currentYear - (Int(yearOfBirth) ?? 0) < 13 {
-                profileChanges.profileType = .limited
-                isYongUser = true
-            } else {
-                withAnimation {
-                    isYongUser = false
-                }
-            }
+            yearOfBirth = Int(yearsConfiguration.text) ?? 0
         } else {
-            if (currentYear - userModel.yearOfBirth) < 13 {
-                profileChanges.profileType = .limited
-                isYongUser = true
-            } else {
-                withAnimation {
-                    isYongUser = false
-                }
-            }
+            yearOfBirth = userModel.yearOfBirth
         }
-        if profileChanges.profileType == .full {
-            isEditable = true
-        } else {
+        
+        if yearOfBirth == 0 {
+            withAnimation {
+                isYongUser = false
+            }
             isEditable = false
+        } else if currentYear - yearOfBirth < minimumFullAccountAge {
+            profileChanges.profileType = .limited
+            isYongUser = true
+            isEditable = false
+        } else {
+            withAnimation {
+                isYongUser = false
+            }
+            isEditable = profileChanges.profileType == .full
         }
     }
     
@@ -234,23 +249,13 @@ public class EditProfileViewModel: ObservableObject {
     @MainActor
     func uploadData(parameters: [String: any Any & Sendable]) async {
         do {
-            if profileChanges.isAvatarDeleted {
+            if profileChanges.isAvatarDeleted || profileChanges.profileType == .limited {
                 try await deleteAvatar()
                 profileChanges.isAvatarChanged = false
                 profileChanges.isAvatarDeleted = false
                 profileChanges.isAvatarSaved = true
-                checkChanges()
             }
-            if profileChanges.isAvatarChanged {
-                if let newImage = inputImage?.jpegData(compressionQuality: 80) {
-                    isShowProgress = true
-                    try await interactor.uploadProfilePicture(pictureData: newImage)
-                    isShowProgress = false
-                    profileChanges.isAvatarChanged = false
-                    profileChanges.isAvatarSaved = true
-                    checkChanges()
-                }
-            }
+            checkChanges()
             
             if isChanged {
                 if !parameters.isEmpty {
@@ -264,6 +269,18 @@ public class EditProfileViewModel: ObservableObject {
                 }
                 isChanged = false
             }
+            
+            if profileChanges.profileType == .full {
+                if let newImage = inputImage?.jpegData(compressionQuality: 80) {
+                    isShowProgress = true
+                    try await interactor.uploadProfilePicture(pictureData: newImage)
+                    isShowProgress = false
+                    profileChanges.isAvatarChanged = false
+                    profileChanges.isAvatarSaved = true
+                    checkChanges()
+                }
+            }
+            
         } catch {
             isShowProgress = false
             if error.isInternetError {
@@ -283,7 +300,7 @@ public class EditProfileViewModel: ObservableObject {
                 onCloseTapped: {
                     self.router.dismiss(animated: true)
                 },
-                okTapped: {
+                firstButtonTapped: {
                     self.router.dismiss(animated: false)
                     self.router.back()
                 },
@@ -312,6 +329,7 @@ public class EditProfileViewModel: ObservableObject {
         }
         
         generateFieldConfigurations()
+        checkProfileType()
     }
     
     private func generateYears() {

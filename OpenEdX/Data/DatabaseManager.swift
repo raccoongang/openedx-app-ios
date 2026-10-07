@@ -2,7 +2,7 @@
 //  Persistence.swift
 //  OpenEdX
 //
-//  Created by  Stepanok Ivan on 25.07.2023.
+//  Created by  Stepanok Ivan on 25.07.2023.
 //
 
 import Foundation
@@ -11,7 +11,9 @@ import Core
 import Discovery
 import Dashboard
 import Course
+import Downloads
 import Profile
+import AppDates
 
 final class DatabaseManager: CoreDataHandlerProtocol {
     
@@ -22,7 +24,9 @@ final class DatabaseManager: CoreDataHandlerProtocol {
         Bundle(for: DiscoveryBundle.self),
         Bundle(for: DashboardBundle.self),
         Bundle(for: CourseBundle.self),
-        Bundle(for: ProfileBundle.self)
+        Bundle(for: ProfileBundle.self),
+        Bundle(for: AppDatesBundle.self),
+        Bundle(for: DownloadsBundle.self)
     ]
         
     private nonisolated(unsafe) var persistentContainer: NSPersistentContainer?

@@ -10,11 +10,15 @@ import Core
 import OEXFoundation
 
 @MainActor
-public final class ResetPasswordViewModel: ObservableObject {
-    
-    @Published private(set) var isShowProgress = false
-    @Published private(set) var showError: Bool = false
-    @Published private(set) var showAlert: Bool = false
+@Observable public final class ResetPasswordViewModel {
+
+    private(set) var isShowProgress = false
+    private(set) var showError: Bool = false
+    private(set) var showAlert: Bool = false
+
+    var email: String = ""
+    var isRecovered: Bool = false
+
     var errorMessage: String? {
         didSet {
             withAnimation {
@@ -68,6 +72,8 @@ public final class ResetPasswordViewModel: ObservableObject {
                 errorMessage = CoreLocalization.Error.invalidCredentials
             } else if error.isInternetError {
                 errorMessage = CoreLocalization.Error.slowOrNoInternetConnection
+            } else if error.isUpdateRequeiredError {
+                router.showUpdateRequiredView(showAccountLink: false)
             } else {
                 errorMessage = CoreLocalization.Error.unknownError
             }

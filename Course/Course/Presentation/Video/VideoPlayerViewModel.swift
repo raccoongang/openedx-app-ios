@@ -12,25 +12,27 @@ import _AVKit_SwiftUI
 import Combine
 
 @MainActor
-public class VideoPlayerViewModel: ObservableObject {
-    @Published var pause: Bool = false
-    @Published var currentTime: Double = 0
-    @Published var isLoading: Bool = true
+@Observable
+public class VideoPlayerViewModel {
+    var pause: Bool = false
+    var currentTime: Double = 0
+    var isLoading: Bool = true
+    var isLocalProgressApplied: Bool = false
 
     public let connectivity: ConnectivityProtocol
 
     private var subtitlesDownloaded: Bool = false
-    @Published var subtitles: [Subtitle] = []
+    var subtitles: [Subtitle] = []
     var languages: [SubtitleUrl]
-    @Published var items: [PickerItem] = []
-    @Published var selectedLanguage: String?
-    
-    @Published var showError: Bool = false
-    var errorMessage: String? {
-        didSet {
-            showError = errorMessage != nil
-        }
+    var items: [PickerItem] = []
+    var selectedLanguage: String?
+
+    var errorMessage: String?
+
+    var showError: Bool {
+        errorMessage != nil
     }
+
     var isPlayingInPip: Bool {
         playerHolder.isPlayingInPip
     }
@@ -42,6 +44,7 @@ public class VideoPlayerViewModel: ObservableObject {
     internal var subscription = Set<AnyCancellable>()
     private var appStorage: CoreStorage?
     private var analytics: CourseAnalytics?
+    private var lastSavedTime: Double = 0
 
     public init(
         languages: [SubtitleUrl],
@@ -70,6 +73,7 @@ public class VideoPlayerViewModel: ObservableObject {
                 }
             case .kill:
                 if self?.playerHolder.isPlayingInPip != true {
+                    self?.saveCurrentProgress(duration: self?.playerHolder.duration ?? .nan)
                     self?.playerHolder.playerController?.stop()
                 }
             case .none:
@@ -81,6 +85,7 @@ public class VideoPlayerViewModel: ObservableObject {
         playerHolder.getTimePublisher()
             .sink {[weak self] time in
                 self?.currentTime = time
+                self?.loadAndApplyLocalProgress()
             }
             .store(in: &subscription)
         playerHolder.getErrorPublisher()
@@ -110,6 +115,13 @@ public class VideoPlayerViewModel: ObservableObject {
         playerHolder.getFinishPublisher()
             .sink { [weak self] in
                 self?.trackVideoCompleted()
+            }
+            .store(in: &subscription)
+        
+        NotificationCenter.default.publisher(for: .saveVideoProgressBeforeNavigation)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.saveCurrentProgress(duration: self.playerHolder.duration)
             }
             .store(in: &subscription)
 
@@ -255,6 +267,40 @@ public class VideoPlayerViewModel: ObservableObject {
                     currentTime: currentTime,
                     duration: playerHolder.duration
                 )
+            }
+        }
+    }
+    
+    public func saveCurrentProgress(duration: TimeInterval) {
+        Task {
+            let time = currentTime
+                        
+            if duration > 0 && time > 0 {
+                let progress = min(time / duration, 1.0)
+                await playerHolder.getService().updateVideoProgress(progress: progress)
+            }
+        }
+    }
+    
+    private func loadAndApplyLocalProgress() {
+        guard playerHolder.duration != 0, !playerHolder.duration.isNaN, !isLocalProgressApplied else { return }
+        Task {
+            let duration = playerHolder.duration
+            
+            if let localProgress = await playerHolder.getService().loadVideoProgress() {
+                
+                if localProgress > 0 && duration > 0 {
+                    let timeToSeek = localProgress * duration
+                    await MainActor.run {
+                        // Seek to the saved position
+                        if let playerController = playerHolder.playerController {
+                            let seekDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 -
+                               Date().secondsSinceMidnight() + timeToSeek)
+                            playerController.seekTo(to: seekDate)
+                        }
+                    }
+                }
+                isLocalProgressApplied = true
             }
         }
     }

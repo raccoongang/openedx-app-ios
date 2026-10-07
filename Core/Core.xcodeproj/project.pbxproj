@@ -48,7 +48,6 @@
 		027BD3AD2909475000392132 /* KeyboardScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027BD3AA2909474F00392132 /* KeyboardScroller.swift */; };
 		027BD3AE2909475000392132 /* KeyboardScrollerOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027BD3AB2909474F00392132 /* KeyboardScrollerOptions.swift */; };
 		027BD3AF2909475000392132 /* DismissKeyboardTapHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027BD3AC2909475000392132 /* DismissKeyboardTapHandler.swift */; };
-		027BD3B32909475900392132 /* Publishers+KeyboardState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027BD3B02909475800392132 /* Publishers+KeyboardState.swift */; };
 		027BD3B42909475900392132 /* KeyboardState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027BD3B12909475800392132 /* KeyboardState.swift */; };
 		027BD3B52909475900392132 /* KeyboardStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027BD3B22909475900392132 /* KeyboardStateObserver.swift */; };
 		027BD3B82909476200392132 /* DismissKeyboardTapViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027BD3B62909476200392132 /* DismissKeyboardTapViewModifier.swift */; };
@@ -90,6 +89,7 @@
 		02F6EF3B28D9B8EC00835477 /* CourseCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02F6EF3A28D9B8EC00835477 /* CourseCellView.swift */; };
 		02F6EF4A28D9F0A700835477 /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02F6EF4928D9F0A700835477 /* DateExtension.swift */; };
 		0604C9AA2B22FACF00AD5DBF /* UIComponentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0604C9A92B22FACF00AD5DBF /* UIComponentsConfig.swift */; };
+		12624ABABF5AE7FBF7B4F5E5 /* InstancesConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC6455FBE49B22E32CB777A /* InstancesConfig.swift */; };
 		064987932B4D69FF0071642A /* DragAndDropCssInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0649878A2B4D69FE0071642A /* DragAndDropCssInjection.swift */; };
 		064987942B4D69FF0071642A /* WebviewInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0649878B2B4D69FE0071642A /* WebviewInjection.swift */; };
 		064987952B4D69FF0071642A /* SurveyCssInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0649878C2B4D69FE0071642A /* SurveyCssInjection.swift */; };
@@ -135,6 +135,7 @@
 		A53A32352B233DEC005FE38A /* ThemeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53A32342B233DEC005FE38A /* ThemeConfig.swift */; };
 		A595689B2B6173DF00ED4F90 /* BranchConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A595689A2B6173DF00ED4F90 /* BranchConfig.swift */; };
 		A5D4B3DE2CDD0A9700688951 /* SecureInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D4B3DD2CDD0A9700688951 /* SecureInputView.swift */; };
+		A5D56C222E9F4C44004BE2F6 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5BBFF32E24236500D51C92 /* ColorExtension.swift */; };
 		A5F4E7B52B61544A00ACD166 /* BrazeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F4E7B42B61544A00ACD166 /* BrazeConfig.swift */; };
 		BA4AFB422B5A7A0900A21367 /* VideoDownloadQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4AFB412B5A7A0900A21367 /* VideoDownloadQualityView.swift */; };
 		BA4AFB442B6A5AF100A21367 /* CheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4AFB432B6A5AF100A21367 /* CheckBoxView.swift */; };
@@ -152,11 +153,18 @@
 		C8C446EF233F81B9FABB77D2 /* Pods_App_Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349B90CD6579F7B8D257E515 /* Pods_App_Core.framework */; };
 		CE09B2B62CE796AE0090DB53 /* InvalidCoreDataContextError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09B2B52CE796AE0090DB53 /* InvalidCoreDataContextError.swift */; };
 		CE1D5B7D2CE65D360019CA34 /* Protected.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1D5B7C2CE65D360019CA34 /* Protected.swift */; };
+		CE38BBD72D9D8294002CD276 /* ExperimentalFeaturesConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE38BBD62D9D8294002CD276 /* ExperimentalFeaturesConfig.swift */; };
 		CE54C2D22CC80D8500E529F9 /* DownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE54C2D12CC80D8500E529F9 /* DownloadManagerTests.swift */; };
 		CE57127C2CD109DB00D4AB17 /* OEXFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = CE57127B2CD109DB00D4AB17 /* OEXFoundation */; };
 		CE7CAF392CC1561E00E0AC9D /* OEXFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = CE7CAF382CC1561E00E0AC9D /* OEXFoundation */; };
-		CE953A3B2CD0DA940023D667 /* CoreMock.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE953A3A2CD0DA940023D667 /* CoreMock.generated.swift */; };
+		CE953A3B2CD0DA940023D667 /* CoreMocks.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE953A3A2CD0DA940023D667 /* CoreMocks.generated.swift */; };
+		CEC873BE2D75D55600A2626C /* CourseStructureManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC873BD2D75D55600A2626C /* CourseStructureManagerProtocol.swift */; };
+		CEC875392D7845DB00A2626C /* DeviceStorageFullAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC875372D7845DB00A2626C /* DeviceStorageFullAlertView.swift */; };
+		CEC8753A2D7845DB00A2626C /* DownloadActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC875352D7845DB00A2626C /* DownloadActionView.swift */; };
+		CEC8753B2D7845DB00A2626C /* DownloadErrorAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC875362D7845DB00A2626C /* DownloadErrorAlertView.swift */; };
+		CEC8753F2D786F7B00A2626C /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8753E2D786F7B00A2626C /* ArrayExtension.swift */; };
 		CED42FFC2D099F0400C7AD89 /* DownloadManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED42FFB2D099F0400C7AD89 /* DownloadManagerMock.swift */; };
+		CEF4AA1E2DBA41C4006C4F0A /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4AA1D2DBA41C4006C4F0A /* StringExtension.swift */; };
 		CFC84952299F8B890055E497 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC84951299F8B890055E497 /* Debounce.swift */; };
 		DBF6F2412B014ADA0098414B /* FirebaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF6F2402B014ADA0098414B /* FirebaseConfig.swift */; };
 		DBF6F2462B01DAFE0098414B /* AgreementConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF6F2452B01DAFE0098414B /* AgreementConfig.swift */; };
@@ -242,7 +250,6 @@
 		027BD3AA2909474F00392132 /* KeyboardScroller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardScroller.swift; sourceTree = "<group>"; };
 		027BD3AB2909474F00392132 /* KeyboardScrollerOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardScrollerOptions.swift; sourceTree = "<group>"; };
 		027BD3AC2909475000392132 /* DismissKeyboardTapHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissKeyboardTapHandler.swift; sourceTree = "<group>"; };
-		027BD3B02909475800392132 /* Publishers+KeyboardState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Publishers+KeyboardState.swift"; sourceTree = "<group>"; };
 		027BD3B12909475800392132 /* KeyboardState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardState.swift; sourceTree = "<group>"; };
 		027BD3B22909475900392132 /* KeyboardStateObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardStateObserver.swift; sourceTree = "<group>"; };
 		027BD3B62909476200392132 /* DismissKeyboardTapViewModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissKeyboardTapViewModifier.swift; sourceTree = "<group>"; };
@@ -284,6 +291,7 @@
 		02F6EF4928D9F0A700835477 /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		043DD0B526F919DFA1C5E600 /* Pods-App-Core-CoreTests.releaseprod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App-Core-CoreTests.releaseprod.xcconfig"; path = "Target Support Files/Pods-App-Core-CoreTests/Pods-App-Core-CoreTests.releaseprod.xcconfig"; sourceTree = "<group>"; };
 		0604C9A92B22FACF00AD5DBF /* UIComponentsConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIComponentsConfig.swift; sourceTree = "<group>"; };
+		2FC6455FBE49B22E32CB777A /* InstancesConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesConfig.swift; sourceTree = "<group>"; };
 		0649878A2B4D69FE0071642A /* DragAndDropCssInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DragAndDropCssInjection.swift; sourceTree = "<group>"; };
 		0649878B2B4D69FE0071642A /* WebviewInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebviewInjection.swift; sourceTree = "<group>"; };
 		0649878C2B4D69FE0071642A /* SurveyCssInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SurveyCssInjection.swift; sourceTree = "<group>"; };
@@ -364,9 +372,17 @@
 		C7E5BCE79CE297B20777B27A /* Pods-App-Core.debugprod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App-Core.debugprod.xcconfig"; path = "Target Support Files/Pods-App-Core/Pods-App-Core.debugprod.xcconfig"; sourceTree = "<group>"; };
 		CE09B2B52CE796AE0090DB53 /* InvalidCoreDataContextError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvalidCoreDataContextError.swift; sourceTree = "<group>"; };
 		CE1D5B7C2CE65D360019CA34 /* Protected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protected.swift; sourceTree = "<group>"; };
+		CE38BBD62D9D8294002CD276 /* ExperimentalFeaturesConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalFeaturesConfig.swift; sourceTree = "<group>"; };
 		CE54C2D12CC80D8500E529F9 /* DownloadManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerTests.swift; sourceTree = "<group>"; };
-		CE953A3A2CD0DA940023D667 /* CoreMock.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreMock.generated.swift; sourceTree = "<group>"; };
+		CE5BBFF32E24236500D51C92 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
+		CE953A3A2CD0DA940023D667 /* CoreMocks.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreMocks.generated.swift; sourceTree = "<group>"; };
+		CEC873BD2D75D55600A2626C /* CourseStructureManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseStructureManagerProtocol.swift; sourceTree = "<group>"; };
+		CEC875352D7845DB00A2626C /* DownloadActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadActionView.swift; sourceTree = "<group>"; };
+		CEC875362D7845DB00A2626C /* DownloadErrorAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadErrorAlertView.swift; sourceTree = "<group>"; };
+		CEC875372D7845DB00A2626C /* DeviceStorageFullAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStorageFullAlertView.swift; sourceTree = "<group>"; };
+		CEC8753E2D786F7B00A2626C /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
 		CED42FFB2D099F0400C7AD89 /* DownloadManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManagerMock.swift; sourceTree = "<group>"; };
+		CEF4AA1D2DBA41C4006C4F0A /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		CFC84951299F8B890055E497 /* Debounce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
 		DBF6F2402B014ADA0098414B /* FirebaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseConfig.swift; sourceTree = "<group>"; };
 		DBF6F2452B01DAFE0098414B /* AgreementConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgreementConfig.swift; sourceTree = "<group>"; };
@@ -462,7 +478,6 @@
 			children = (
 				027BD3B12909475800392132 /* KeyboardState.swift */,
 				027BD3B22909475900392132 /* KeyboardStateObserver.swift */,
-				027BD3B02909475800392132 /* Publishers+KeyboardState.swift */,
 			);
 			path = State;
 			sourceTree = "<group>";
@@ -480,9 +495,12 @@
 		0283347E28D4DCC100C828FC /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				CE5BBFF32E24236500D51C92 /* ColorExtension.swift */,
+				CEC8753E2D786F7B00A2626C /* ArrayExtension.swift */,
 				0283347F28D4DCD200C828FC /* ViewExtension.swift */,
 				02F6EF4928D9F0A700835477 /* DateExtension.swift */,
 				07460FE2294B72D700F70538 /* Notification.swift */,
+				CEF4AA1D2DBA41C4006C4F0A /* StringExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -604,6 +622,7 @@
 				0727878728D3172D002E9142 /* Model */,
 				0236961A28F9A28B00EEF206 /* AuthInteractor.swift */,
 				029A132F2C2479E7005FB830 /* OfflineSyncInteractor.swift */,
+				CEC873BD2D75D55600A2626C /* CourseStructureManagerProtocol.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -747,6 +766,7 @@
 				06DEA4A42BBD66D700110D20 /* BackNavigationButtonViewModel.swift */,
 				0267F8502C3C256F0089D810 /* FileWebView.swift */,
 				A5D4B3DD2CDD0A9700688951 /* SecureInputView.swift */,
+				CEC875382D7845DB00A2626C /* ActionViews */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -841,6 +861,24 @@
 			path = DownloadManager;
 			sourceTree = "<group>";
 		};
+		CE953A3C2CD0DA940023D668 /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				CE953A3A2CD0DA940023D667 /* CoreMocks.generated.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		CEC875382D7845DB00A2626C /* ActionViews */ = {
+			isa = PBXGroup;
+			children = (
+				CEC875352D7845DB00A2626C /* DownloadActionView.swift */,
+				CEC875362D7845DB00A2626C /* DownloadErrorAlertView.swift */,
+				CEC875372D7845DB00A2626C /* DeviceStorageFullAlertView.swift */,
+			);
+			path = ActionViews;
+			sourceTree = "<group>";
+		};
 		CFC84955299FAC4D0055E497 /* Combine */ = {
 			isa = PBXGroup;
 			children = (
@@ -853,6 +891,7 @@
 			isa = PBXGroup;
 			children = (
 				0604C9A92B22FACF00AD5DBF /* UIComponentsConfig.swift */,
+				2FC6455FBE49B22E32CB777A /* InstancesConfig.swift */,
 				0727876F28D23411002E9142 /* Config.swift */,
 				DBF6F2402B014ADA0098414B /* FirebaseConfig.swift */,
 				A5F4E7B42B61544A00ACD166 /* BrazeConfig.swift */,
@@ -866,6 +905,7 @@
 				02CA59832BD7DDBE00D517AA /* DashboardConfig.swift */,
 				A53A32342B233DEC005FE38A /* ThemeConfig.swift */,
 				E0D586192B2FF74C009B4BA7 /* DiscoveryConfig.swift */,
+				CE38BBD62D9D8294002CD276 /* ExperimentalFeaturesConfig.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -873,7 +913,7 @@
 		E09179FA2B0F204D002AB695 /* CoreTests */ = {
 			isa = PBXGroup;
 			children = (
-				CE953A3A2CD0DA940023D667 /* CoreMock.generated.swift */,
+				CE953A3C2CD0DA940023D668 /* Generated */,
 				CE54C2CE2CC80B4A00E529F9 /* DownloadManager */,
 				E09179FB2B0F204D002AB695 /* Configuration */,
 			);
@@ -917,10 +957,10 @@
 			buildConfigurationList = 07169476296D996900E3DED6 /* Build configuration list for PBXNativeTarget "CoreTests" */;
 			buildPhases = (
 				F87EB93C339DD81527F250AE /* [CP] Check Pods Manifest.lock */,
+				CE953A3D2CD0DA940023D669 /* Generate Mockolo Mocks */,
 				07169465296D996800E3DED6 /* Sources */,
 				07169466296D996800E3DED6 /* Frameworks */,
 				07169467296D996800E3DED6 /* Resources */,
-				C9AA9371F83D4B112F310DB8 /* [CP] Copy Pods Resources */,
 				CE7CAF3B2CC1561E00E0AC9D /* Embed Frameworks */,
 			);
 			buildRules = (
@@ -1043,22 +1083,24 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"${PODS_ROOT}/SwiftGen/bin/swiftgen\" ]]; then\n  \"${PODS_ROOT}/SwiftGen/bin/swiftgen\"\nelse\n  echo \"warning: SwiftGen is not installed. Run 'pod install --repo-update' to install it.\"\nfi\n";
 		};
-		C9AA9371F83D4B112F310DB8 /* [CP] Copy Pods Resources */ = {
+		CE953A3D2CD0DA940023D669 /* Generate Mockolo Mocks */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-App-Core-CoreTests/Pods-App-Core-CoreTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			inputPaths = (
+			);
+			name = "Generate Mockolo Mocks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-App-Core-CoreTests/Pods-App-Core-CoreTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-App-Core-CoreTests/Pods-App-Core-CoreTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "if which mockolo >/dev/null; then\n    mockolo \\\n        --sourcedirs \"${SRCROOT}/Core\" \\\n        --destination \"${SRCROOT}/CoreTests/Generated/CoreMocks.generated.swift\" \\\n        --mock-final \\\n        --testable-imports \"Core\" \\\n        --custom-imports \"Foundation\" \"SwiftUI\" \"Combine\"\nelse\n    echo \"warning: mockolo not installed, download from https://github.com/uber/mockolo\"\nfi\n";
 		};
 		ED83AD5255805030E042D62A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1112,7 +1154,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BAD9CA422B2B140100DE790A /* AgreementConfigTests.swift in Sources */,
-				CE953A3B2CD0DA940023D667 /* CoreMock.generated.swift in Sources */,
+				CE953A3B2CD0DA940023D667 /* CoreMocks.generated.swift in Sources */,
 				E09179FD2B0F204E002AB695 /* ConfigTests.swift in Sources */,
 				CE54C2D22CC80D8500E529F9 /* DownloadManagerTests.swift in Sources */,
 			);
@@ -1138,6 +1180,7 @@
 				0727877728D23847002E9142 /* DataLayer.swift in Sources */,
 				0241666B28F5A78B00082765 /* HTMLFormattedText.swift in Sources */,
 				02D800CC29348F460099CF16 /* ImagePicker.swift in Sources */,
+				CE38BBD72D9D8294002CD276 /* ExperimentalFeaturesConfig.swift in Sources */,
 				027BD3B92909476200392132 /* KeyboardAvoidingModifier.swift in Sources */,
 				BA4AFB422B5A7A0900A21367 /* VideoDownloadQualityView.swift in Sources */,
 				02A8C5812C05DBB4004B91FF /* Data_EnrollmentsStatus.swift in Sources */,
@@ -1148,11 +1191,11 @@
 				06619EAF2B973B25001FAADE /* AccessibilityInjection.swift in Sources */,
 				BAFB99822B0E2354007D09F9 /* FacebookConfig.swift in Sources */,
 				02935B732BCECAD000B22F66 /* Data_PrimaryEnrollment.swift in Sources */,
-				027BD3B32909475900392132 /* Publishers+KeyboardState.swift in Sources */,
 				06DEA4A32BBD66A700110D20 /* BackNavigationButton.swift in Sources */,
 				0727877D28D25212002E9142 /* ProgressBar.swift in Sources */,
 				CE09B2B62CE796AE0090DB53 /* InvalidCoreDataContextError.swift in Sources */,
 				BA981BD02B91ED50005707C2 /* FullScreenProgressView.swift in Sources */,
+				CEF4AA1E2DBA41C4006C4F0A /* StringExtension.swift in Sources */,
 				0236961F28F9A2F600EEF206 /* AuthEndpoint.swift in Sources */,
 				BAD9CA332B28A8F300DE790A /* AjaxProvider.swift in Sources */,
 				0282DA7328F98CC9003C3F07 /* WebUnitView.swift in Sources */,
@@ -1182,6 +1225,7 @@
 				BA4AFB442B6A5AF100A21367 /* CheckBoxView.swift in Sources */,
 				076F297F2A1F80C800967E7D /* Pagination.swift in Sources */,
 				14769D3C2B9822EE00AB36D4 /* CoreAnalytics.swift in Sources */,
+				CEC873BE2D75D55600A2626C /* CourseStructureManagerProtocol.swift in Sources */,
 				02AFCC1A2AEFDC18000360F0 /* ThirdPartyMailer.swift in Sources */,
 				0770DE5F28D0B22C006D8A5D /* Strings.swift in Sources */,
 				02C917F029CDA99E00DBB8BD /* Data_Enrollments.swift in Sources */,
@@ -1205,7 +1249,9 @@
 				071009C428D1C9D000344290 /* StyledButton.swift in Sources */,
 				064987932B4D69FF0071642A /* DragAndDropCssInjection.swift in Sources */,
 				027BD3B42909475900392132 /* KeyboardState.swift in Sources */,
+				A5D56C222E9F4C44004BE2F6 /* ColorExtension.swift in Sources */,
 				027BD3922907D88F00392132 /* Data_RegistrationFields.swift in Sources */,
+				CEC8753F2D786F7B00A2626C /* ArrayExtension.swift in Sources */,
 				07460FE3294B72D700F70538 /* Notification.swift in Sources */,
 				02A4833829B8A8F900D33F33 /* CoreDataModel.xcdatamodeld in Sources */,
 				064987952B4D69FF0071642A /* SurveyCssInjection.swift in Sources */,
@@ -1249,12 +1295,16 @@
 				029A132A2C2471DF005FB830 /* OfflineSyncRepository.swift in Sources */,
 				0236961928F9A26900EEF206 /* AuthRepository.swift in Sources */,
 				023A1136291432B200D0D354 /* RegistrationTextField.swift in Sources */,
+				CEC875392D7845DB00A2626C /* DeviceStorageFullAlertView.swift in Sources */,
+				CEC8753A2D7845DB00A2626C /* DownloadActionView.swift in Sources */,
+				CEC8753B2D7845DB00A2626C /* DownloadErrorAlertView.swift in Sources */,
 				02A463112AEA966C00331037 /* AppReviewView.swift in Sources */,
 				025B36752A13B7D5001A640E /* UnitButtonView.swift in Sources */,
 				028F9F39293A452B00DE65D0 /* ResetPassword.swift in Sources */,
 				0233D56F2AF13EB200BAC8BD /* StarRatingView.swift in Sources */,
 				029A13302C2479E7005FB830 /* OfflineSyncInteractor.swift in Sources */,
 				0604C9AA2B22FACF00AD5DBF /* UIComponentsConfig.swift in Sources */,
+				12624ABABF5AE7FBF7B4F5E5 /* InstancesConfig.swift in Sources */,
 				027BD3B82909476200392132 /* DismissKeyboardTapViewModifier.swift in Sources */,
 				0770DE6128D0B2CB006D8A5D /* Assets.swift in Sources */,
 				07E0939F2B308D2800F1E4B2 /* Data_Certificate.swift in Sources */,
@@ -1373,7 +1423,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1403,7 +1453,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1493,7 +1543,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1522,7 +1572,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1544,7 +1594,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1567,7 +1617,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1590,7 +1640,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1613,7 +1663,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1635,7 +1685,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1657,7 +1707,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.openedx.CoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1752,7 +1802,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1849,7 +1899,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1951,7 +2001,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2048,7 +2098,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2209,7 +2259,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2247,7 +2297,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2331,7 +2381,7 @@
 			repositoryURL = "https://github.com/openedx/openedx-app-foundation-ios/";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.2;
+				version = 1.0.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

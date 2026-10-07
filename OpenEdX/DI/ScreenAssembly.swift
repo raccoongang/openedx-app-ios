@@ -13,12 +13,14 @@ import OEXFoundation
 import Authorization
 import Discovery
 import Dashboard
+import Downloads
 import Profile
 import Course
 import Discussion
+import AppDates
 @preconcurrency import Combine
 
-// swiftlint:disable function_body_length closure_parameter_position
+// swiftlint:disable function_body_length closure_parameter_position type_body_length
 class ScreenAssembly: Assembly {
     func assemble(container: Container) {
         
@@ -150,8 +152,9 @@ class ScreenAssembly: Assembly {
                 storage: r.resolve(CoreStorage.self)!
             )
         }
-        
-        container.register(DiscoveryWebviewViewModel.self) { @MainActor r, sourceScreen in
+        .inObjectScope(.weak)
+
+    container.register(DiscoveryWebviewViewModel.self) { @MainActor r, sourceScreen in
             DiscoveryWebviewViewModel(
                 router: r.resolve(DiscoveryRouter.self)!,
                 config: r.resolve(ConfigProtocol.self)!,
@@ -162,6 +165,7 @@ class ScreenAssembly: Assembly {
                 sourceScreen: sourceScreen
             )
         }
+        .inObjectScope(.weak)
         
         container.register(ProgramWebviewViewModel.self) { @MainActor r in
             ProgramWebviewViewModel(
@@ -173,6 +177,7 @@ class ScreenAssembly: Assembly {
                 authInteractor: r.resolve(AuthInteractorProtocol.self)!
             )
         }
+        .inObjectScope(.weak)
         
         container.register(SearchViewModel.self) { @MainActor r in
             SearchViewModel(
@@ -211,6 +216,7 @@ class ScreenAssembly: Assembly {
                 storage: r.resolve(CoreStorage.self)!
             )
         }
+        .inObjectScope(.weak)
         
         container.register(PrimaryCourseDashboardViewModel.self) { @MainActor r in
             PrimaryCourseDashboardViewModel(
@@ -218,10 +224,12 @@ class ScreenAssembly: Assembly {
                 connectivity: r.resolve(ConnectivityProtocol.self)!,
                 analytics: r.resolve(DashboardAnalytics.self)!,
                 config: r.resolve(ConfigProtocol.self)!,
-                storage: r.resolve(CoreStorage.self)!
+                storage: r.resolve(CoreStorage.self)!,
+                router: r.resolve(DashboardRouter.self)!
             )
         }
-        
+        .inObjectScope(.container)
+
         container.register(AllCoursesViewModel.self) { @MainActor r in
             AllCoursesViewModel(
                 interactor: r.resolve(DashboardInteractorProtocol.self)!,
@@ -230,6 +238,7 @@ class ScreenAssembly: Assembly {
                 storage: r.resolve(CoreStorage.self)!
             )
         }
+        .inObjectScope(.weak)
         
         // MARK: Profile
         
@@ -261,6 +270,7 @@ class ScreenAssembly: Assembly {
                 connectivity: r.resolve(ConnectivityProtocol.self)!
             )
         }
+        .inObjectScope(.weak)
         container.register(EditProfileViewModel.self) { @MainActor r, userModel in
             EditProfileViewModel(
                 userModel: userModel,
@@ -279,7 +289,8 @@ class ScreenAssembly: Assembly {
                 coreAnalytics: r.resolve(CoreAnalytics.self)!,
                 config: r.resolve(ConfigProtocol.self)!,
                 corePersistence: r.resolve(CorePersistenceProtocol.self)!,
-                connectivity: r.resolve(ConnectivityProtocol.self)!
+                connectivity: r.resolve(ConnectivityProtocol.self)!,
+                coreStorage: r.resolve(AppStorage.self)!
             )
         }
         
@@ -313,6 +324,43 @@ class ScreenAssembly: Assembly {
                 analytics: r.resolve(ProfileAnalytics.self)!
             )
         }
+        
+        // MARK: AppDates
+        container.register(DatesPersistenceProtocol.self) { r in
+            DatesPersistence(container: r.resolve(DatabaseManager.self)!.getPersistentContainer())
+        }
+
+        container.register(DatesRepositoryProtocol.self) { r in
+            DatesRepository(
+                api: r.resolve(API.self)!,
+                storage: r.resolve(CoreStorage.self)!,
+                config: r.resolve(ConfigProtocol.self)!,
+                persistence: r.resolve(DatesPersistenceProtocol.self)!
+            )
+        }
+                
+        container.register(CourseStructureManagerProtocol.self) { r in
+            CourseInteractor(
+                repository: r.resolve(CourseRepositoryProtocol.self)!
+            )
+        }
+        
+        container.register(DatesInteractorProtocol.self) { r in
+            DatesInteractor(
+                repository: r.resolve(DatesRepositoryProtocol.self)!
+            )
+        }
+        
+        container.register(DatesViewModel.self) { @MainActor r in
+            DatesViewModel(
+                interactor: r.resolve(DatesInteractorProtocol.self)!,
+                connectivity: r.resolve(ConnectivityProtocol.self)!,
+                courseManager: r.resolve(CourseStructureManagerProtocol.self)!,
+                analytics: r.resolve(AppDatesAnalytics.self)!,
+                router: r.resolve(AppDatesRouter.self)!
+            )
+        }
+        .inObjectScope(.weak)
         
         // MARK: Course
         container.register(CoursePersistenceProtocol.self) { r in
@@ -355,6 +403,7 @@ class ScreenAssembly: Assembly {
                 courseHelper: r.resolve(CourseDownloadHelperProtocol.self)!
             )
         }
+        .inObjectScope(.weak)
         container.register(
             CourseDownloadHelperProtocol.self
         ) { @MainActor r in
@@ -373,7 +422,17 @@ class ScreenAssembly: Assembly {
         
         container.register(
             CourseUnitViewModel.self
-        ) { @MainActor r, blockId, courseId, courseName, chapters, chapterIndex, sequentialIndex, verticalIndex in
+        ) {
+            @MainActor r,
+            blockId,
+            courseId,
+            courseName,
+            chapters,
+            chapterIndex,
+            sequentialIndex,
+            verticalIndex,
+            showVideoNavigation,
+            courseVideosStructure in
             CourseUnitViewModel(
                 lessonID: blockId,
                 courseID: courseId,
@@ -388,7 +447,9 @@ class ScreenAssembly: Assembly {
                 analytics: r.resolve(CourseAnalytics.self)!,
                 connectivity: r.resolve(ConnectivityProtocol.self)!,
                 storage: r.resolve(CourseStorage.self)!,
-                manager: r.resolve(DownloadManagerProtocol.self)!
+                manager: r.resolve(DownloadManagerProtocol.self)!,
+                showVideoNavigation: showVideoNavigation,
+                courseVideosStructure: courseVideosStructure
             )
         }
         
@@ -544,6 +605,15 @@ class ScreenAssembly: Assembly {
             )
         }
         
+        container.register(CourseProgressViewModel.self) { @MainActor r in
+            CourseProgressViewModel(
+                interactor: r.resolve(CourseInteractorProtocol.self)!,
+                router: r.resolve(CourseRouter.self)!,
+                analytics: r.resolve(CourseAnalytics.self)!,
+                connectivity: r.resolve(ConnectivityProtocol.self)!
+            )
+        }
+        
         // MARK: Discussion
         container.register(DiscussionRepositoryProtocol.self) { r in
             DiscussionRepository(
@@ -576,7 +646,7 @@ class ScreenAssembly: Assembly {
                 interactor: r.resolve(DiscussionInteractorProtocol.self)!,
                 storage: r.resolve(CoreStorage.self)!,
                 router: r.resolve(DiscussionRouter.self)!,
-                debounce: .searchDebounce
+                debounceInterval: 0.8
             )
         }
         
@@ -636,9 +706,60 @@ class ScreenAssembly: Assembly {
             )
         }
         
+        container.register(VideoThumbnailServiceProtocol.self) { _ in
+            VideoThumbnailService()
+        }
+        
         container.register(BackNavigationProtocol.self) { r in
             r.resolve(Router.self)!
         }
+        
+        // MARK: Downloads
+        
+        container.register(DownloadsPersistenceProtocol.self) { r in
+            DownloadsPersistence(container: r.resolve(DatabaseManager.self)!.getPersistentContainer())
+        }
+        
+        container.register(DownloadsRepositoryProtocol.self) { r in
+            DownloadsRepository(
+                api: r.resolve(API.self)!,
+                coreStorage: r.resolve(CoreStorage.self)!,
+                config: r.resolve(ConfigProtocol.self)!,
+                persistence: r.resolve(DownloadsPersistenceProtocol.self)!
+            )
+        }
+        
+        container.register(DownloadsInteractorProtocol.self) { r in
+            DownloadsInteractor(
+                repository: r.resolve(DownloadsRepositoryProtocol.self)!
+            )
+        }
+        
+        container.register(
+            DownloadsHelperProtocol.self
+        ) { @MainActor r in
+            DownloadsHelper(downloadManager: r.resolve(DownloadManagerProtocol.self)!)
+        }
+        
+        container.register(CourseStructureManagerProtocol.self) { r in
+            CourseInteractor(
+                repository: r.resolve(CourseRepositoryProtocol.self)!
+            )
+        }
+        
+        container.register(AppDownloadsViewModel.self) { @MainActor r in
+            AppDownloadsViewModel(
+                interactor: r.resolve(DownloadsInteractorProtocol.self)!,
+                courseManager: r.resolve(CourseStructureManagerProtocol.self)!,
+                downloadManager: r.resolve(DownloadManagerProtocol.self)!,
+                connectivity: r.resolve(ConnectivityProtocol.self)!,
+                downloadsHelper: r.resolve(DownloadsHelperProtocol.self)!,
+                router: r.resolve(DownloadsRouter.self)!,
+                storage: r.resolve(DownloadsStorage.self)!,
+                analytics: r.resolve(DownloadsAnalytics.self)!
+            )
+        }
+        .inObjectScope(.weak)
     }
 }
-// swiftlint:enable function_body_length closure_parameter_position
+// swiftlint:enable function_body_length closure_parameter_position type_body_length

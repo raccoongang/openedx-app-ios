@@ -2,7 +2,7 @@
 //  SettingsViewModel.swift
 //  Profile
 //
-//  Created by  Stepanok Ivan on 16.03.2023.
+//  Created by  Stepanok Ivan on 16.03.2023.
 //
 
 import Foundation
@@ -11,11 +11,12 @@ import SwiftUI
 import Combine
 
 @MainActor
-public final class SettingsViewModel: ObservableObject {
+@Observable
+public final class SettingsViewModel {
     
-    @Published private(set) var isShowProgress = false
-    @Published var showError: Bool = false
-    @Published var wifiOnly: Bool {
+    private(set) var isShowProgress = false
+    var showError: Bool = false
+    var wifiOnly: Bool {
         willSet {
             if newValue != wifiOnly {
                 userSettings.wifiOnly = newValue
@@ -26,7 +27,7 @@ public final class SettingsViewModel: ObservableObject {
         }
     }
     
-    @Published var selectedQuality: StreamingQuality {
+    var selectedQuality: StreamingQuality {
         willSet {
             if newValue != selectedQuality {
                 userSettings.streamingQuality = newValue
@@ -53,9 +54,9 @@ public final class SettingsViewModel: ObservableObject {
         case updateRequired
     }
     
-    @Published var versionState: VersionState = .actual
-    @Published var currentVersion: String = ""
-    @Published var latestVersion: String = ""
+    var versionState: VersionState = .actual
+    var currentVersion: String = ""
+    var latestVersion: String = ""
 
     var errorMessage: String? {
         didSet {
@@ -65,10 +66,8 @@ public final class SettingsViewModel: ObservableObject {
         }
     }
     
-    @Published private(set) var userSettings: UserSettings
+    private(set) var userSettings: UserSettings
     
-    private var cancellables = Set<AnyCancellable>()
-
     private let interactor: ProfileInteractorProtocol
     private let downloadManager: DownloadManagerProtocol
     let router: ProfileRouter
@@ -77,6 +76,7 @@ public final class SettingsViewModel: ObservableObject {
     let config: ConfigProtocol
     let corePersistence: CorePersistenceProtocol
     let connectivity: ConnectivityProtocol
+    private var coreStorage: CoreStorage
     
     public init(
         interactor: ProfileInteractorProtocol,
@@ -86,7 +86,8 @@ public final class SettingsViewModel: ObservableObject {
         coreAnalytics: CoreAnalytics,
         config: ConfigProtocol,
         corePersistence: CorePersistenceProtocol,
-        connectivity: ConnectivityProtocol
+        connectivity: ConnectivityProtocol,
+        coreStorage: CoreStorage
     ) {
         self.interactor = interactor
         self.downloadManager = downloadManager
@@ -96,6 +97,7 @@ public final class SettingsViewModel: ObservableObject {
         self.config = config
         self.corePersistence = corePersistence
         self.connectivity = connectivity
+        self.coreStorage = coreStorage
         
         let userSettings = interactor.getSettings()
         self.userSettings = userSettings
@@ -106,19 +108,37 @@ public final class SettingsViewModel: ObservableObject {
     
     func generateVersionState() {
         guard let info = Bundle.main.infoDictionary else { return }
+        
         guard let currentVersion = info["CFBundleShortVersionString"] as? String else { return }
         self.currentVersion = currentVersion
-        NotificationCenter.default.publisher(for: .onActualVersionReceived)
-            .sink { [weak self] notification in
-                guard let latestVersion = notification.object as? String else { return }
-                Task {
-                    self?.latestVersion = latestVersion
-                    
-                    if latestVersion != currentVersion {
-                        self?.versionState = .updateNeeded
-                    }
-                }
-            }.store(in: &cancellables)
+        
+        guard !coreStorage.updateAppRequired else {
+            self.versionState = .updateRequired
+            return
+        }
+        
+        if let latestVersion = coreStorage.latestAvailableAppVersion {
+            self.latestVersion = latestVersion
+            
+            if isVersion(latestVersion, greaterThan: currentVersion) {
+                self.versionState = .updateNeeded
+            }
+        }
+    }
+    
+    func isVersion(_ version1: String, greaterThan version2: String) -> Bool {
+        let components1 = version1.split(separator: ".").compactMap { Int($0) }
+        let components2 = version2.split(separator: ".").compactMap { Int($0) }
+
+        let maxCount = max(components1.count, components2.count)
+        let padded1 = components1 + Array(repeating: 0, count: maxCount - components1.count)
+        let padded2 = components2 + Array(repeating: 0, count: maxCount - components2.count)
+
+        for (v1, v2) in zip(padded1, padded2) {
+            if v1 > v2 { return true }
+            if v1 < v2 { return false }
+        }
+        return false
     }
     
     func contactSupport() -> URL? {

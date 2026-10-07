@@ -19,11 +19,14 @@ public enum MainTab {
     case discovery
     case dashboard
     case programs
+    case dates
+    case downloads
     case profile
 }
 
 @MainActor
-final class MainScreenViewModel: ObservableObject {
+@Observable
+final class MainScreenViewModel {
     
     private let analytics: MainScreenAnalytics
     let config: ConfigProtocol
@@ -37,8 +40,10 @@ final class MainScreenViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var postLoginData: PostLoginData?
     
-    @Published var selection: MainTab = .dashboard
-    @Published var showRegisterBanner: Bool = false
+    var selection: MainTab = .dashboard
+    var showRegisterBanner: Bool = false
+    var disableAllTabs = false
+    var updateAvailable = false
 
     init(analytics: MainScreenAnalytics,
          config: ConfigProtocol,
@@ -103,8 +108,15 @@ final class MainScreenViewModel: ObservableObject {
         analytics.mainProgramsTabClicked()
     }
     
+    func trackMainDownloadsTabClicked() {
+        analytics.mainDownloadsTabClicked()
+    }
+    
     func trackMainProfileTabClicked() {
         analytics.mainProfileTabClicked()
+    }
+    func trackMainDatesScreenClicked() {
+        analytics.mainDatesScreenViewed()
     }
     
     @MainActor

@@ -11,11 +11,15 @@ import SwiftUI
 import WebKit
 
 @MainActor
-public final class DiscoveryWebviewViewModel: ObservableObject {
-    @Published var courseDetails: CourseDetails?
-    @Published private(set) var showProgress = false
-    @Published var showError: Bool = false
-    @Published var webViewError: Bool = false
+@Observable
+public final class DiscoveryWebviewViewModel {
+
+    var courseDetails: CourseDetails?
+    private(set) var showProgress = false
+    var showError: Bool = false
+    var webViewError: Bool = false
+    var searchQuery: String = ""
+    var isLoading: Bool = true
 
     var errorMessage: String? {
         didSet {
@@ -150,7 +154,7 @@ extension DiscoveryWebviewViewModel: WebViewNavigationDelegate {
                         screen: self?.sourceScreen.value ?? "",
                         action: "cancel"
                     )
-                }, okTapped: { [weak self] in
+                }, firstButtonTapped: { [weak self] in
                     UIApplication.shared.open(url, options: [:])
                     self?.analytics.externalLinkOpenAction(
                         url: url.absoluteString,

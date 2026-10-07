@@ -9,7 +9,7 @@ import Foundation
 import Core
 import UIKit
 
-//sourcery: AutoMockable
+/// @mockable
 public protocol ProfileStorage: Sendable {
     var userProfile: DataLayer.UserProfile? {get set}
     var useRelativeDates: Bool {get set}
@@ -22,10 +22,9 @@ public protocol ProfileStorage: Sendable {
 }
 
 #if DEBUG
-public final class ProfileStorageMock: ProfileStorage, @unchecked Sendable {
-  
-    public var userProfile: DataLayer.UserProfile?
+public final class ProfileStoragePreview: ProfileStorage, @unchecked Sendable {
     public var useRelativeDates: Bool = true
+    public var userProfile: DataLayer.UserProfile?
     public var calendarSettings: CalendarSettings?
     public var hideInactiveCourses: Bool?
     public var lastLoginUsername: String?
@@ -35,4 +34,5 @@ public final class ProfileStorageMock: ProfileStorage, @unchecked Sendable {
     
     public init() {}
 }
+
 #endif

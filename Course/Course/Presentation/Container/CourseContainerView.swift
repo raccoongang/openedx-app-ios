@@ -14,11 +14,12 @@ import Theme
 
 public struct CourseContainerView: View {
     
-    @ObservedObject
-    public var viewModel: CourseContainerViewModel
-    @ObservedObject
+    @Bindable public var viewModel: CourseContainerViewModel
     public var courseDatesViewModel: CourseDatesViewModel
+    public var courseProgressViewModel: CourseProgressViewModel
+    
     @State private var isAnimatingForTap: Bool = false
+    @State private var discussionTopicsViewModel: DiscussionTopicsViewModel
     public var courseID: String
     private var title: String
     @State private var ignoreOffset: Bool = false
@@ -29,6 +30,7 @@ public struct CourseContainerView: View {
     @Environment(\.isHorizontal) private var isHorizontal
     @Namespace private var animationNamespace
     private var idiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
+    private let discussionRouter: DiscussionRouter
     
     private let coordinateBoundaryLower: CGFloat = -115
     private let courseRawImage: String?
@@ -53,11 +55,20 @@ public struct CourseContainerView: View {
     public init(
         viewModel: CourseContainerViewModel,
         courseDatesViewModel: CourseDatesViewModel,
+        courseProgressViewModel: CourseProgressViewModel,
         courseID: String,
         title: String,
         courseRawImage: String?
     ) {
+        let resolvedDiscussionTopicsViewModel = Container.shared.resolve(
+            DiscussionTopicsViewModel.self,
+            argument: title
+        )!
+        let resolvedDiscussionRouter = Container.shared.resolve(DiscussionRouter.self)!
+        self._discussionTopicsViewModel = State(initialValue: resolvedDiscussionTopicsViewModel)
         self.viewModel = viewModel
+        self.courseDatesViewModel = courseDatesViewModel
+        self.courseProgressViewModel = courseProgressViewModel
         Task {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask {
@@ -70,8 +81,8 @@ public struct CourseContainerView: View {
         }
         self.courseID = courseID
         self.title = title
-        self.courseDatesViewModel = courseDatesViewModel
         self.courseRawImage = courseRawImage
+        self.discussionRouter = resolvedDiscussionRouter
     }
     
     public var body: some View {
@@ -123,7 +134,9 @@ public struct CourseContainerView: View {
                                ? (collapsed ? coordinateBoundaryLower : coordinate)
                                : (collapsed ? coordinateBoundaryLower : .zero))
                         )
+
                         backButton(containerWidth: proxy.size.width)
+
                     }
                 }
                 .ignoresSafeArea(edges: idiom == .pad ? .leading : .top)
@@ -190,16 +203,36 @@ public struct CourseContainerView: View {
             ForEach(CourseTab.allCases) { tab in
                 switch tab {
                 case .course:
-                    CourseOutlineView(
+                    VStack {
+                        CourseOutlineAndProgressView(
+                            viewModelContainer: viewModel,
+                            viewModelProgress: courseProgressViewModel,
+                            title: title,
+                            courseID: courseID,
+                            isVideo: false,
+                            selection: $viewModel.selection,
+                            coordinate: $coordinate,
+                            collapsed: $collapsed,
+                            viewHeight: $viewHeight,
+                            dateTabIndex: CourseTab.dates.rawValue,
+                            connectivity: viewModel.connectivity
+                        )
+                    }
+                    .tabItem {
+                        tab.image
+                        Text(tab.title)
+                    }
+                    .tag(tab)
+                    .accentColor(Theme.Colors.accentColor)
+                case .content:
+                    CourseContentView(
                         viewModel: viewModel,
                         title: title,
                         courseID: courseID,
-                        isVideo: false,
                         selection: $viewModel.selection,
                         coordinate: $coordinate,
                         collapsed: $collapsed,
-                        viewHeight: $viewHeight,
-                        dateTabIndex: CourseTab.dates.rawValue
+                        viewHeight: $viewHeight
                     )
                     .tabItem {
                         tab.image
@@ -207,17 +240,15 @@ public struct CourseContainerView: View {
                     }
                     .tag(tab)
                     .accentColor(Theme.Colors.accentColor)
-                case .videos:
-                    CourseOutlineView(
-                        viewModel: viewModel,
-                        title: title,
+                case .progress:
+                    CourseProgressScreenView(
                         courseID: courseID,
-                        isVideo: true,
-                        selection: $viewModel.selection,
                         coordinate: $coordinate,
                         collapsed: $collapsed,
                         viewHeight: $viewHeight,
-                        dateTabIndex: CourseTab.dates.rawValue
+                        viewModel: courseProgressViewModel,
+                        connectivity: viewModel.connectivity,
+                        courseStructure: viewModel.courseStructure
                     )
                     .tabItem {
                         tab.image
@@ -259,9 +290,8 @@ public struct CourseContainerView: View {
                         coordinate: $coordinate,
                         collapsed: $collapsed,
                         viewHeight: $viewHeight,
-                        viewModel: Container.shared.resolve(DiscussionTopicsViewModel.self,
-                                                            argument: title)!,
-                        router: Container.shared.resolve(DiscussionRouter.self)!
+                        viewModel: discussionTopicsViewModel,
+                        router: discussionRouter
                     )
                     .tabItem {
                         tab.image
@@ -357,42 +387,47 @@ public struct CourseContainerView: View {
 }
 
 #if DEBUG
-struct CourseScreensView_Previews: PreviewProvider {
-    static var previews: some View {
-        CourseContainerView(
-            viewModel: CourseContainerViewModel(
-                interactor: CourseInteractor.mock,
-                authInteractor: AuthInteractor.mock,
-                router: CourseRouterMock(),
-                analytics: CourseAnalyticsMock(),
-                config: ConfigMock(),
-                connectivity: Connectivity(),
-                manager: DownloadManagerMock(),
-                storage: CourseStorageMock(),
-                isActive: true,
-                courseStart: nil,
-                courseEnd: nil,
-                enrollmentStart: nil,
-                enrollmentEnd: nil,
-                lastVisitedBlockID: nil,
-                coreAnalytics: CoreAnalyticsMock(),
-                courseHelper: CourseDownloadHelper(courseStructure: nil, manager: DownloadManagerMock())
-            ),
-            courseDatesViewModel: CourseDatesViewModel(
-                interactor: CourseInteractor.mock,
-                router: CourseRouterMock(),
-                cssInjector: CSSInjectorMock(),
-                connectivity: Connectivity(),
-                config: ConfigMock(),
-                courseID: "1",
-                courseName: "a",
-                analytics: CourseAnalyticsMock(),
-                calendarManager: CalendarManagerMock()
-            ),
-            courseID: "",
-            title: "Title of Course",
-            courseRawImage: nil
-        )
-    }
+#Preview {
+    CourseContainerView(
+        viewModel: CourseContainerViewModel(
+            interactor: CourseInteractor.mock,
+            authInteractor: AuthInteractor.mock,
+            router: CourseRouterMock(),
+            analytics: CourseAnalyticsMock(),
+            config: ConfigMock(),
+            connectivity: Connectivity(config: ConfigMock()),
+            manager: DownloadManagerMock(),
+            storage: CourseStorageMock(),
+            isActive: true,
+            courseStart: nil,
+            courseEnd: nil,
+            enrollmentStart: nil,
+            enrollmentEnd: nil,
+            lastVisitedBlockID: nil,
+            coreAnalytics: CoreAnalyticsMock(),
+            courseHelper: CourseDownloadHelper(courseStructure: nil, manager: DownloadManagerMock())
+        ),
+        courseDatesViewModel: CourseDatesViewModel(
+            interactor: CourseInteractor.mock,
+            router: CourseRouterMock(),
+            cssInjector: CSSInjectorMock(),
+            connectivity: Connectivity(config: ConfigMock()),
+            config: ConfigMock(),
+            courseID: "1",
+            courseName: "a",
+            analytics: CourseAnalyticsMock(),
+            calendarManager: CalendarManagerMock()
+        ),
+        courseProgressViewModel: CourseProgressViewModel(
+            interactor: CourseInteractor.mock,
+            router: CourseRouterMock(),
+            analytics: CourseAnalyticsMock(),
+            connectivity: Connectivity(config: ConfigMock()),
+        ),
+        courseID: "",
+        title: "Title of Course",
+        courseRawImage: nil
+    )
+    .loadFonts()
 }
 #endif

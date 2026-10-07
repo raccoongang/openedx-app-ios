@@ -15,19 +15,23 @@ import Course
 import Discussion
 import Discovery
 import Dashboard
+import Downloads
 import Profile
 import WhatsNew
 import Combine
+import AppDates
 
 // swiftlint:disable type_body_length file_length
 public class Router: AuthorizationRouter,
                      WhatsNewRouter,
                      DiscoveryRouter,
                      ProfileRouter,
+                     DownloadsRouter,
                      DashboardRouter,
                      CourseRouter,
                      DiscussionRouter,
-                     BackNavigationProtocol {
+                     BackNavigationProtocol,
+                     AppDatesRouter {
 
     public var container: Container
 
@@ -106,6 +110,9 @@ public class Router: AuthorizationRouter,
             let controller = UIHostingController(rootView: MainScreenView(viewModel: viewModel))
             navigationController.viewControllers = [controller]
             navigationController.setViewControllers([controller], animated: true)
+            if case .courseDetail = sourceScreen {
+                showTabScreen(tab: .discovery)
+            }
         }
     }
     
@@ -162,7 +169,7 @@ public class Router: AuthorizationRouter,
         alertMessage: String,
         positiveAction: String,
         onCloseTapped: @escaping () -> Void,
-        okTapped: @escaping () -> Void,
+        firstButtonTapped: @escaping () -> Void,
         type: AlertViewType
     ) {
         presentView(
@@ -174,7 +181,7 @@ public class Router: AuthorizationRouter,
                 alertMessage: alertMessage,
                 positiveAction: positiveAction,
                 onCloseTapped: onCloseTapped,
-                okTapped: okTapped,
+                firstButtonTapped: firstButtonTapped,
                 type: type
             )
         }
@@ -187,7 +194,7 @@ public class Router: AuthorizationRouter,
         action: String,
         image: Image,
         onCloseTapped: @escaping () -> Void,
-        okTapped: @escaping () -> Void,
+        firstButtonTapped: @escaping () -> Void,
         nextSectionTapped: @escaping () -> Void
     ) {
         presentView(
@@ -201,7 +208,7 @@ public class Router: AuthorizationRouter,
                 mainAction: action,
                 image: image,
                 onCloseTapped: onCloseTapped,
-                okTapped: okTapped,
+                firstButtonTapped: firstButtonTapped,
                 nextSectionTapped: { nextSectionTapped() }
             )
         }
@@ -316,7 +323,7 @@ public class Router: AuthorizationRouter,
     }
     
     public func showDiscussionsSearch(courseID: String, isBlackedOut: Bool) {
-        let viewModel = Container.shared.resolve(DiscussionSearchTopicsViewModel<RunLoop>.self, argument: courseID)!
+        let viewModel = Container.shared.resolve(DiscussionSearchTopicsViewModel.self, argument: courseID)!
 
         let view = DiscussionSearchTopicsView(viewModel: viewModel)
         
@@ -432,9 +439,12 @@ public class Router: AuthorizationRouter,
             title
         )!
         
+        let progressVm = Container.shared.resolve(CourseProgressViewModel.self)!
+        
         let screensView = CourseContainerView(
             viewModel: vm,
             courseDatesViewModel: datesVm,
+            courseProgressViewModel: progressVm,
             courseID: courseID,
             title: title,
             courseRawImage: courseRawImage
@@ -475,7 +485,9 @@ public class Router: AuthorizationRouter,
         verticalIndex: Int,
         chapters: [CourseChapter],
         chapterIndex: Int,
-        sequentialIndex: Int
+        sequentialIndex: Int,
+        showVideoNavigation: Bool = false,
+        courseVideoStructure: CourseStructure? = nil
     ) {
         let controller = getUnitController(
             courseName: courseName,
@@ -484,7 +496,9 @@ public class Router: AuthorizationRouter,
             verticalIndex: verticalIndex,
             chapters: chapters,
             chapterIndex: chapterIndex,
-            sequentialIndex: sequentialIndex
+            sequentialIndex: sequentialIndex,
+            showVideoNavigation: showVideoNavigation,
+            courseVideoStructure: courseVideoStructure
         )
         navigationController.pushViewController(controller, animated: true)
     }
@@ -496,7 +510,9 @@ public class Router: AuthorizationRouter,
         verticalIndex: Int,
         chapters: [CourseChapter],
         chapterIndex: Int,
-        sequentialIndex: Int
+        sequentialIndex: Int,
+        showVideoNavigation: Bool = false,
+        courseVideoStructure: CourseStructure? = nil
     ) -> UIHostingController<CourseUnitView> {
         let viewModel = Container.shared.resolve(
             CourseUnitViewModel.self,
@@ -506,14 +522,17 @@ public class Router: AuthorizationRouter,
             chapters,
             chapterIndex,
             sequentialIndex,
-            verticalIndex
+            verticalIndex,
+            showVideoNavigation,
+            courseVideoStructure
         )!
         
         let config = Container.shared.resolve(ConfigProtocol.self)
         let isDropdownActive = config?.uiComponents.courseDropDownNavigationEnabled ?? false
 
         let view = CourseUnitView(viewModel: viewModel, isDropdownActive: isDropdownActive)
-        return UIHostingController(rootView: view)
+        let controller = UIHostingController(rootView: view)
+        return controller
     }
     
     public func showCourseComponent(
@@ -577,7 +596,7 @@ public class Router: AuthorizationRouter,
             onCloseTapped: {
                 self.dismiss(animated: true)
             },
-            okTapped: {
+            firstButtonTapped: {
                 self.dismiss(animated: true)
                 if UIApplication.shared.canOpenURL(blockURL) {
                     UIApplication.shared.open(blockURL, options: [:], completionHandler: nil)
@@ -595,9 +614,10 @@ public class Router: AuthorizationRouter,
         chapters: [CourseChapter],
         chapterIndex: Int,
         sequentialIndex: Int,
-        animated: Bool
+        animated: Bool,
+        showVideoNavigation: Bool,
+        courseVideoStructure: CourseStructure?
     ) {
-
         let controllerUnit = getUnitController(
             courseName: courseName,
             blockId: blockId,
@@ -605,14 +625,18 @@ public class Router: AuthorizationRouter,
             verticalIndex: verticalIndex,
             chapters: chapters,
             chapterIndex: chapterIndex,
-            sequentialIndex: sequentialIndex
+            sequentialIndex: sequentialIndex,
+            showVideoNavigation: showVideoNavigation,
+            courseVideoStructure: courseVideoStructure
         )
         
         var controllers = navigationController.viewControllers
         let config = Container.shared.resolve(ConfigProtocol.self)!
         let courseDropDownNavigationEnabled = config.uiComponents.courseDropDownNavigationEnabled
 
-        if courseDropDownNavigationEnabled || currentCourseTabSelection == CourseTab.dates.rawValue {
+        if courseDropDownNavigationEnabled
+            || currentCourseTabSelection == CourseTab.dates.rawValue
+            || showVideoNavigation {
             controllers.removeLast(1)
             controllers.append(contentsOf: [controllerUnit])
         } else {

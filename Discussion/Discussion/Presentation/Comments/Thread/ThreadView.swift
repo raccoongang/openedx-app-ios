@@ -16,9 +16,8 @@ public struct ThreadView: View {
     public let thread: UserThread
     private var onBackTapped: (() -> Void) = {}
     
-    @ObservedObject private var viewModel: ThreadViewModel
+    private var viewModel: ThreadViewModel
     @Environment(\.colorScheme) var colorScheme
-    @State private var isShowProgress: Bool = true
     @State private var commentText: String = ""
     @State private var commentSize: CGFloat = .init(64)
     
@@ -31,7 +30,13 @@ public struct ThreadView: View {
     
     public var body: some View {
         GeometryReader { proxy in
-            ZStack(alignment: .top) {
+            ZStack(alignment: .center) {
+                
+                if viewModel.postComments == nil {
+                    ProgressBar(size: 40, lineWidth: 8)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityIdentifier("progress_bar")
+                }
                 
                 // MARK: - Page Body
                 ScrollViewReader { scroll in
@@ -160,11 +165,6 @@ public struct ThreadView: View {
                                         Spacer(minLength: 84)
                                     }
                                 }
-                                .onRightSwipeGesture {
-                                    viewModel.router.back()
-                                    onBackTapped()
-                                    viewModel.sendUpdateUnreadState()
-                                }
                                 .frameLimit(width: proxy.size.width)
                             }
                             .refreshable {
@@ -209,6 +209,11 @@ public struct ThreadView: View {
                     }.scrollAvoidKeyboard(dismissKeyboardByTap: true)
                 }
                 .padding(.top, 8)
+                // MARK: - Send Progress
+                if viewModel.isShowProgress {
+                    ProgressBar(size: 40, lineWidth: 8)
+                }
+                
                 // MARK: - Error Alert
                 if viewModel.showError {
                     VStack {
@@ -254,7 +259,22 @@ public struct ThreadView: View {
                         BackNavigationButton(color: Theme.Colors.accentColor) {
                             viewModel.router.back()
                         }
-                        .offset(x: -8, y: -1.5)
+                        .offset(
+                            x: {
+                                if #available(iOS 26.0, *) {
+                                    return 6
+                                } else {
+                                    return -8
+                                }
+                            }(),
+                            y: {
+                                if #available(iOS 26.0, *) {
+                                    return 1
+                                } else {
+                                    return -1.5
+                                }
+                            }()
+                        )
                     }
                 )
             }
@@ -266,6 +286,7 @@ public struct ThreadView: View {
             .onDisappear {
                 onBackTapped()
                 viewModel.sendUpdateUnreadState()
+                viewModel.cleanup()
             }
             .edgesIgnoringSafeArea(.bottom)
             .background(
@@ -302,11 +323,11 @@ struct CommentsView_Previews: PreviewProvider {
                                     numPages: 3)
         let vm = ThreadViewModel(
             interactor: DiscussionInteractor.mock,
-            router: DiscussionRouterMock(),
+            router: DiscussionRouterPreviewMock(),
             config: ConfigMock(),
             storage: CoreStorageMock(),
             postStateSubject: .init(nil),
-            analytics: DiscussionAnalyticsMock()
+            analytics: DiscussionAnalyticsPreviewMock()
         )
         
         ThreadView(thread: userThread, viewModel: vm)

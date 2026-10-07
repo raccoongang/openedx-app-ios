@@ -16,11 +16,11 @@ import GoogleSignIn
 import MSAL
 
 @MainActor
-public class SignInViewModel: ObservableObject {
+@Observable public class SignInViewModel {
 
-    @Published private(set) var isShowProgress = false
-    @Published private(set) var showError: Bool = false
-    @Published private(set) var showAlert: Bool = false
+    private(set) var isShowProgress = false
+    private(set) var showError: Bool = false
+    private(set) var showAlert: Bool = false
     let sourceScreen: LogistrationSourceScreen
     
     var errorMessage: String? {
@@ -162,6 +162,8 @@ public class SignInViewModel: ObservableObject {
             errorMessage = CoreLocalization.Error.invalidCredentials
         } else if error.isInternetError {
             errorMessage = CoreLocalization.Error.slowOrNoInternetConnection
+        } else if error.isUpdateRequeiredError {
+            router.showUpdateRequiredView(showAccountLink: false)
         } else {
             errorMessage = CoreLocalization.Error.unknownError
         }

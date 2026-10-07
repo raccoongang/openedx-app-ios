@@ -10,12 +10,13 @@ import Core
 import SwiftUI
 
 @MainActor
-public final class ProfileViewModel: ObservableObject {
+@Observable
+public final class ProfileViewModel {
 
-    @Published public var userModel: UserProfile?
-    @Published public var updatedAvatar: UIImage?
-    @Published private(set) var isShowProgress = false
-    @Published var showError: Bool = false
+    public var userModel: UserProfile?
+    public var updatedAvatar: UIImage?
+    private(set) var isShowProgress = false
+    var showError: Bool = false
     var errorMessage: String? {
         didSet {
             withAnimation {
@@ -62,6 +63,8 @@ public final class ProfileViewModel: ObservableObject {
             isShowProgress = false
             if error.isInternetError {
                 errorMessage = CoreLocalization.Error.slowOrNoInternetConnection
+            } else if error.isUpdateRequeiredError {
+                return
             } else {
                 errorMessage = CoreLocalization.Error.unknownError
             }

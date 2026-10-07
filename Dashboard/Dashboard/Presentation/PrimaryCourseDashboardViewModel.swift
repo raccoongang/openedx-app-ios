@@ -2,23 +2,25 @@
 //  PrimaryCourseDashboardViewModel.swift
 //  Dashboard
 //
-//  Created by  Stepanok Ivan on 16.04.2024.
+//  Created by  Stepanok Ivan on 16.04.2024.
 //
 
 import Foundation
 import Core
 import SwiftUI
-import Combine
 
 @MainActor
-public class PrimaryCourseDashboardViewModel: ObservableObject {
-    
+@Observable
+public class PrimaryCourseDashboardViewModel {
+
     var nextPage = 1
     var totalPages = 1
-    @Published public private(set) var fetchInProgress = true
-    @Published var enrollments: PrimaryEnrollment?
-    @Published var showError: Bool = false
-    @Published var updateNeeded: Bool = false
+    public private(set) var fetchInProgress = true
+    var enrollments: PrimaryEnrollment?
+    var showError: Bool = false
+    var updateNeeded: Bool = false
+    private var updateShowedOnce: Bool = false
+
     var errorMessage: String? {
         didSet {
             withAnimation {
@@ -26,13 +28,14 @@ public class PrimaryCourseDashboardViewModel: ObservableObject {
             }
         }
     }
-    
+
     let connectivity: ConnectivityProtocol
     private let interactor: DashboardInteractorProtocol
     let analytics: DashboardAnalytics
     let config: ConfigProtocol
-    let storage: CoreStorage
-    private var cancellables = Set<AnyCancellable>()
+    var storage: CoreStorage
+    let router: DashboardRouter
+    @ObservationIgnored nonisolated(unsafe) private var observers: [NSObjectProtocol] = []
 
     private let ipadPageSize = 7
     private let iphonePageSize = 5
@@ -42,47 +45,82 @@ public class PrimaryCourseDashboardViewModel: ObservableObject {
         connectivity: ConnectivityProtocol,
         analytics: DashboardAnalytics,
         config: ConfigProtocol,
-        storage: CoreStorage
+        storage: CoreStorage,
+        router: DashboardRouter
     ) {
         self.interactor = interactor
         self.connectivity = connectivity
         self.analytics = analytics
         self.config = config
         self.storage = storage
-        
-        let enrollmentPublisher = NotificationCenter.default.publisher(for: .onCourseEnrolled)
-        let completionPublisher = NotificationCenter.default.publisher(for: .onblockCompletionRequested)
-        let refreshEnrollmentsPublisher = NotificationCenter.default.publisher(for: .refreshEnrollments)
-        
-        enrollmentPublisher
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                Task {
-                    await self.getEnrollments()
-                }
+        self.router = router
+
+        let enrollmentObserver = NotificationCenter.default.addObserver(
+            forName: .onCourseEnrolled,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task {
+                await self.getEnrollments()
             }
-            .store(in: &cancellables)
-        
-        completionPublisher
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                DispatchQueue.main.async {
-                    self.updateEnrollmentsIfNeeded()
-                }
+        }
+
+        let completionObserver = NotificationCenter.default.addObserver(
+            forName: .onblockCompletionRequested,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task { @MainActor in
+                self.updateEnrollmentsIfNeeded()
             }
-            .store(in: &cancellables)
-        
-        refreshEnrollmentsPublisher
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                Task {
-                    await self.getEnrollments()
-                }
+        }
+
+        let refreshObserver = NotificationCenter.default.addObserver(
+            forName: .refreshEnrollments,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            Task {
+                await self.getEnrollments()
             }
-            .store(in: &cancellables)
+        }
+
+        observers.append(contentsOf: [enrollmentObserver, completionObserver, refreshObserver])
     }
     
-    private func updateEnrollmentsIfNeeded() {
+    func setupNotifications() {
+        let versionObserver = NotificationCenter.default.addObserver(
+            forName: .onActualVersionReceived,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            let latestVersion = notification.object as? String
+            Task { @MainActor in
+                if let latestVersion = latestVersion {
+                    // Save the latest version to storage
+                    self.storage.latestAvailableAppVersion = latestVersion
+
+                    if let info = Bundle.main.infoDictionary {
+                        guard let currentVersion = info["CFBundleShortVersionString"] as? String else { return }
+                        if currentVersion.isAppVersionGreater(than: latestVersion) == false
+                            && currentVersion != latestVersion {
+                            if self.updateShowedOnce == false {
+                                self.router.showUpdateRecomendedView()
+                                self.updateShowedOnce = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        observers.append(versionObserver)
+    }
+    
+    func updateEnrollmentsIfNeeded() {
         guard updateNeeded else { return }
         Task {
             await getEnrollments()
@@ -106,6 +144,9 @@ public class PrimaryCourseDashboardViewModel: ObservableObject {
             fetchInProgress = false
             if error is NoCachedDataError {
                 errorMessage = CoreLocalization.Error.noCachedData
+            } else if error.isUpdateRequeiredError {
+                storage.updateAppRequired = true
+                self.router.showUpdateRequiredView(showAccountLink: true)
             } else {
                 errorMessage = CoreLocalization.Error.unknownError
             }
@@ -114,5 +155,9 @@ public class PrimaryCourseDashboardViewModel: ObservableObject {
     
     func trackDashboardCourseClicked(courseID: String, courseName: String) {
         analytics.dashboardCourseClicked(courseID: courseID, courseName: courseName)
+    }
+
+    deinit {
+        observers.forEach { NotificationCenter.default.removeObserver($0) }
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-//sourcery: AutoMockable
+/// @mockable
 public protocol ConfigProtocol: Sendable {
     var baseURL: URL { get }
     var baseSSOURL: URL { get }
@@ -33,6 +33,7 @@ public protocol ConfigProtocol: Sendable {
     var braze: BrazeConfig { get }
     var branch: BranchConfig { get }
     var program: DiscoveryConfig { get }
+    var experimentalFeatures: ExperimentalFeaturesConfig { get }
     var URIScheme: String { get }
 }
 
@@ -202,6 +203,7 @@ public class ConfigMock: Config, @unchecked Sendable {
         "PLATFORM_NAME": "OpenEdx",
         "TOKEN_TYPE": "JWT",
         "WHATS_NEW_ENABLED": false,
+        "APP_LEVEL_DATES_ENABLED": false,
         "AGREEMENT_URLS": [
             "PRIVACY_POLICY_URL": "https://www.example.com/privacy",
             "TOS_URL": "https://www.example.com/tos",
@@ -224,6 +226,11 @@ public class ConfigMock: Config, @unchecked Sendable {
         ],
         "APPLE_SIGNIN": [
             "ENABLED": true
+        ],
+        "EXPERIMENTAL_FEATURES": [
+            "APP_LEVEL_DOWNLOADS": [
+                "ENABLED": false
+            ]
         ]
     ]
     

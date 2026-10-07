@@ -24,9 +24,10 @@ public protocol WebViewNavigationDelegate: AnyObject {
 
 public struct WebView: UIViewRepresentable {
     
-    public class ViewModel: ObservableObject {
-        
-        @Published var url: String
+    @Observable
+    public class ViewModel {
+
+        var url: String
         let baseURL: String
         let injections: [WebviewInjection]?
         var openFile: (String) -> Void
@@ -44,7 +45,7 @@ public struct WebView: UIViewRepresentable {
         }
     }
     
-    @ObservedObject var viewModel: ViewModel
+    var viewModel: ViewModel
     @Binding public var isLoading: Bool
     var webViewNavDelegate: WebViewNavigationDelegate?
     let connectivity: ConnectivityProtocol
@@ -361,17 +362,5 @@ extension WKWebView {
     func clear() {
         configuration.userContentController.removeAllUserScripts()
         configuration.userContentController.removeAllScriptMessageHandlers()
-    }
-}
-
-extension Array where Element == WebviewInjection {
-    
-    @MainActor
-    func handle(message: WKScriptMessage) {
-        let messages = compactMap { $0.messages }
-            .flatMap { $0 }
-        if let currentMessage = messages.first(where: { $0.name == message.name }) {
-            currentMessage.handler(message.body, message.webView)
-        }
     }
 }
