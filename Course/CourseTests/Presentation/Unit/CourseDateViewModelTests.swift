@@ -529,4 +529,19 @@ final class CourseDateViewModelTests: XCTestCase {
         XCTAssertEqual(BlockStatus.status(of: "assignment-due-date"), .assignment, "Incorrect mapping for 'assignment-due-date'")
         XCTAssertEqual(BlockStatus.status(of: ""), .event, "Incorrect mapping for 'event'")
     }
+
+    func testDateWithFractionalSecondsAfterNoon_isParsedExactly() {
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(identifier: "UTC")!
+
+        let date = Date(iso8601: "2026-07-30T16:46:03.445838Z")
+        let components = utc.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+
+        XCTAssertEqual(components.year, 2026)
+        XCTAssertEqual(components.month, 7)
+        XCTAssertEqual(components.day, 30)
+        XCTAssertEqual(components.hour, 16)
+        XCTAssertEqual(components.minute, 46)
+        XCTAssertEqual(components.second, 3)
+    }
 }
