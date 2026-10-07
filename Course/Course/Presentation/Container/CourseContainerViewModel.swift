@@ -312,7 +312,10 @@ extension CourseTab {
 
         do {
             try await interactor.shiftDueDates(courseID: courseID)
-            NotificationCenter.default.post(name: .shiftCourseDates, object: courseID)
+            NotificationCenter.default.post(
+                name: .shiftCourseDates,
+                object: (courseID, courseStructure?.displayName ?? "")
+            )
             isShowProgress = false
             isShowRefresh = false
 
@@ -1775,7 +1778,9 @@ extension CourseTab {
 
 extension CourseContainerViewModel {
     @objc private func handleShiftDueDates(_ notification: Notification) {
-        if let courseID = notification.object as? String {
+        // Every sender posts `(courseID, courseName)`; calendar sync needs the name too.
+        if let (courseID, _) = notification.object as? (String, String),
+           courseID == courseStructure?.id {
             Task {
                 await withTaskGroup(of: Void.self) { group in
                     group.addTask {

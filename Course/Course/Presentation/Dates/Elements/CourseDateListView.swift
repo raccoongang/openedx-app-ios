@@ -49,7 +49,7 @@ struct CourseDateListView: View {
                             .padding(.bottom, 16)
                         }
                         
-                        ForEach(Array(viewModel.sortedStatuses), id: \.self) { status in
+                        ForEach(viewModel.sortedStatuses(in: courseDates), id: \.self) { status in
                             let courseDateBlockDict = courseDates.statusDatesBlocks[status]!
                             if status == .completed {
                                 CompletedBlocks(

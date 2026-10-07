@@ -607,6 +607,35 @@ final class CourseDateViewModelTests: XCTestCase {
         XCTAssertEqual(interactor.getCourseDatesCallCount, 2)
     }
 
+    // MARK: - Shifting due dates
+
+    func testShiftDueDates_reloadsDatesAndConfirmsTheShift() async {
+        let interactor = CourseInteractorProtocolMock()
+        let dates = pastDueDates
+        interactor.shiftDueDatesHandler = { _ in }
+        interactor.getCourseDatesHandler = { _ in dates }
+        let viewModel = makeDatesViewModel(interactor: interactor)
+
+        await viewModel.shiftDueDates(courseID: "1", withProgress: false, screen: .courseDates, type: "")
+        await waitUntil { viewModel.eventState == .shiftedDueDates }
+
+        XCTAssertEqual(interactor.shiftDueDatesCallCount, 1)
+        XCTAssertEqual(interactor.getCourseDatesCallCount, 1)
+        XCTAssertEqual(viewModel.eventState, .shiftedDueDates)
+        XCTAssertFalse(viewModel.isShowProgress)
+    }
+
+    func testShiftDueDatesInAnotherCourse_doesNotTouchThisCourse() async {
+        let interactor = CourseInteractorProtocolMock()
+        let viewModel = makeDatesViewModel(interactor: interactor)
+
+        NotificationCenter.default.post(name: .shiftCourseDates, object: ("2", "Another course"))
+        try? await Task.sleep(for: .milliseconds(200))
+
+        XCTAssertEqual(interactor.getCourseDatesCallCount, 0)
+        XCTAssertNil(viewModel.eventState)
+    }
+
     func testDateWithFractionalSecondsAfterNoon_isParsedExactly() {
         var utc = Calendar(identifier: .gregorian)
         utc.timeZone = TimeZone(identifier: "UTC")!

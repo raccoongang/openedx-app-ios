@@ -67,7 +67,10 @@ public class CourseDatesViewModel {
         addObservers()
     }
         
-    var sortedStatuses: [CompletionStatus] {
+    /// Statuses present in `courseDates`, in display order. Takes the dates the list is
+    /// drawing rather than reading `self.courseDates`, which a background refresh can
+    /// replace while the list still renders the previous value.
+    func sortedStatuses(in courseDates: CourseDates) -> [CompletionStatus] {
         let desiredSequence = [
             CompletionStatus.completed,
             CompletionStatus.pastDue,
@@ -79,7 +82,7 @@ public class CourseDatesViewModel {
         
         // Filter out keys that don't exist in the dictionary
         let filteredKeys = desiredSequence.filter {
-            courseDates?.statusDatesBlocks.keys.contains($0) ?? false }
+            courseDates.statusDatesBlocks.keys.contains($0) }
         return filteredKeys
     }
     
@@ -180,13 +183,11 @@ extension CourseDatesViewModel {
     }
     
     @objc private func handleShiftDueDates(_ notification: Notification) {
-        if let courseID = notification.object as? String {
-            Task {
-                await getCourseDates(courseID: courseID)
-                await MainActor.run { [weak self] in
-                    self?.eventState = .shiftedDueDates
-                }
-            }
+        guard let (courseID, _) = notification.object as? (String, String),
+              courseID == self.courseID else { return }
+        Task {
+            await getCourseDates(courseID: courseID, withProgress: false)
+            eventState = .shiftedDueDates
         }
     }
     
