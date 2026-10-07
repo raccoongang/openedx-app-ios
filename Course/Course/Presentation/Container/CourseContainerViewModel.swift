@@ -220,7 +220,16 @@ extension CourseTab {
     @MainActor
     func getCourseStructure(courseID: String) async throws -> CourseStructure? {
         if isInternetAvaliable {
-            return try await interactor.getCourseBlocks(courseID: courseID)
+            do {
+                return try await interactor.getCourseBlocks(courseID: courseID)
+            } catch let error where error.isInternetError {
+                // A network that is up but not working fails only after the request times
+                // out; open the copy saved on the last visit rather than an empty course.
+                if let saved = try? await interactor.getLoadedCourseBlocks(courseID: courseID) {
+                    return saved
+                }
+                throw error
+            }
         } else {
             return try await interactor.getLoadedCourseBlocks(courseID: courseID)
         }

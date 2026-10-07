@@ -333,6 +333,7 @@ final class CourseContainerViewModelTests: XCTestCase {
         )
 
         interactor.getCourseBlocksHandler = { _ in throw noInternetError }
+        interactor.getLoadedCourseBlocksHandler = { _ in throw NoCachedDataError() }
         interactor.getCourseAssignmentBlocksHandler = { _ in courseStructure }
 
         let mockCourseProgress = CourseProgressDetails(
@@ -617,12 +618,15 @@ final class CourseContainerViewModelTests: XCTestCase {
         XCTAssertEqual(analytics.courseOutlineHandoutsTabClickedCallCount, 1)
     }
 
-    private func makeViewModel(manager: DownloadManagerProtocol = DownloadManagerMock()) -> CourseContainerViewModel {
+    private func makeViewModel(
+        manager: DownloadManagerProtocol = DownloadManagerMock(),
+        interactor: CourseInteractorProtocolMock = CourseInteractorProtocolMock()
+    ) -> CourseContainerViewModel {
         let connectivity = ConnectivityProtocolMock()
         connectivity.isInternetAvaliable = true
         connectivity.internetReachableSubject = .init(.reachable)
         return CourseContainerViewModel(
-            interactor: CourseInteractorProtocolMock(),
+            interactor: interactor,
             authInteractor: AuthInteractorProtocolMock(),
             router: CourseRouterMock(),
             analytics: CourseAnalyticsMock(),
@@ -730,5 +734,18 @@ final class CourseContainerViewModelTests: XCTestCase {
         ])
 
         XCTAssertEqual(viewModel.getSequentialAssignmentStatus(for: "homework"), .incomplete)
+    }
+
+    func testCourseStructure_whenTheNetworkFails_opensTheSavedCopy() async throws {
+        let interactor = CourseInteractorProtocolMock()
+        let saved = course(withAssignment: [block("problem", .problem, completion: 0)])
+        interactor.getCourseBlocksHandler = { _ in throw AFError.sessionTaskFailed(error: URLError(.timedOut)) }
+        interactor.getLoadedCourseBlocksHandler = { _ in saved }
+        let viewModel = makeViewModel(interactor: interactor)
+
+        let structure = try await viewModel.getCourseStructure(courseID: "course")
+
+        XCTAssertEqual(structure?.id, saved.id)
+        XCTAssertEqual(interactor.getLoadedCourseBlocksCallCount, 1)
     }
 }
