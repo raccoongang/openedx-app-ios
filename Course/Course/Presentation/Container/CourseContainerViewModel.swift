@@ -1445,7 +1445,7 @@ extension CourseTab {
         for chapter in courseStructure.childs {
             for sequential in chapter.childs {
                 if sequential.blockId == blockKey || sequential.id == blockKey {
-                    if sequential.completion >= 1.0 {
+                    if sequential.completion >= 1.0 || isEveryGradedProblemAttempted(in: sequential) {
                         return .completed
                     }
 
@@ -1458,6 +1458,17 @@ extension CourseTab {
             }
         }
         return nil
+    }
+
+    /// An assignment is done once every graded problem in it has been attempted. A problem is
+    /// marked complete when it is submitted, whatever the score, while the subsection itself
+    /// stays incomplete until its videos and text are viewed too.
+    private func isEveryGradedProblemAttempted(in sequential: CourseSequential) -> Bool {
+        let scoredTypes: Set<BlockType> = [.problem, .dragAndDropV2, .openassessment, .peerInstructionTool]
+        let gradedProblems = sequential.childs
+            .flatMap { $0.childs }
+            .filter { $0.graded && scoredTypes.contains($0.type) }
+        return !gradedProblems.isEmpty && gradedProblems.allSatisfy { $0.completion >= 1.0 }
     }
 
     private func createUIModels(from subsections: [CourseProgressSubsection]) -> [CourseProgressSubsectionUI] {
