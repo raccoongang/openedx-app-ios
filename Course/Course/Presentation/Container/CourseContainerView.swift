@@ -95,6 +95,9 @@ public struct CourseContainerView: View {
         .onChange(of: viewModel.selection, perform: didSelect)
         .onChange(of: coordinate, perform: collapseHeader)
         .background(Theme.Colors.background)
+        .sheet(isPresented: $viewModel.isDownloadsListPresented) {
+            DownloadsView(router: viewModel.router, courseHelper: viewModel.courseHelper)
+        }
     }
     
     @ViewBuilder

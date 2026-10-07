@@ -617,7 +617,7 @@ final class CourseContainerViewModelTests: XCTestCase {
         XCTAssertEqual(analytics.courseOutlineHandoutsTabClickedCallCount, 1)
     }
 
-    private func makeViewModel() -> CourseContainerViewModel {
+    private func makeViewModel(manager: DownloadManagerProtocol = DownloadManagerMock()) -> CourseContainerViewModel {
         let connectivity = ConnectivityProtocolMock()
         connectivity.isInternetAvaliable = true
         connectivity.internetReachableSubject = .init(.reachable)
@@ -628,7 +628,7 @@ final class CourseContainerViewModelTests: XCTestCase {
             analytics: CourseAnalyticsMock(),
             config: ConfigMock(),
             connectivity: connectivity,
-            manager: DownloadManagerMock(),
+            manager: manager,
             storage: CourseStorageMock(),
             isActive: true,
             courseStart: Date(),
@@ -697,6 +697,17 @@ final class CourseContainerViewModelTests: XCTestCase {
             isSelfPaced: true,
             courseProgress: nil
         )
+    }
+
+    func testSectionIndicatorWhileDownloading_opensDownloadsListInsteadOfCancelling() async {
+        let downloadManager = DownloadManagerProtocolMock()
+        let viewModel = makeViewModel(manager: downloadManager)
+        let section = CourseChapter(blockId: "", id: "section", displayName: "Section", type: .chapter, childs: [])
+
+        await viewModel.onDownloadViewTap(chapter: section, state: .downloading)
+
+        XCTAssertTrue(viewModel.isDownloadsListPresented)
+        XCTAssertEqual(downloadManager.cancelDownloadingCallCount, 0)
     }
 
     func testAssignmentWithEveryGradedProblemAttempted_isCompleted_evenWithAnUnwatchedVideo() {

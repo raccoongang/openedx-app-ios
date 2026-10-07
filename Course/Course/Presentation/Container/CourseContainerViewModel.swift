@@ -89,6 +89,7 @@ extension CourseTab {
     var downloadedFilesSize: Int = 0
     var largestDownloadBlocks: [CourseBlock] = []
     var downloadAllButtonState: OfflineView.DownloadAllState = .start
+    var isDownloadsListPresented = false
     var expandedSections: [String: Bool] = [:]
     var courseDeadlines: CourseDates?
     private(set) var assignmentSectionsData: [AssignmentSection] = []
@@ -382,8 +383,18 @@ extension CourseTab {
         }
     }
 
+    /// A section's progress indicator opens the list of videos being downloaded, where each one
+    /// can be cancelled, instead of cancelling the whole section on a single tap.
+    func showDownloadsList() {
+        isDownloadsListPresented = true
+    }
+
     @MainActor
     func onDownloadViewTap(chapter: CourseChapter, state: DownloadViewState) async {
+        guard state != .downloading else {
+            showDownloadsList()
+            return
+        }
         let blocks = chapter.childs
             .flatMap { $0.childs }
             .flatMap { $0.childs }
